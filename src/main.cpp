@@ -8,8 +8,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 600;
+const unsigned int SCR_HEIGHT = 800;
 
 // Forward declaration callback method for resizing a window
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
@@ -32,7 +32,6 @@ int main(int, char **)
         return -1;
     }
 
-    glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -48,25 +47,32 @@ int main(int, char **)
 
     glfwMakeContextCurrent(window.get());
     glfwSetFramebufferSizeCallback(window.get(), framebuffer_size_callback);
+    glewExperimental = true;
+
+    if(glewInit() != GLEW_OK)
+    {
+        std::cerr << "Failed to initialize GLEW \n";
+        return -1;
+    }
 
     std::cout << "Renderer: " << glGetString(GL_RENDERER);
     std::cout << "OpenGL version supported \n"
               << glGetString(GL_VERSION) << std::endl;
-    glewExperimental = true;
 
-    Shader ourShader("../Shaders/shader.vs", "../Shaders/shader.vs");
+    Shader ourShader("../Shaders/shader.vs", "../Shaders/shader.fs");
 
     float vertices[] = {
         // positions          // colors           // texture coords
-        0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,   // top right
-        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-        -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f   // top left
+        -0.5f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,  // top left 
+         0.5f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f // bottom left
     };
 
+
     unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
+        0, 1, 2, // first triangle
+        2, 3, 0  // second triangle
     };
 
     unsigned int VBO, VAO, EBO;
@@ -86,8 +92,8 @@ int main(int, char **)
     glEnableVertexAttribArray(0);
 
     // color
-    /* code */ glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-    /* code */ glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // texture coord
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
@@ -101,7 +107,7 @@ int main(int, char **)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true);
@@ -116,8 +122,11 @@ int main(int, char **)
     {
         std::cout << "Failed to load texture" << std::endl;
     }
+    stbi_image_free(data);
 
     ourShader.use();
+    ourShader.SetInt("texture1", 0);
+   
     while (!glfwWindowShouldClose(window.get()))
     {
         processInput(window.get());
