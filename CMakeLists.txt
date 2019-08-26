@@ -14,7 +14,7 @@ include_directories(${GLFW_INCLUDE_DIR})
 link_libraries(${GLFW_LIBRARY_DIRS})
 
 #glew
-find_package(glfw3 REQUIRED)
+find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 
 set(EigenHeaders "3rdParties/Eigen/Eigen")

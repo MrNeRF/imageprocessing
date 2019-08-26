@@ -1,5 +1,4 @@
 #include "Shader.h"
-#include <GL/glew.h>
 
 
 Shader::Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)

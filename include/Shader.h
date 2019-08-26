@@ -1,6 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include <GL/glew.h>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -20,6 +21,9 @@ class Shader
     public:
         Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
         ~Shader(void) = default;
+        unsigned int GetShaderProgramID(void){return m_shaderProgramID;};
+        void SetInt(const std::string &name, int value) const {glUniform1i(glGetUniformLocation(m_shaderProgramID, name.c_str()), value);};
+        void use(void) {glUseProgram(m_shaderProgramID);};
 
     private:
         void initShaders(void);
