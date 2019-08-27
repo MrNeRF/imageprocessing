@@ -58,6 +58,9 @@ void Shader::initShaders(void)
     glCompileShader(fragmentShaderID);
     checkCompileErrors(fragmentShaderID, ShaderType::Fragment);
 
+    m_shaderProgramID = glCreateProgram();
+    glAttachShader(m_shaderProgramID, vertexShaderID);
+    glAttachShader(m_shaderProgramID, fragmentShaderID);
     glLinkProgram(m_shaderProgramID);
     checkCompileErrors(m_shaderProgramID, ShaderType::Program);
     glDeleteShader(vertexShaderID);
