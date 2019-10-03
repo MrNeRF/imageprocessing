@@ -1,15 +1,15 @@
-#include <GL/glew.h>  
-#include <GLFW/glfw3.h>
-
-#include "Shader.h"
 #include "Image.h"
+#include "Shader.h"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <iostream>
+#include <vector>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow* window);
 
 // settings
-const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_WIDTH  = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 int main()
@@ -24,40 +24,44 @@ int main()
     // glfw window creation
     // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
+
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) 
+
+    if (glewInit() != GLEW_OK)
     {
-        std::cerr <<  "Failed to initialize GLEW\n";
+        std::cerr << "Failed to initialize GLEW\n";
         return -1;
     }
-        // get version info
+    // get version info
     const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
-    const GLubyte* version = glGetString(GL_VERSION); // version as a string
-    std::cout << "Renderer: " <<  renderer << std::endl;
-    std::cout << "OpenGL version supported \n" << version << std::endl;
+    const GLubyte* version  = glGetString(GL_VERSION);  // version as a string
+    std::cout << "Renderer: " << renderer << std::endl;
+    std::cout << "OpenGL version supported \n"
+              << version << std::endl;
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader("../Shaders/shader.vs", "../Shaders/shader.fs"); 
+    Shader ourShader("../Shaders/shader.vs", "../Shaders/shader.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
         // positions          // colors           // texture coords
-        -0.5f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,  // top left 
-         0.5f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f // bottom left
+        -0.5f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, // top left
+        0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // top right
+        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f // bottom left
     };
-    
+
     unsigned int indices[] = {
         0, 1, 2, // first triangle
         2, 3, 0  // second triangle
@@ -133,7 +137,7 @@ int main()
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -143,7 +147,7 @@ void processInput(GLFWwindow *window)
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
+    // make sure the viewport matches the new window dimensions; note that width and
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
-}    // ------------------------------------------------------------------
+} // ------------------------------------------------------------------
