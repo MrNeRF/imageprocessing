@@ -101,5 +101,53 @@ void Shader::checkCompileErrors(unsigned int shaderID, Shader::ShaderType shader
 
 }
 
+void Shader::activate(void)
+{
+    glUseProgram(m_shaderProgramID);
+}
 
+void Shader::SetBool(const std::string& name, bool value)
+{
+    glUniform1i(glGetUniformLocation(m_shaderProgramID, name.c_str()), (int)value);
+}
+
+void Shader::SetInt(const std::string& name, int value)
+{
+    glUniform1i(glGetUniformLocation(m_shaderProgramID, name.c_str()), value);
+}
+
+void Shader::SetFloat(const std::string& name, float value)
+{
+    glUniform1f(glGetUniformLocation(m_shaderProgramID, name.c_str()), value);
+}
+
+void Shader::SetVec3(const std::string& name, Eigen::Vector3f& v)
+{
+    glUniform3fv(glGetUniformLocation(m_shaderProgramID, name.c_str()), 1, v.data());
+}
+
+void Shader::SetVec3(const std::string& name, float x, float y, float z)
+{
+    glUniform3f(glGetUniformLocation(m_shaderProgramID, name.c_str()), x, y, z);
+}
+
+void Shader::SetVec4(const std::string& name, Eigen::Vector4f v)
+{
+    glUniform4fv(glGetUniformLocation(m_shaderProgramID, name.c_str()), 1, v.data());
+}
+
+void Shader::SetVec4(const std::string& name, float x, float y, float z, float w)
+{
+    glUniform4f(glGetUniformLocation(m_shaderProgramID, name.c_str()), x, y, z, w);
+}
+
+void Shader::SetMat3(const std::string& name, Eigen::Matrix3f mat)
+{
+    glUniformMatrix3fv(glGetUniformLocation(m_shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data());
+}
+
+void Shader::SetMat4(const std::string& name, Eigen::Matrix4f mat)
+{
+    glUniformMatrix4fv(glGetUniformLocation(m_shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data());
+}
 

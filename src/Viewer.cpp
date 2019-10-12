@@ -1,4 +1,5 @@
 #include "Viewer.h"
+#include "Circle.h"
 #include "Image.h"
 #include "Shader.h"
 #include <GL/glew.h>
@@ -62,8 +63,8 @@ void Viewer::Run(void)
 {
     registerCallbacks();
 
-    Shader ourShader("../Shaders/shader.vs", "../Shaders/shader.fs");
-
+    Shader imageShader("../Shaders/image.vs", "../Shaders/image.fs");
+    Shader pointShader("../Shaders/points.vs", "../Shaders/points.fs");
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -103,11 +104,12 @@ void Viewer::Run(void)
     glEnableVertexAttribArray(2);
 
     Image image1("../images/fibi.jpg");
+    Circle circle(0.5f, 11);
 
     // -------------------------------------------------------------------------------------------
-    ourShader.use(); // don't forget to activate/use the shader before setting uniforms!
-    // either set it manually like so:
-    glUniform1i(glGetUniformLocation(ourShader.GetShaderProgramID(), "texture1"), 0);
+    imageShader.activate(); // don't forget to activate/use the shader before setting uniforms!
+    imageShader.SetInt("texture1", 0);
+
     while (!glfwWindowShouldClose(m_window))
     {
         // input
@@ -124,10 +126,12 @@ void Viewer::Run(void)
         glActiveTexture(GL_TEXTURE0);
         image1.Use();
         // render container
-        ourShader.use();
+        imageShader.activate();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        pointShader.activate();
+        circle.draw();
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_window);
         glfwPollEvents();

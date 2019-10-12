@@ -1,6 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include <Eigen/Dense>
 #include <GL/glew.h>
 #include <fstream>
 #include <iostream>
@@ -22,12 +23,19 @@ public:
     Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
     ~Shader(void) = default;
     unsigned int GetShaderProgramID(void) { return m_shaderProgramID; };
-    void         SetInt(const std::string& name, int value) const { glUniform1i(glGetUniformLocation(m_shaderProgramID, name.c_str()), value); };
-    void         use(void) { glUseProgram(m_shaderProgramID); };
 
-private:
     void initShaders(void);
     void checkCompileErrors(unsigned int shaderID, Shader::ShaderType shaderType);
+    void activate(void);
+    void SetBool(const std::string& name, bool value);
+    void SetInt(const std::string& name, int value);
+    void SetFloat(const std::string& name, float value);
+    void SetVec3(const std::string& name, Eigen::Vector3f& v);
+    void SetVec3(const std::string& name, float x, float y, float z);
+    void SetVec4(const std::string& name, Eigen::Vector4f v);
+    void SetVec4(const std::string& name, float x, float y, float z, float w);
+    void SetMat3(const std::string& name, Eigen::Matrix3f mat);
+    void SetMat4(const std::string& name, Eigen::Matrix4f mat);
 
 private:
     unsigned int                      m_shaderProgramID;
