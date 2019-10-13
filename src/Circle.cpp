@@ -1,4 +1,5 @@
 #include "Circle.h"
+#include "Constants.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -40,7 +41,7 @@ void Circle::createCircle(float radius, Eigen::Matrix<float, Eigen::Dynamic, 2, 
     float fraction       = 1.0f / static_cast<float>(numberOfPoints);
     for (int i = 0; i < numberOfPoints; ++i)
     {
-        vertices(i + 1, 0) = radius * std::cos(PI2 * i * fraction);
+        vertices(i + 1, 0) = radius * std::cos(PI2 * i * fraction) * ASPECTRATIO;
         vertices(i + 1, 1) = radius * std::sin(PI2 * i * fraction);
 
         std::cout << vertices(i + 1, 0) << " " << vertices(i + 1, 1) << std::endl;

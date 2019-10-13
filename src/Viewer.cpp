@@ -10,6 +10,8 @@
 const unsigned int SCR_WIDTH  = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+double xpos, ypos;
+
 Viewer::Viewer(void)
 {
     // glfw: initialize and configure
@@ -104,7 +106,7 @@ void Viewer::Run(void)
     glEnableVertexAttribArray(2);
 
     Image image1("../images/fibi.jpg");
-    Circle circle(0.5f, 11);
+    Circle circle(0.01f, 31);
 
     // -------------------------------------------------------------------------------------------
     imageShader.activate(); // don't forget to activate/use the shader before setting uniforms!
@@ -150,7 +152,6 @@ void Viewer::registerCallbacks(void)
     auto mouse_button_callback = [](GLFWwindow* window, int button, int action, int mods) {
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
         {
-            double xpos, ypos;
             glfwGetCursorPos(window, &xpos, &ypos);
             std::cout << "Cursor Position at (" << xpos << " : " << ypos << ")\n";
         }
