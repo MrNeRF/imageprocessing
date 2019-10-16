@@ -1,6 +1,7 @@
 #include "Viewer.h"
 #include "Circle.h"
 #include "Image.h"
+#include "Line.h"
 #include "Shader.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -106,6 +107,9 @@ void Viewer::Run(void)
     glEnableVertexAttribArray(2);
 
     Image image1("../images/fibi.jpg");
+    Eigen::Vector2f p1(0.0, 0.0), p2(0.4, 0.4);
+    Line            line(p1, p2, 0.005);
+
     Circle circle(0.01f, 31);
 
     // -------------------------------------------------------------------------------------------
@@ -133,7 +137,9 @@ void Viewer::Run(void)
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         pointShader.activate();
-        circle.draw();
+        circle.Draw();
+
+        line.Draw();
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_window);
         glfwPollEvents();

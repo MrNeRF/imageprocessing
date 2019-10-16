@@ -12,7 +12,7 @@ public:
     virtual ~Circle(void) = default;
 
 public:
-    void draw(void) override;
+    void Draw(void) override;
 
 private:
     void createCircle(float radius, Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>& vertices);

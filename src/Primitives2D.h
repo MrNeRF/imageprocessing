@@ -7,6 +7,6 @@ class Primitives2D
             Primitives2D(void)          = default;
             virtual ~Primitives2D(void) = default;
 
-            virtual void draw(void) = 0;
+            virtual void Draw(void) = 0;
 };
 #endif

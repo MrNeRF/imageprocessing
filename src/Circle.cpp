@@ -7,7 +7,6 @@
 Circle::Circle(float radius, int numberOfPoints)
     : vertices{numberOfPoints, 2}
 {
-    std::cout << vertices.size() << std::endl;
     createCircle(radius, vertices);
 
     glGenVertexArrays(1, &VAO);
@@ -43,8 +42,6 @@ void Circle::createCircle(float radius, Eigen::Matrix<float, Eigen::Dynamic, 2, 
     {
         vertices(i + 1, 0) = radius * std::cos(PI2 * i * fraction) * ASPECTRATIO;
         vertices(i + 1, 1) = radius * std::sin(PI2 * i * fraction);
-
-        std::cout << vertices(i + 1, 0) << " " << vertices(i + 1, 1) << std::endl;
         // indices
         indices.push_back(i + 1);
     }
@@ -52,7 +49,7 @@ void Circle::createCircle(float radius, Eigen::Matrix<float, Eigen::Dynamic, 2, 
     indices.push_back(1);
 }
 
-void Circle::draw(void)
+void Circle::Draw(void)
 {
     glBindVertexArray(VAO);
     glPointSize(10.f);
