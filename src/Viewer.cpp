@@ -2,6 +2,7 @@
 #include "Circle.h"
 #include "Image.h"
 #include "Line.h"
+#include "Rectangle.h"
 #include "Shader.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -112,6 +113,8 @@ void Viewer::Run(void)
 
     Circle circle(0.01f, 31);
 
+    Eigen::Vector2f p3(-0.2, 0.2);
+    Rectangle       rectangle(p3, 0.2f, 0.25f);
     // -------------------------------------------------------------------------------------------
     imageShader.activate(); // don't forget to activate/use the shader before setting uniforms!
     imageShader.SetInt("texture1", 0);
@@ -140,6 +143,7 @@ void Viewer::Run(void)
         circle.Draw();
 
         line.Draw();
+        rectangle.Draw();
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_window);
         glfwPollEvents();
