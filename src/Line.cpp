@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-Line::Line(Eigen::Vector2f& p1, Eigen::Vector2f& p2, float width)
+Line::Line(const Eigen::Vector2f& p1, const Eigen::Vector2f& p2, const float width)
     : m_p1(p1)
     , m_p2(p2)
     , m_width(width)
@@ -56,7 +56,7 @@ void Line::createLine(void)
     indices = {0, 1, 3, 2, 3, 0};
 }
 
-void Line::Draw(void)
+void Line::Draw(void) const
 {
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, NULL);

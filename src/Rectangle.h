@@ -5,14 +5,14 @@
 #include "Primitives2D.h"
 #include <vector>
 
-class Rectangle : Primitives2D
+class Rectangle : public Primitives2D
 {
 public:
-    Rectangle(Eigen::Vector2f& p1, float width, float height);
+    Rectangle(const Eigen::Vector2f& p1, const float width, const float height);
     virtual ~Rectangle(void) = default;
 
 public:
-    void Draw(void) override;
+    void Draw(void) const override;
     void SetPosition(Eigen::Vector2f& p1);
     void SetWidth(float width, float height);
 

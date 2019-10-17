@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-Rectangle::Rectangle(Eigen::Vector2f& p1, float width, float height)
+Rectangle::Rectangle(const Eigen::Vector2f& p1, const float width, const float height)
     : m_p1(p1)
     , m_width(width)
     , m_height(height)
@@ -51,7 +51,7 @@ void Rectangle::createRectangle(void)
     indices = {0, 1, 2, 0, 2, 3};
 }
 
-void Rectangle::Draw(void)
+void Rectangle::Draw(void) const
 {
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, NULL);

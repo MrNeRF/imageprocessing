@@ -1,7 +1,7 @@
 #include "Viewer.h"
-#include "Circle.h"
 #include "Image.h"
 #include "Line.h"
+#include "Polyline2D.h"
 #include "Rectangle.h"
 #include "Shader.h"
 #include <GL/glew.h>
@@ -108,10 +108,12 @@ void Viewer::Run(void)
     glEnableVertexAttribArray(2);
 
     Image image1("../images/fibi.jpg");
-    Eigen::Vector2f p1(0.0, 0.0), p2(0.4, 0.4);
-    Line            line(p1, p2, 0.005);
 
-    Circle circle(0.01f, 31);
+    Polyline2D polyline;
+    polyline.AddLines(std::make_unique<Line>(Line({0.0f, 0.0f}, {0.4f, 0.4f}, 0.005)));
+    polyline.AddLines(std::make_unique<Line>(Line({0.4f, 0.4f}, {0.4f, 0.5f}, 0.005)));
+    polyline.AddLines(std::make_unique<Line>(Line({0.4f, 0.5f}, {0.5f, 0.0f}, 0.005)));
+    polyline.AddLines(std::make_unique<Line>(Line({0.5f, 0.0f}, {0.0f, -0.2f}, 0.005)));
 
     Eigen::Vector2f p3(-0.2, 0.2);
     Rectangle       rectangle(p3, 0.2f, 0.25f);
@@ -140,9 +142,8 @@ void Viewer::Run(void)
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         pointShader.activate();
-        circle.Draw();
 
-        line.Draw();
+        polyline.Draw();
         rectangle.Draw();
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_window);

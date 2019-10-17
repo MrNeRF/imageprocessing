@@ -5,16 +5,22 @@
 #include "Primitives2D.h"
 #include <vector>
 
-class Line : Primitives2D
+class Line : public Primitives2D
 {
 public:
-    Line(Eigen::Vector2f& p1, Eigen::Vector2f& p2, float width);
+    Line(const Eigen::Vector2f& p1, const Eigen::Vector2f& p2, const float width);
     virtual ~Line(void) = default;
 
 public:
-    void Draw(void) override;
+    void Draw(void) const override;
     void SetPosition(Eigen::Vector2f& p1, Eigen::Vector2f& p2);
     void SetWidth(float width);
+    void GetEndPoints(Eigen::Vector2f& p1, Eigen::Vector2f& p2)
+    {
+        p1 = m_p1;
+        p2 = m_p2;
+    };
+    float GetWidth(void) { return m_width; };
 
 private:
     void createLine(void);
