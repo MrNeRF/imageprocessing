@@ -28,3 +28,4 @@ void Polyline2D::Draw(void) const
     }
 }
 
+bool

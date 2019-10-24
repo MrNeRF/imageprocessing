@@ -13,6 +13,9 @@ public:
 
 public:
     void Draw(void) const override;
+    Eigen::Vector3f GetColor(void) const override { return m_color; };
+    void            SetColor(const Eigen::Vector3f& color) override { m_color = color; };
+    bool            CheckCollision(const Eigen::Vector2f& pointToTest) const override;
     void SetPosition(Eigen::Vector2f& p1, Eigen::Vector2f& p2);
     void SetWidth(float width);
     void GetEndPoints(Eigen::Vector2f& p1, Eigen::Vector2f& p2)
@@ -21,6 +24,7 @@ public:
         p2 = m_p2;
     };
     float GetWidth(void) { return m_width; };
+    void  GetVertices(std::vector<Eigen::Vector2f>& v) { v = collisionPoints; };
 
 private:
     void createLine(void);
@@ -31,7 +35,10 @@ private:
     Eigen::Vector2f m_normal;
     float           m_width = 0.01f;
 
-    std::vector<int> indices;
+    std::vector<Eigen::Vector2f>                collisionPoints;
+    std::vector<int>                            indices;
     Eigen::Matrix<float, 4, 2, Eigen::RowMajor> vertices;
+
+    Eigen::Vector3f m_color = {0.0f, 0.0f, 1.0f};
 };
 #endif

@@ -1,5 +1,6 @@
 #include "Rectangle.h"
 #include "Constants.h"
+#include "CrossingNumberPPolygon.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -38,11 +39,15 @@ void Rectangle::createRectangle(void)
     vertices.block(0, 0, 1, 2) = (m_p1).transpose();
     // point 2
     vertices.block(1, 0, 1, 2) = (m_p1 + m_width * xDir).transpose();
-
     // point3
     vertices.block(2, 0, 1, 2) = (m_p1 + m_width * xDir + m_height * yDir).transpose();
     // point4
     vertices.block(3, 0, 1, 2) = (m_p1 + yDir * m_height).transpose();
+
+    collisionPoints.emplace_back(m_p1);
+    collisionPoints.emplace_back(m_p1 + m_width * xDir);
+    collisionPoints.emplace_back(m_p1 + m_width * xDir + m_height * yDir);
+    collisionPoints.emplace_back(m_p1 + yDir * m_height);
 
     std::cout << vertices(0, 0) << ", " << vertices(0, 1) << "\n";
     std::cout << vertices(1, 0) << ", " << vertices(1, 1) << "\n";
@@ -56,4 +61,11 @@ void Rectangle::Draw(void) const
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, NULL);
     glBindVertexArray(0);
+}
+
+bool Rectangle::CheckCollision(const Eigen::Vector2f& pointToTest) const
+{
+    CrossingNumberPPolygon collision(collisionPoints, pointToTest);
+    collision.Compute();
+    return collision.GetOutput();
 }

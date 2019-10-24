@@ -57,3 +57,9 @@ void Circle::Draw(void) const
     glDrawElements(GL_TRIANGLE_FAN, m_indices.size(), GL_UNSIGNED_INT, NULL);
     glBindVertexArray(0);
 }
+
+bool Circle::CheckCollision(const Eigen::Vector2f& pointToTest) const
+{
+    /* Collision muss noch implementiert werden */
+    return false;
+}

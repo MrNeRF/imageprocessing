@@ -30,12 +30,12 @@ public:
     void SetBool(const std::string& name, bool value);
     void SetInt(const std::string& name, int value);
     void SetFloat(const std::string& name, float value);
-    void SetVec3(const std::string& name, Eigen::Vector3f& v);
+    void SetVec3(const std::string& name, const Eigen::Vector3f& v);
     void SetVec3(const std::string& name, float x, float y, float z);
-    void SetVec4(const std::string& name, Eigen::Vector4f v);
+    void SetVec4(const std::string& name, const Eigen::Vector4f& v);
     void SetVec4(const std::string& name, float x, float y, float z, float w);
-    void SetMat3(const std::string& name, Eigen::Matrix3f mat);
-    void SetMat4(const std::string& name, Eigen::Matrix4f mat);
+    void SetMat3(const std::string& name, const Eigen::Matrix3f& mat);
+    void SetMat4(const std::string& name, const Eigen::Matrix4f& mat);
 
 private:
     unsigned int                      m_shaderProgramID;

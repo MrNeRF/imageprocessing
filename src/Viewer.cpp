@@ -142,8 +142,9 @@ void Viewer::Run(void)
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         pointShader.activate();
-
+        pointShader.SetVec3("CustomColor", Eigen::Vector3f(0.0f, 1.0f, 0.0f));
         polyline.Draw();
+        pointShader.SetVec3("CustomColor", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
         rectangle.Draw();
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_window);
