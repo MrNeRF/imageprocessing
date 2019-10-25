@@ -16,7 +16,7 @@ public:
 public:
     void Draw(void) const override;
     Eigen::Vector3f GetColor(void) const override { return m_color; };
-    void            SetColor(const Eigen::Vector3f& color) override { m_color = color; };
+    void            SetColor(const Eigen::Vector3f& color) override;
     bool            CheckCollision(const Eigen::Vector2f& pointToTest) const override;
     void AddLines(std::unique_ptr<Line> line);
 
