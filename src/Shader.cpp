@@ -48,7 +48,7 @@ std::string Shader::readShaderProgramCode(const std::string& shaderPath)
 
 void Shader::createShader(unsigned int shaderID, const std::string& shaderProgramCode, const Shader::ShaderType& shaderType)
 {
-    const GLchar* code = shaderProgramCode.c_str();
+    const GLchar* code = (const GLchar*)shaderProgramCode.c_str();
     glShaderSource(shaderID, 1, &code, NULL);
     glCompileShader(shaderID);
     checkCompileErrors(shaderID, shaderType);
@@ -61,6 +61,7 @@ void Shader::createShaderProgram(const std::vector<unsigned int>& IDs)
     {
         glAttachShader(shaderProgramID, id);
     }
+    glLinkProgram(shaderProgramID);
     checkCompileErrors(shaderProgramID, ShaderType::PROGRAM);
     for (const auto& id : IDs)
     {
@@ -71,7 +72,7 @@ void Shader::createShaderProgram(const std::vector<unsigned int>& IDs)
 void Shader::checkCompileErrors(unsigned int shaderID, const Shader::ShaderType& shaderType)
 {
     int  success;
-    char infoLog[1024];
+    char infoLog[GL_INFO_LOG_LENGTH];
 
     // Lambda to print compile Error
     auto printCompileError = [this](const Shader::ShaderType& type, char* infoLog) {
@@ -86,18 +87,18 @@ void Shader::checkCompileErrors(unsigned int shaderID, const Shader::ShaderType&
     {
         case ShaderType::FRAGMENT:
         case ShaderType::VERTEX:
-            glGetShaderiv(shaderID, GL_LINK_STATUS, &success);
+            glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
             if (!success)
             {
-                glGetShaderInfoLog(shaderID, 1024, NULL, infoLog);
+                glGetShaderInfoLog(shaderID, GL_INFO_LOG_LENGTH, NULL, &infoLog[0]);
                 printCompileError(shaderType, infoLog);
             }
             break;
         case ShaderType::PROGRAM:
-            glGetProgramiv(shaderID, GL_COMPILE_STATUS, &success);
+            glGetProgramiv(shaderID, GL_LINK_STATUS, &success);
             if (!success)
             {
-                glGetProgramInfoLog(shaderID, 1024, NULL, infoLog);
+                glGetProgramInfoLog(shaderID, GL_INFO_LOG_LENGTH, NULL, &infoLog[0]);
                 printCompileError(shaderType, infoLog);
             }
             break;

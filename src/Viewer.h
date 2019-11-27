@@ -1,14 +1,15 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
+#include <memory>
 #include <string>
 
-class GLFWwindow;
+class Window;
 
 class Viewer
 {
 public:
-    Viewer(const std::string& windowName);
+    Viewer(std::unique_ptr<Window> window);
     ~Viewer(void);
 
     void Run(void);
@@ -17,7 +18,7 @@ private:
     void registerCallbacks(void);
 
 private:
-    GLFWwindow*  m_window;
+    std::unique_ptr<Window> m_window;
     unsigned int VBO, VAO, EBO;
 };
 

@@ -40,7 +40,7 @@ public:
 
     void ViewPortResized(int width, int height);
     void MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods);
-
+    GLFWwindow* GetGLFWWindow(void) { return windowInstance; }
     // Callbacks
     static void WindowResizeCallback(GLFWwindow* win, int h, int w);
     static void MouseInputCallback(GLFWwindow* win, int button, int action, int mods);

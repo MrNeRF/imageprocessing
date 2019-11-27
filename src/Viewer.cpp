@@ -7,12 +7,9 @@
 #include "Window.h"
 #include <GLFW/glfw3.h>
 
-
-double xpos, ypos;
-
-Viewer::Viewer(const std::string& windowName)
+Viewer::Viewer(std::unique_ptr<Window> window)
+    : m_window(std::move(window))
 {
-    auto window = Window(windowName);
 }
 
 Viewer::~Viewer(void)
@@ -79,13 +76,13 @@ void Viewer::Run(void)
     imageShader.UseShader(); // don't forget to activate/use the shader before setting uniforms!
     imageShader.SetValue("texture1", 0);
 
-    while (!glfwWindowShouldClose(m_window))
+    while (!glfwWindowShouldClose(m_window->GetGLFWWindow()))
     {
         // input
         // -----
-        if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        if (glfwGetKey(m_window->GetGLFWWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
-            glfwSetWindowShouldClose(m_window, true);
+            glfwSetWindowShouldClose(m_window->GetGLFWWindow(), true);
         }
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -105,7 +102,7 @@ void Viewer::Run(void)
         pointShader.SetVector("CustomColor", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
         rectangle.Draw();
         // -------------------------------------------------------------------------------
-        glfwSwapBuffers(m_window);
+        glfwSwapBuffers(m_window->GetGLFWWindow());
         glfwPollEvents();
     }
 }
