@@ -4,52 +4,15 @@
 #include "Polyline2D.h"
 #include "Rectangle.h"
 #include "Shader.h"
-#include <GL/glew.h>
+#include "Window.h"
 #include <GLFW/glfw3.h>
 
-#include <iostream>
-
-const unsigned int SCR_WIDTH  = 800;
-const unsigned int SCR_HEIGHT = 600;
 
 double xpos, ypos;
 
-Viewer::Viewer(void)
+Viewer::Viewer(const std::string& windowName)
 {
-    // glfw: initialize and configure
-    // ------------------------------
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // glfw window creation
-    // --------------------
-    m_window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-
-    if (m_window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return;
-    }
-
-    glfwMakeContextCurrent(m_window);
-    glewExperimental = GL_TRUE;
-
-    if (glewInit() != GLEW_OK)
-    {
-        std::cerr << "Failed to initialize GLEW\n";
-        glfwTerminate();
-        return;
-    }
-    // get version info
-    const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
-    const GLubyte* version  = glGetString(GL_VERSION);  // version as a string
-    std::cout << "Renderer: " << renderer << std::endl;
-    std::cout << "OpenGL version supported \n"
-              << version << std::endl;
-    // build and compile our shader zprogram
-    // ------------------------------------
+    auto window = Window(windowName);
 }
 
 Viewer::~Viewer(void)
@@ -57,19 +20,14 @@ Viewer::~Viewer(void)
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-
-    // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
-    glfwTerminate();
 }
 
 void Viewer::Run(void)
 {
-    registerCallbacks();
-
-    Shader imageShader("../Shaders/image.vs", "../Shaders/image.fs");
-    Shader pointShader("../Shaders/points.vs", "../Shaders/points.fs");
-    // set up vertex data (and buffer(s)) and configure vertex attributes
+    Shader imageShader("ImageShader");
+    imageShader.InitShaders("../Shaders/image.vs", "../Shaders/image.fs");
+    Shader pointShader("PointShader");
+    pointShader.InitShaders("../Shaders/points.vs", "../Shaders/points.fs");
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
@@ -118,8 +76,8 @@ void Viewer::Run(void)
     Eigen::Vector2f p3(-0.2, 0.2);
     Rectangle       rectangle(p3, 0.2f, 0.25f);
     // -------------------------------------------------------------------------------------------
-    imageShader.activate(); // don't forget to activate/use the shader before setting uniforms!
-    imageShader.SetInt("texture1", 0);
+    imageShader.UseShader(); // don't forget to activate/use the shader before setting uniforms!
+    imageShader.SetValue("texture1", 0);
 
     while (!glfwWindowShouldClose(m_window))
     {
@@ -137,40 +95,18 @@ void Viewer::Run(void)
         glActiveTexture(GL_TEXTURE0);
         image1.Use();
         // render container
-        imageShader.activate();
+        imageShader.UseShader();
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        pointShader.activate();
-        pointShader.SetVec3("CustomColor", Eigen::Vector3f(0.0f, 1.0f, 0.0f));
+        pointShader.UseShader();
+        pointShader.SetVector("CustomColor", Eigen::Vector3f(0.0f, 1.0f, 0.0f));
         polyline.Draw();
-        pointShader.SetVec3("CustomColor", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
+        pointShader.SetVector("CustomColor", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
         rectangle.Draw();
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_window);
         glfwPollEvents();
     }
-}
-
-void Viewer::registerCallbacks(void)
-{
-    // Create Callbacks
-    auto framebuffer_size_callback = [](GLFWwindow* window, int width, int height) {
-        // make sure the viewport matches the new window dimensions; note that width and
-        // height will be significantly larger than specified on retina displays.
-        glViewport(0, 0, width, height);
-    };
-
-    auto mouse_button_callback = [](GLFWwindow* window, int button, int action, int mods) {
-        if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-        {
-            glfwGetCursorPos(window, &xpos, &ypos);
-            std::cout << "Cursor Position at (" << xpos << " : " << ypos << ")\n";
-        }
-    };
-
-    // Register Callback
-    glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
-    glfwSetMouseButtonCallback(m_window, mouse_button_callback);
 }
 

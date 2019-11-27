@@ -3,45 +3,94 @@
 
 #include <Eigen/Dense>
 #include <GL/glew.h>
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
+#include <type_traits>
+#include <vector>
 
 class Shader
 {
 public:
     enum class ShaderType
     {
-        Program,
-        Vertex,
-        Fragment
+        VERTEX,
+        FRAGMENT,
+        PROGRAM
     };
 
 public:
-    Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
-    ~Shader(void) = default;
-    unsigned int GetShaderProgramID(void) { return m_shaderProgramID; };
+    explicit Shader(const std::string& name)
+        : shaderName(name){};
 
-    void initShaders(void);
-    void checkCompileErrors(unsigned int shaderID, Shader::ShaderType shaderType);
-    void activate(void);
-    void SetBool(const std::string& name, bool value);
-    void SetInt(const std::string& name, int value);
-    void SetFloat(const std::string& name, float value);
-    void SetVec3(const std::string& name, const Eigen::Vector3f& v);
-    void SetVec3(const std::string& name, float x, float y, float z);
-    void SetVec4(const std::string& name, const Eigen::Vector4f& v);
-    void SetVec4(const std::string& name, float x, float y, float z, float w);
-    void SetMat3(const std::string& name, const Eigen::Matrix3f& mat);
-    void SetMat4(const std::string& name, const Eigen::Matrix4f& mat);
+    void InitShaders(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
+    void UseShader(void) { glUseProgram(shaderProgramID); }
+    unsigned int GetShaderProgramID(void) { return shaderProgramID; };
+
+    template<typename T>
+    void SetValue(const std::string& name, T value);
+    template<typename T, int N = 1>
+    void SetVector(const std::string& name, const T& v);
+    template<typename T>
+    void SetTransformationMatrix(const std::string& name, const T& mat);
+
+public:
+    const std::string shaderName;
 
 private:
-    unsigned int                      m_shaderProgramID;
-    std::map<ShaderType, std::string> m_shaderTypeMapping;
-    std::string                       m_vertexShaderPath;
-    std::string                       m_fragmentShaderPath;
+    std::string readShaderProgramCode(const std::string& shaderPath);
+
+    void createShader(unsigned int shaderID, const std::string& shaderProgramCode, const Shader::ShaderType& shaderType);
+    void createShaderProgram(const std::vector<unsigned int>& IDs);
+    void checkCompileErrors(unsigned int shaderID, const Shader::ShaderType& shaderType);
+
+private:
+    unsigned int shaderProgramID;
+
+    std::map<ShaderType, std::string> shaderTypeMapping = {{ShaderType::VERTEX, "VERTEX"},
+                                                           {ShaderType::FRAGMENT, "FRAGMENT"},
+                                                           {ShaderType::PROGRAM, "PROGRAM"}};
 };
+
+template<typename T>
+void Shader::SetValue(const std::string& name, T value)
+{
+    if (std::is_floating_point<T>::value)
+    {
+        glUniform1f(glGetUniformLocation(shaderProgramID, name.c_str()), value);
+    }
+    else
+    {
+        glUniform1i(glGetUniformLocation(shaderProgramID, name.c_str()), value);
+    }
+}
+
+// Vector
+template<typename T, int N>
+void Shader::SetVector(const std::string& name, const T& v)
+{
+    if (std::is_same<Eigen::Vector3f, T>::value)
+    {
+        glUniform3fv(glGetUniformLocation(shaderProgramID, name.c_str()), N, v.data());
+    }
+    else if (std::is_same<Eigen::Vector4f, T>::value)
+    {
+        glUniform4fv(glGetUniformLocation(shaderProgramID, name.c_str()), N, v.data());
+    }
+    else
+    {
+        assert(false && "Neither Vectorf3f nor Vector4f");
+    }
+}
+
+// Matrices
+template<typename T>
+void Shader::SetTransformationMatrix(const std::string& name, const T& mat)
+{
+    glUniformMatrix3fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data());
+}
 
 #endif

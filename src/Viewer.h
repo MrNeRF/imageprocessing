@@ -1,22 +1,23 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
+#include <string>
+
 class GLFWwindow;
 
 class Viewer
 {
 public:
-    Viewer(void);
+    Viewer(const std::string& windowName);
     ~Viewer(void);
 
     void Run(void);
-    /* void Setup(void); */
 
 private:
     void registerCallbacks(void);
 
 private:
-    GLFWwindow* m_window;
+    GLFWwindow*  m_window;
     unsigned int VBO, VAO, EBO;
 };
 
