@@ -43,6 +43,7 @@ Window::Window(const std::string name)
     // Register Callbacks
     glfwSetFramebufferSizeCallback(windowInstance, WindowResizeCallback);
     glfwSetMouseButtonCallback(windowInstance, MouseInputCallback);
+    glfwSetCursorPosCallback(windowInstance, CursorPositionCallback);
 }
 
 Window::~Window(void)
@@ -88,8 +89,14 @@ void Window::MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods
             break;
     }
 
-    glfwGetCursorPos(win, &mouseDevice.xPos, &mouseDevice.yPos);
+    glfwGetCursorPos(win, &mouseDevice.clickedPosX, &mouseDevice.clickedPosY);
     //@TODO Modifier Keys alt, shift, etc...
+}
+
+void Window::UpdateCursorPosition(double xCursorPos, double yCursorPos)
+{
+    mouseDevice.cursorPosX = xCursorPos;
+    mouseDevice.cursorPosY = yCursorPos;
 }
 
 void Window::WindowResizeCallback(GLFWwindow* win, int h, int w)
@@ -102,4 +109,10 @@ void Window::MouseInputCallback(GLFWwindow* win, int button, int action, int mod
 {
     Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
     window->MouseDeviceUpdate(win, button, action, mods);
+}
+
+void Window::CursorPositionCallback(GLFWwindow* win, double xCursorPos, double yCursorPos)
+{
+    Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
+    window->UpdateCursorPosition(xCursorPos, yCursorPos);
 }

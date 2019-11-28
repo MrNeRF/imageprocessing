@@ -5,7 +5,7 @@ void Polyline2D::AddLines(std::unique_ptr<Line> line)
 {
     Eigen::Vector2f p1, p2;
     line->GetEndPoints(p1, p2);
-    line->SetColor(m_color);
+    line->SetColor(color);
     float radius = 0.01f;
 
     if (m_polyline.size() == 0)
@@ -21,11 +21,6 @@ void Polyline2D::AddLines(std::unique_ptr<Line> line)
     }
 }
 
-void Polyline2D::SetColor(const Eigen::Vector3f& color)
-{
-    m_color = color;
-}
-
 void Polyline2D::Draw(void) const
 {
     for (const auto& p : m_polyline)
@@ -33,7 +28,6 @@ void Polyline2D::Draw(void) const
         p->Draw();
     }
 }
-
 
 bool Polyline2D::CheckCollision(const Eigen::Vector2f& pointToTest) const
 {

@@ -2,6 +2,7 @@
 #define OPENGL_WINDOW_H
 
 #include "GLFW/glfw3.h"
+#include <Eigen/Dense>
 #include <cstdint>
 #include <string>
 
@@ -25,10 +26,12 @@ public:
             REPEAT
         };
 
-        double   xPos       = 0;
-        double   yPos       = 0;
-        bool     isPressed  = false;
-        bool     isReleased = true;
+        double clickedPosX = 0.;
+        double clickedPosY = 0.;
+        double cursorPosX  = 0.;
+        double cursorPosY  = 0.;
+        bool   isPressed   = false;
+        bool   isReleased  = true;
 
         MouseButton currentButton = MouseButton::NONE;
         MouseAction currentAction = MouseAction::RELEASE;
@@ -40,10 +43,14 @@ public:
 
     void ViewPortResized(int width, int height);
     void MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods);
+    void            UpdateCursorPosition(double xCursorPos, double yCursorPos);
     GLFWwindow* GetGLFWWindow(void) { return windowInstance; }
+    Eigen::Vector2f GetCursorPosition(void) { return Eigen::Vector2f(static_cast<float>(mouseDevice.cursorPosX), static_cast<float>(mouseDevice.cursorPosY)); }
+
     // Callbacks
     static void WindowResizeCallback(GLFWwindow* win, int h, int w);
     static void MouseInputCallback(GLFWwindow* win, int button, int action, int mods);
+    static void CursorPositionCallback(GLFWwindow* win, double xCursorPos, double yCursorPos);
 
 public:
     const std::string windowName;

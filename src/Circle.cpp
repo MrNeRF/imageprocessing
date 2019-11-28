@@ -9,24 +9,7 @@ Circle::Circle(const Eigen::Vector2f center, const float radius, const int numbe
     , m_center{center}
 {
     createCircle(radius, m_vertices);
-
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * m_vertices.size(), m_vertices.data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * m_indices.size(), &m_indices[0], GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GL_FLOAT), (void*)0);
-    glEnableVertexAttribArray(0);
-    // unbind
-    glBindVertexArray(0);
+    dataObject.CreateVertices(m_vertices, m_indices);
 }
 
 void Circle::createCircle(float radius, Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>& vertices)
@@ -52,10 +35,7 @@ void Circle::createCircle(float radius, Eigen::Matrix<float, Eigen::Dynamic, 2, 
 
 void Circle::Draw(void) const
 {
-    glBindVertexArray(VAO);
-    glPointSize(10.f);
-    glDrawElements(GL_TRIANGLE_FAN, m_indices.size(), GL_UNSIGNED_INT, NULL);
-    glBindVertexArray(0);
+    dataObject.DrawObject(GL_TRIANGLE_FAN);
 }
 
 bool Circle::CheckCollision(const Eigen::Vector2f& pointToTest) const

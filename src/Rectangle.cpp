@@ -11,24 +11,9 @@ Rectangle::Rectangle(const Eigen::Vector2f& p1, const float width, const float h
     , m_height(height)
 {
     createRectangle();
-
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * indices.size(), &indices[0], GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GL_FLOAT), (void*)0);
-    glEnableVertexAttribArray(0);
-    // unbind
-    glBindVertexArray(0);
+    dataObject.CreateVertices(vertices, indices);
+    std::vector<int> colorIndices(indices.size(), 0);
+    dataObject.CreateColor(color, indices);
 }
 
 void Rectangle::createRectangle(void)
@@ -49,18 +34,13 @@ void Rectangle::createRectangle(void)
     collisionPoints.emplace_back(m_p1 + m_width * xDir + m_height * yDir);
     collisionPoints.emplace_back(m_p1 + yDir * m_height);
 
-    std::cout << vertices(0, 0) << ", " << vertices(0, 1) << "\n";
-    std::cout << vertices(1, 0) << ", " << vertices(1, 1) << "\n";
-    std::cout << vertices(2, 0) << ", " << vertices(2, 1) << "\n";
-    std::cout << vertices(3, 0) << ", " << vertices(3, 1) << "\n";
-    indices = {0, 1, 2, 0, 2, 3};
+    indices = {0, 1, 2,
+               2, 3, 0};
 }
 
 void Rectangle::Draw(void) const
 {
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, NULL);
-    glBindVertexArray(0);
+    dataObject.DrawObject(GL_TRIANGLES);
 }
 
 bool Rectangle::CheckCollision(const Eigen::Vector2f& pointToTest) const
