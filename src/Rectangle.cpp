@@ -1,6 +1,7 @@
 #include "Rectangle.h"
 #include "Constants.h"
 #include "CrossingNumberPPolygon.h"
+#include "TextureObject.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -12,7 +13,7 @@ Rectangle::Rectangle(const Eigen::Vector2f& p1, const float width, const float h
 {
     createRectangle();
     dataObject.CreateVertices(vertices, indices);
-    dataObject.CreateColor(color);
+    dataObject.CreateTextureCoordinates(vertices);
 }
 
 void Rectangle::createRectangle(void)

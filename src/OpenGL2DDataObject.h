@@ -15,6 +15,7 @@ public:
     ~OpenGL2DDataObject(void);
     void CreateVertices(const DataTypeVertices& vertices, std::vector<int> indices);
     void CreateColor(const Color& color);
+    void CreateTextureCoordinates(const DataTypeVertices& uvCoordinates);
     void DrawObject(GLenum mode) const;
 
 private:

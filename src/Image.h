@@ -1,19 +1,20 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include <memory>
 #include <string>
 
 class Image
 {
 public:
     Image(const std::string& path);
-    ~Image(void) = default;
-    int  GetImageID(void) { return m_textureID; };
-    void Use();
+    ~Image(void);
 
-private:
-    void         init(const std::string& path);
-    unsigned int m_textureID;
+    unsigned char* data = nullptr;
+
+    int width;
+    int height;
+    int nrChannels;
 };
 
 #endif

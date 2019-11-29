@@ -74,6 +74,26 @@ void OpenGL2DDataObject::CreateColor(const Color& color)
     glBindVertexArray(0);
 }
 
+void OpenGL2DDataObject::CreateTextureCoordinates(const DataTypeVertices& uvCoordinates)
+
+{
+    glGenBuffers(1, &textureBuffer);
+    checkBufferCreationError(textureBuffer);
+    buffersInUseVector.push_back(textureBuffer);
+
+    // Dimension of Color Data
+    constexpr unsigned int dimension = 2;
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * uvCoordinates.size(), uvCoordinates.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(textureAttrIdx, dimension, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(textureAttrIdx);
+    glBindVertexArray(0);
+}
+
 void OpenGL2DDataObject::DrawObject(GLenum mode) const
 {
     if (numberOfIndices == 0)

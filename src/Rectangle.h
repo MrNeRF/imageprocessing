@@ -5,7 +5,10 @@
 #include "Eigen/Dense"
 #include "OpenGL2DDataObject.h"
 #include "Primitives2D.h"
+#include <memory>
 #include <vector>
+
+class TextureObject;
 
 class Rectangle : public Primitives2D
 {
@@ -35,5 +38,7 @@ private:
     std::vector<Eigen::Vector2f>                collisionPoints;
     std::vector<int>                            indices;
     Eigen::Matrix<float, 4, 2, Eigen::RowMajor> vertices;
+    std::unique_ptr<TextureObject>              spTextureObj;
 };
+
 #endif
