@@ -11,75 +11,77 @@ static void checkBufferCreationError(unsigned int bufferObjectID)
 
 OpenGL2DDataObject::~OpenGL2DDataObject(void)
 {
-    glDeleteBuffers(buffersBO.size(), &buffersBO[0]);
+    // Delete Array Buffers.
+    glDeleteBuffers(buffersInUseVector.size(), &buffersInUseVector[0]);
+    // Delete Indexbuffer
+    glDeleteBuffers(1, &indexBuffer);
 }
 
 void OpenGL2DDataObject::CreateVertices(const DataTypeVertices& vertices, std::vector<int> indices)
 {
-    numberOfVertices = indices.size();
-    if (numberOfVertices < 1)
+    if (indices.empty() || vertices.size() == 0)
     {
-        assert(false && "There are no vertices");
+        assert(false && "There are no vertices indexed");
     }
+
+    numberOfIndices  = indices.size();
+    numberOfVertices = vertices.size();
 
     glGenVertexArrays(1, &VAO);
 
-    glGenBuffers(1, &verticesVBO);
-    checkBufferCreationError(verticesVBO);
-    glGenBuffers(1, &verticesEBO);
-    checkBufferCreationError(verticesEBO);
+    glGenBuffers(1, &vertexBuffer);
+    checkBufferCreationError(vertexBuffer);
+    glGenBuffers(1, &indexBuffer);
+    checkBufferCreationError(indexBuffer);
 
-    buffersBO.push_back(verticesVBO);
-    buffersBO.push_back(verticesEBO);
+    buffersInUseVector.push_back(vertexBuffer);
 
     glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numberOfVertices, vertices.data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, verticesEBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * indices.size(), &indices[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * numberOfIndices, &indices[0], GL_STATIC_DRAW);
 
-    glVertexAttribPointer(vertexAttribIndex, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glEnableVertexAttribArray(vertexAttribIndex);
+    // Dimension of Vertex Data
+    constexpr unsigned int dimension = 2;
+    glVertexAttribPointer(vertexAttrIdx, dimension, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(vertexAttrIdx);
+
+    // unbind
+    glBindVertexArray(0);
 }
 
-void OpenGL2DDataObject::CreateColor(const Color& color, std::vector<int> indices)
+void OpenGL2DDataObject::CreateColor(const Color& color)
 {
-    numberOfVertices = indices.size();
-    if (numberOfVertices < 1)
-    {
-        assert(false && "There are no colors");
-    }
+    glGenBuffers(1, &colorBuffer);
+    checkBufferCreationError(colorBuffer);
+    buffersInUseVector.push_back(colorBuffer);
 
-    glGenBuffers(1, &colorsVBO);
-    checkBufferCreationError(colorsVBO);
-    glGenBuffers(1, &colorsEBO);
-    checkBufferCreationError(colorsEBO);
+    // Dimension of Color Data
+    constexpr unsigned int dimension = 3;
 
-    buffersBO.push_back(colorsVBO);
-    buffersBO.push_back(colorsEBO);
-
+    Eigen::Matrix<float, Eigen::Dynamic, dimension, Eigen::RowMajor> colorData;
+    colorData = color.GetColor().replicate(1, numberOfVertices).transpose();
     glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, colorsVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3, color.GetColor().data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * colorData.size(), colorData.data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, colorsEBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * indices.size(), &indices[0], GL_STATIC_DRAW);
-
-    glVertexAttribPointer(colorsAttribIndex, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glEnableVertexAttribArray(colorsAttribIndex);
+    glVertexAttribPointer(colorAttrIdx, dimension, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(colorAttrIdx);
+    glBindVertexArray(0);
 }
 
 void OpenGL2DDataObject::DrawObject(GLenum mode) const
 {
-    if (numberOfVertices < 1)
+    if (numberOfIndices == 0)
     {
         assert(false && "There are no vertices");
     }
 
     glBindVertexArray(VAO);
-    glDrawElements(mode, numberOfVertices, GL_UNSIGNED_INT, NULL);
+    glDrawElements(mode, numberOfIndices, GL_UNSIGNED_INT, NULL);
     glBindVertexArray(0);
 }

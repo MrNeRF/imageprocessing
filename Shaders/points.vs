@@ -1,7 +1,10 @@
 #version 450 core
-layout (location = 0) in vec3 aPos;
+layout (location = 0) in vec2 vertexPosition;
+layout (location = 1) in vec3 inputVertexColor;
 
+out vec3 vertexColor;
 void main()
 {
-    gl_Position = vec4(aPos, 1.0);
+    vertexColor = inputVertexColor;
+    gl_Position = vec4(vertexPosition, 0.f, 1.f);
 }

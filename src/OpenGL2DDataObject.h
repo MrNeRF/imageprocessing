@@ -14,31 +14,36 @@ public:
     OpenGL2DDataObject() { glGenVertexArrays(1, &VAO); }
     ~OpenGL2DDataObject(void);
     void CreateVertices(const DataTypeVertices& vertices, std::vector<int> indices);
-    void CreateColor(const Color& rgb, std::vector<int> indices);
+    void CreateColor(const Color& color);
     void DrawObject(GLenum mode) const;
 
 private:
     // Vertex Array Object
     unsigned int VAO = 0;
-    // Vertex and Element Buffer Object for Coordinate Attribute
-    unsigned int verticesVBO = 0;
-    unsigned int verticesEBO = 0;
-    unsigned int vertexAttribIndex = 0;
-    // Vertex and Element Buffer Object for Coordinate Attribute
-    unsigned int textureVBO = 0;
-    unsigned int textureEBO = 0;
-    unsigned int textureAttribIndex = 1;
-    // Vertex and Element Buffer Object for Coordinate Attribute
-    unsigned int normalsVBO = 0;
-    unsigned int normalsEBO = 0;
-    unsigned int normalsAttribIndex = 1;
-    // Vertex and Element Buffer Object for Coordinate Attribute
-    unsigned int colorsVBO = 0;
-    unsigned int colorsEBO = 0;
-    unsigned int colorsAttribIndex = 1;
 
-    unsigned numberOfVertices = 0;
-    std::vector<unsigned int> buffersBO;
+    // Vertex Element Object
+    unsigned int indexBuffer = 0;
+
+    // Vertex Buffer
+    unsigned int vertexBuffer  = 0;
+    unsigned int vertexAttrIdx = 0;
+
+    // Color Buffer
+    unsigned int colorBuffer  = 0;
+    unsigned int colorAttrIdx = 1;
+
+    // Texture Buffer
+    unsigned int textureBuffer  = 0;
+    unsigned int textureAttrIdx = 2;
+
+    // Normal Buffer
+    unsigned int normalsVBO    = 0;
+    unsigned int normalAttrIdx = 3;
+
+    unsigned int numberOfIndices  = 0;
+    unsigned int numberOfVertices = 0;
+
+    std::vector<unsigned int> buffersInUseVector;
 };
 
 #endif

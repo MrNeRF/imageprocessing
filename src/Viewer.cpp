@@ -55,10 +55,8 @@ void Viewer::Run(void)
         imageShader.UseShader();
 
         pointShader.UseShader();
-        pointShader.SetVector("CustomColor", Eigen::Vector3f(0.0f, 1.0f, 0.0f));
+        /* canvas.Draw(); */
         polyline.Draw();
-        pointShader.SetVector("CustomColor", Eigen::Vector3f(0.0f, 0.0f, 1.0f));
-        canvas.Draw();
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(m_window->GetGLFWWindow());
         glfwPollEvents();

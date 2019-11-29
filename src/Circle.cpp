@@ -10,6 +10,9 @@ Circle::Circle(const Eigen::Vector2f center, const float radius, const int numbe
 {
     createCircle(radius, m_vertices);
     dataObject.CreateVertices(m_vertices, m_indices);
+    std::vector<int> colorIndices(m_indices.size(), 0);
+    Color            newColor(0.15f, 1.f, 0.5f);
+    dataObject.CreateColor(newColor);
 }
 
 void Circle::createCircle(float radius, Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>& vertices)

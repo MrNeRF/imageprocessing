@@ -3,6 +3,7 @@
 
 #include "Color.h"
 #include "Eigen/Dense"
+#include "OpenGL2DDataObject.h"
 #include "Primitives2D.h"
 #include <vector>
 
@@ -36,6 +37,7 @@ private:
     Eigen::Vector2f m_normal;
     float           m_width = 0.01f;
 
+    OpenGL2DDataObject                          dataObject;
     std::vector<Eigen::Vector2f>                collisionPoints;
     std::vector<int>                            indices;
     Eigen::Matrix<float, 4, 2, Eigen::RowMajor> vertices;

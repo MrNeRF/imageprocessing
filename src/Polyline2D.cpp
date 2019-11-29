@@ -12,6 +12,7 @@ void Polyline2D::AddLines(std::unique_ptr<Line> line)
     {
         m_polyline.push_back(std::make_unique<Circle>(p1, radius, 20));
         m_polyline.push_back(std::move(line));
+
         m_polyline.push_back(std::make_unique<Circle>(p2, radius, 20));
     }
     else

@@ -12,8 +12,7 @@ Rectangle::Rectangle(const Eigen::Vector2f& p1, const float width, const float h
 {
     createRectangle();
     dataObject.CreateVertices(vertices, indices);
-    std::vector<int> colorIndices(indices.size(), 0);
-    dataObject.CreateColor(color, indices);
+    dataObject.CreateColor(color);
 }
 
 void Rectangle::createRectangle(void)

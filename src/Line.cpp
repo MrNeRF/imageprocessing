@@ -18,24 +18,8 @@ Line::Line(const Eigen::Vector2f& p1, const Eigen::Vector2f& p2, const float wid
     m_normal.normalize();
 
     createLine();
-
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * indices.size(), &indices[0], GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GL_FLOAT), (void*)0);
-    glEnableVertexAttribArray(0);
-    // unbind
-    glBindVertexArray(0);
+    dataObject.CreateVertices(vertices, indices);
+    dataObject.CreateColor(Color(.0f, .0f, 1.0f));
 }
 
 void Line::createLine(void)
@@ -58,9 +42,7 @@ void Line::createLine(void)
 
 void Line::Draw(void) const
 {
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, NULL);
-    glBindVertexArray(0);
+    dataObject.DrawObject(GL_TRIANGLES);
 }
 
 bool Line::CheckCollision(const Eigen::Vector2f& pointToTest) const
