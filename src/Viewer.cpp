@@ -37,8 +37,8 @@ void Viewer::Run(void)
     modelShader.SetTransformationMatrix("view", viewMatrix);
     modelShader.SetTransformationMatrix("projection", pProjMatrix);
 
-    Eigen::Vector3f lightPos   = Eigen::Vector3f(30.f, 15.f, 1.0f);
-    Eigen::Vector3f lightColor = Eigen::Vector3f(0.9f, 0.9f, 0.9f);
+    Eigen::Vector3f lightPos   = Eigen::Vector3f(10.f, 22.f, 1.0f);
+    Eigen::Vector3f lightColor = Eigen::Vector3f(1.0f, 1.0f, 1.0f);
 
     modelShader.SetVector("lightPosition", lightPos);
     modelShader.SetVector("lightColor", lightColor);
@@ -47,15 +47,44 @@ void Viewer::Run(void)
 
     while (!glfwWindowShouldClose(m_window->GetGLFWWindow()))
     {
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
+
         if (glfwGetKey(m_window->GetGLFWWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
             glfwSetWindowShouldClose(m_window->GetGLFWWindow(), true);
         }
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        if (m_window->keyboardDevice.key == GLFW_KEY_W
+            && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
+        {
+            eye += Eigen::Vector3f(0.0f, 0.f, 0.1f);
+            std::cout << "W" << std::endl;
+        }
+        if (m_window->keyboardDevice.key == GLFW_KEY_S
+            && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
+        {
+            eye += Eigen::Vector3f(0.0f, 0.f, -0.1f);
+            std::cout << "S" << std::endl;
+        }
+        if (m_window->keyboardDevice.key == GLFW_KEY_D
+            && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
+        {
+            eye += Eigen::Vector3f(-0.1f, 0.f, 0.f);
+            std::cout << "D" << std::endl;
+        }
+        if (m_window->keyboardDevice.key == GLFW_KEY_A
+            && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
+        {
+            eye += Eigen::Vector3f(0.0f, 0.f, 0.f);
+            std::cout << "A" << std::endl;
+        }
 
+        viewMatrix = Camera::LookAt(eye, target, up);
         modelShader.UseShader();
+        modelShader.SetTransformationMatrix("view", viewMatrix);
+
         suzanne.Draw();
         glfwSwapBuffers(m_window->GetGLFWWindow());
         glfwPollEvents();

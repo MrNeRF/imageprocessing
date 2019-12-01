@@ -94,6 +94,25 @@ void OpenGL3DDataObject::InitializeTextureUVBuffer(const Eigen::Matrix<float, Ei
     glBindVertexArray(0);
 }
 
+void OpenGL3DDataObject::InitializeNormalBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& normals)
+{
+    glGenBuffers(1, &normalsBuffer);
+    checkBufferCreationError(normalsBuffer);
+    buffersInUseVector.push_back(normalsBuffer);
+
+    // Dimension of Color Data
+    constexpr unsigned int dimension = 3;
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * normals.size(), normals.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(normalAttrIdx, dimension, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(normalAttrIdx);
+    glBindVertexArray(0);
+}
+
 void OpenGL3DDataObject::DrawObject(GLenum mode) const
 {
     if (numberOfIndices == 0)

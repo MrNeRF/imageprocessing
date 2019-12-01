@@ -15,14 +15,14 @@ public:
                                 std::vector<int>                                                indices);
 
     void InitializeColorBuffer(const Color& color);
+    void InitializeNormalBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& normals);
     void InitializeTextureUVBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>& uvCoordinates);
     void DrawObject(GLenum mode) const;
 
 private:
     // Vertex Array Object
     unsigned int VAO = 0;
-
-    // Vertex Element Object
+    // Vertex Element Object (EBO)
     unsigned int indexBuffer = 0;
 
     // Vertex Buffer
@@ -38,7 +38,7 @@ private:
     unsigned int textureAttrIdx = 2;
 
     // Normal Buffer
-    unsigned int normalsVBO    = 0;
+    unsigned int normalsBuffer = 0;
     unsigned int normalAttrIdx = 3;
 
     unsigned int numberOfIndices  = 0;

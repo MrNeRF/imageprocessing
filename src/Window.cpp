@@ -44,6 +44,7 @@ Window::Window(const std::string name)
     glfwSetFramebufferSizeCallback(windowInstance, WindowResizeCallback);
     glfwSetMouseButtonCallback(windowInstance, MouseInputCallback);
     glfwSetCursorPosCallback(windowInstance, CursorPositionCallback);
+    glfwSetKeyCallback(windowInstance, KeyboardCallback);
 }
 
 Window::~Window(void)
@@ -96,6 +97,36 @@ void Window::MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods
     //@TODO Modifier Keys alt, shift, etc...
 }
 
+void Window::KeyboardDeviceUpdate(int key, int scancode, int action, int mods)
+{
+    switch (key)
+    {
+        case GLFW_KEY_W:
+        case GLFW_KEY_A:
+        case GLFW_KEY_S:
+        case GLFW_KEY_D:
+            keyboardDevice.key = key;
+            break;
+        default:
+            keyboardDevice.key = -1;
+    }
+
+    switch (action)
+    {
+        case GLFW_RELEASE:
+            keyboardDevice.currentAction = KeyboardDevice::KeyAction::RELEASE;
+            break;
+        case GLFW_PRESS:
+            keyboardDevice.currentAction = KeyboardDevice::KeyAction::PRESS;
+            break;
+        case GLFW_REPEAT:
+            keyboardDevice.currentAction = KeyboardDevice::KeyAction::REPEAT;
+            break;
+    }
+
+    //@TODO Modifier Keys alt, shift, etc...
+}
+
 void Window::UpdateCursorPosition(double xCursorPos, double yCursorPos)
 {
     mouseDevice.cursorPosX = xCursorPos;
@@ -118,4 +149,10 @@ void Window::CursorPositionCallback(GLFWwindow* win, double xCursorPos, double y
 {
     Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
     window->UpdateCursorPosition(xCursorPos, yCursorPos);
+}
+
+void Window::KeyboardCallback(GLFWwindow* win, int key, int scancode, int action, int mods)
+{
+    Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
+    window->KeyboardDeviceUpdate(key, scancode, action, mods);
 }

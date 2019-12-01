@@ -14,17 +14,17 @@ public:
     std::unique_ptr<Mesh3D> Parse(std::unique_ptr<File> spObjFile);
 
     std::vector<int> vertexIndices;
-    std::vector<int> texelIndices;
+    std::vector<int> TextureCoordinatesIndices;
     std::vector<int> normalsIndices;
 
 private:
     void tokenize(std::string& line, char delim, std::vector<std::string>& tokens);
     void createOutputMatrices(std::vector<Eigen::Vector3f>& vertexData,
-                              std::vector<Eigen::Vector2f>& texelData,
+                              std::vector<Eigen::Vector2f>& TextureCoordinatesData,
                               std::vector<Eigen::Vector3f>& normalData);
 
 private:
-    bool                    hasTexels  = false;
+    bool                    hasTextureCoordinates = false;
     bool                    hasNormals = false;
     std::unique_ptr<Mesh3D> spMesh3D   = std::make_unique<Mesh3D>();
 };
