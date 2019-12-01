@@ -1,141 +1,115 @@
 #include "ObjFileParser.h"
-#include <fstream>
 #include <algorithm>
-#include <unordered_map>
+#include <fstream>
 
-namespace
+std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
 {
-    struct Key
-    {
-        Key(int fst, int snd, int trd) : first(fst), second(snd), third(trd){};
-        int first;
-        int second;
-        int third;
-
-        bool operator==(const Key& other) const
-        {
-            return (first == other.first && second == other.second && third == other.third);
-        }
-    };
-
-    struct KeyHasher
-    {
-        std::size_t operator()(const Key& k) const
-        {
-            return ((std::hash<int>()(k.first) ^
-                     (std::hash<int>()(k.second) << 1)) >> 1) ^
-                     (std::hash<int>()(k.third) << 1);
-        }
-    };
-}
-
-void ObjFileParser::Parse(std::vector<Vertex> *vertices, std::vector<int> *indices)
-
-{
-    int newIdx = 0;
-    std::unordered_map<Key, int, KeyHasher> idxMap;
     std::string buffer;
-    upFileToParse->GetContents(buffer);
+    spObjFile->GetContents(buffer);
 
-    std::vector<glm::vec3> coordinates;
-    std::vector<int> idxCoordinates;
-    std::vector<glm::vec2> texels;
-    std::vector<int> idxTexels;
-    std::vector<glm::vec3> normals;
-    std::vector<int> idxNormals;
-    
+    std::vector<Eigen::Vector3f> vertexData;
+    std::vector<Eigen::Vector2f> texelData;
+    std::vector<Eigen::Vector3f> normalData;
 
     std::istringstream iss(buffer);
 
     std::string line;
 
-    bool hasTexels = false;
-    bool hasNormals = false;
 
-    for (std::string line; std::getline(iss, line); )
+    for (std::string line; std::getline(iss, line);)
     {
         std::vector<std::string> tokens;
         tokenize(line, ' ', tokens);
 
-
-        if(tokens.at(0).compare("v") == 0 && tokens.size() == 4)
+        if (tokens.at(0).compare("v") == 0 && tokens.size() == 4)
         {
             //Vertex
-            coordinates.emplace_back(std::stof(tokens[1]), std::stof(tokens[2]), std::stof(tokens[3]));
+            vertexData.emplace_back(Eigen::Vector3f{std::stof(tokens[1]), std::stof(tokens[2]), std::stof(tokens[3])});
         }
         else if (tokens.at(0).compare("vt") == 0 && tokens.size() == 3)
         {
-            // texture coordinates
-            texels.emplace_back(std::stof(tokens[1]), std::stof(tokens[2]));
+            // texture vertexData
+            texelData.emplace_back(Eigen::Vector2f{std::stof(tokens[1]), std::stof(tokens[2])});
             hasTexels = true;
         }
         else if (tokens.at(0).compare("vn") == 0 && tokens.size() == 4)
         {
-            // normals
-            normals.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)), std::stof(tokens.at(3)));
+            // normalData
+            normalData.emplace_back(Eigen::Vector3f{std::stof(tokens[1]), std::stof(tokens.at(2)), std::stof(tokens.at(3))});
             hasNormals = true;
         }
-        else if (tokens.at(0).compare("f") == 0 && tokens.size() == 4 )
-		{
-			for (int i = 1; i < 4; ++i)
-			{
-				std::vector<std::string> subTokens;
-				tokenize(tokens.at(i), '/', subTokens);
+        else if (tokens.at(0).compare("f") == 0 && tokens.size() == 4)
+        {
+            // start of face index enumeration.
+            for (int i = 1; i < 4; ++i)
+            {
+                std::vector<std::string> subTokens;
+                tokenize(tokens.at(i), '/', subTokens);
 
                 // Indices start at 1 that is why we have to subtract 1
-                idxCoordinates.push_back(std::stoi(subTokens[0]) - 1);
-                idxTexels.push_back(std::stoi(subTokens[1]) - 1);
-                idxNormals.push_back(std::stoi(subTokens[2]) - 1);
+                // format is: vertex, texel, normal
+                vertexIndices.push_back(std::stoi(subTokens[0]) - 1);
+                texelIndices.push_back(std::stoi(subTokens[1]) - 1);
+                normalsIndices.push_back(std::stoi(subTokens[2]) - 1);
+            }
+        }
+    }
 
-                Key idxKey(idxCoordinates.back(), idxTexels.back(), idxNormals.back());
-
-                if(idxMap.count(idxKey))
-                {
-                    indices->push_back(idxMap[idxKey]);
-                }
-                else 
-                {
-                    idxMap[idxKey] = newIdx;
-                    indices->push_back(newIdx);
-                    ++newIdx;
-
-                    if(hasTexels && !hasNormals)
-                    {
-                        vertices->emplace_back(coordinates[idxCoordinates.back()], 
-                                           texels[idxTexels.back()]);
-
-                    }
-                    else if (!hasTexels && hasNormals)
-                    {
-                        vertices->emplace_back(coordinates[idxCoordinates.back()], 
-                                           normals[idxNormals.back()]);
-                    }
-                    else if (!hasTexels && !hasNormals)
-                    {
-                        vertices->emplace_back(coordinates[idxCoordinates.back()]);
-                    }
-                    else
-                    {
-                        vertices->emplace_back(coordinates[idxCoordinates.back()], 
-                                           texels[idxTexels.back()],
-                                           normals[idxNormals.back()]);
-                    }
-                    
-                }
-
-			}
-		}
-	}
-
+    createOutputMatrices(vertexData, texelData, normalData);
+    return std::move(spMesh3D);
 }
 
+void ObjFileParser::createOutputMatrices(std::vector<Eigen::Vector3f>& vertexData,
+                                         std::vector<Eigen::Vector2f>& texelData,
+                                         std::vector<Eigen::Vector3f>& normalData)
 
-void ObjFileParser::tokenize(std::string &line, char delim, std::vector<std::string> &tokens)
+{
+    spMesh3D->vertices.resize(vertexData.size(), 3);
+
+    int row = 0;
+    for (const auto& v : vertexData)
+    {
+        spMesh3D->vertices(row, 0) = v(0);
+        spMesh3D->vertices(row, 1) = v(1);
+        spMesh3D->vertices(row, 2) = v(2);
+        ++row;
+    }
+
+    spMesh3D->indices  = vertexIndices;
+
+    // @TODO Weitere Attribute noch einbauen.
+    if (hasTexels)
+    {
+        Eigen::MatrixX2f texels(texelData.size(), 2);
+        row = 0;
+        for (const auto& t : texelData)
+        {
+            texels(row, 0) = t(0);
+            texels(row, 1) = t(1);
+            ++row;
+        }
+    }
+
+    if (hasNormals)
+    {
+        Eigen::MatrixX3f normals(normalData.size(), 3);
+        row = 0;
+        for (const auto& n : normalData)
+        {
+            normals(row, 0) = n(0);
+            normals(row, 1) = n(1);
+            normals(row, 2) = n(2);
+            row++;
+        }
+    }
+}
+
+void ObjFileParser::tokenize(std::string& line, char delim, std::vector<std::string>& tokens)
 {
     auto start = find(cbegin(line), cend(line), delim);
     tokens.push_back(std::string(cbegin(line), start));
 
-    while (start != cend(line)) 
+    while (start != cend(line))
     {
         const auto finish = find(++start, cend(line), delim);
 
@@ -143,5 +117,4 @@ void ObjFileParser::tokenize(std::string &line, char delim, std::vector<std::str
         start = finish;
     }
 }
-
 

@@ -2,25 +2,31 @@
 #define OBJECT_FILE_PARSER
 
 #include "File.h"
-#include "Vertex.h" 
-#include <string>
+#include "Mesh3D.h"
+#include <Eigen/Dense>
 #include <memory>
+#include <string>
 #include <vector>
-
-#define GLM_FORCE_CXX14
-#include <glm/glm.hpp>
 
 class ObjFileParser
 {
-    public:
-	    explicit ObjFileParser(std::unique_ptr<File> up_fileToParse) : upFileToParse(std::move(up_fileToParse)){};
-        void Parse(std::vector<Vertex> *vertices, std::vector<int> *indices);
-    private:
-        void tokenize(std::string &line, char delim, std::vector<std::string> &tokens);
+public:
+    std::unique_ptr<Mesh3D> Parse(std::unique_ptr<File> spObjFile);
 
-    private:
-        //
-       std::unique_ptr<File>  upFileToParse;
+    std::vector<int> vertexIndices;
+    std::vector<int> texelIndices;
+    std::vector<int> normalsIndices;
+
+private:
+    void tokenize(std::string& line, char delim, std::vector<std::string>& tokens);
+    void createOutputMatrices(std::vector<Eigen::Vector3f>& vertexData,
+                              std::vector<Eigen::Vector2f>& texelData,
+                              std::vector<Eigen::Vector3f>& normalData);
+
+private:
+    bool                    hasTexels  = false;
+    bool                    hasNormals = false;
+    std::unique_ptr<Mesh3D> spMesh3D   = std::make_unique<Mesh3D>();
 };
 
 #endif

@@ -13,7 +13,7 @@ Window::Window(const std::string name)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    windowInstance = glfwCreateWindow(800, 600, "Window", NULL, NULL);
+    windowInstance = glfwCreateWindow(winHeight, winWidth, "Window", NULL, NULL);
 
     if (windowInstance == NULL)
     {
@@ -53,10 +53,13 @@ Window::~Window(void)
 
 void Window::ViewPortResized(int width, int height)
 {
-    glViewport(0, 0, static_cast<GLsizei>(width), static_cast<GLsizei>(height));
+    winWidth  = width;
+    winHeight = height;
+    glViewport(0, 0, static_cast<GLsizei>(winWidth), static_cast<GLsizei>(winHeight));
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glMatrixMode(GL_MODELVIEW);
+    aspectRatio = static_cast<float>(winWidth) / static_cast<float>(winHeight);
 }
 
 void Window::MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods)

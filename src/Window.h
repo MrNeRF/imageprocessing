@@ -53,11 +53,13 @@ public:
     static void CursorPositionCallback(GLFWwindow* win, double xCursorPos, double yCursorPos);
 
 public:
+    int   winHeight   = 800;
+    int   winWidth    = 600;
+    float aspectRatio = winWidth / winHeight;
+
     const std::string windowName;
 
 private:
-    int         winWidth   = 800;
-    int         winHeight  = 600;
     GLFWwindow* windowInstance = nullptr;
     MouseDevice mouseDevice;
 };
