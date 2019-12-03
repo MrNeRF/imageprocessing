@@ -17,5 +17,5 @@ void main()
     vertexColor = inputVertexColor;
     vertexNormal = inputVertexNormal;  
     
-    gl_Position = projection * view * vec4(vertexWorldPosition, 1.0);
+    gl_Position = projection * view * model * vec4(inputVertexPosition, 1.f);
 }

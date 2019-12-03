@@ -12,6 +12,11 @@
 #include <type_traits>
 #include <vector>
 
+#define GLM_FORCE_CXX14
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 class Shader
 {
 public:
@@ -36,6 +41,10 @@ public:
     void SetVector(const std::string& name, const T& v);
     template<typename T>
     void SetTransformationMatrix(const std::string& name, const T& mat);
+    void SetTransformationMatrix(const std::string& name, glm::mat4& tran)
+    {
+        glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, &tran[0][0]);
+    }
 
 public:
     const std::string shaderName;
@@ -90,7 +99,7 @@ void Shader::SetVector(const std::string& name, const T& v)
 template<typename T>
 void Shader::SetTransformationMatrix(const std::string& name, const T& mat)
 {
-    glUniformMatrix3fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data());
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data());
 }
 
 #endif
