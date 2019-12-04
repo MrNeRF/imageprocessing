@@ -6,6 +6,6 @@ class Camera
         Camera() = default;
 
         static Eigen::Matrix4f LookAt(Eigen::Vector3f& eye, Eigen::Vector3f& target, Eigen::Vector3f& up);
-        static Eigen::Matrix4f PerspectiveProjection(float fov, float aspectRation, float zNearPlane, float zFarPlane);
+        static Eigen::Matrix4f PerspectiveProjection(float fov, float aspectRatio, float zNearPlane, float zFarPlane);
 };
 

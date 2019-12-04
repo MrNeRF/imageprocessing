@@ -11,15 +11,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#ifndef M_PI
-#define M_PI (4.0 * std::atan2(1.0, 1.0))
-#endif
-
-template<typename N>
-inline N deg2rad(N d)
-{
-    return M_PI * d / 180.0;
-}
 
 Viewer::Viewer(std::unique_ptr<Window> window)
     : m_window(std::move(window))
@@ -114,7 +105,7 @@ void Viewer::Run(void)
         model(0, 0)           = 1.5f;
         model(2, 3)           = 2.f;
         Eigen::Matrix4f view  = Camera::LookAt(eye, target, up);
-        Eigen::Matrix4f projection = Camera::PerspectiveProjection(deg2rad(45.f), m_window->aspectRatio, 0.1f, 100.f);
+        Eigen::Matrix4f projection = Camera::PerspectiveProjection(45.f, 800.f / 600.f, 0.1f, 50.f);
 
         /* glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.f / 600.f, 0.1f, 50.0f); */
 
