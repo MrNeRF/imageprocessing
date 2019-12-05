@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <fstream>
 #include <functional>
+#include <iostream>
 #include <unordered_map>
 
 // See Stackoverflow for description of this custom hash function
@@ -45,8 +46,12 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
     spObjFile->GetContents(buffer);
 
     std::vector<Eigen::Vector3f> vertexData;
-    std::vector<Eigen::Vector2f> TextureCoordinatesData;
+    std::vector<Eigen::Vector2f> textureCoordinatesData;
     std::vector<Eigen::Vector3f> normalData;
+
+    std::vector<int> vertexIndices;
+    std::vector<int> textureCoordinatesIndices;
+    std::vector<int> normalsIndices;
 
     std::vector<Eigen::Vector3f> remappedVertexData;
     std::vector<Eigen::Vector2f> remappedTextureCoordinatesData;
@@ -74,7 +79,7 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
         else if (tokens.at(0).compare("vt") == 0 && tokens.size() == 3)
         {
             // texture vertexData
-            TextureCoordinatesData.emplace_back(Eigen::Vector2f{std::stof(tokens[1]), std::stof(tokens[2])});
+            textureCoordinatesData.emplace_back(Eigen::Vector2f{std::stof(tokens[1]), std::stof(tokens[2])});
             hasTextureCoordinates = true;
         }
         else if (tokens.at(0).compare("vn") == 0 && tokens.size() == 4)
@@ -94,14 +99,14 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
                 // Indices start at 1 that is why we have to subtract 1
                 // format is: vertex, TextureCoordinates, normal
                 vertexIndices.push_back(std::stoi(subTokens[0]) - 1);
-                TextureCoordinatesIndices.push_back(std::stoi(subTokens[1]) - 1);
+                textureCoordinatesIndices.push_back(std::stoi(subTokens[1]) - 1);
                 normalsIndices.push_back(std::stoi(subTokens[2]) - 1);
 
-                Key key(vertexIndices.back(), TextureCoordinatesIndices.back(), normalsIndices.back());
+                Key key(vertexIndices.back(), textureCoordinatesIndices.back(), normalsIndices.back());
 
                 if (indexMap.count(key))
                 {
-                    // the key already exists. We insert it's index;
+                    // the key already exists. We insert its index;
                     remappedIndices.push_back(indexMap[key]);
                 }
                 else
@@ -113,7 +118,7 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
                     remappedVertexData.push_back(vertexData[vertexIndices.back()]);
                     if (hasTextureCoordinates)
                     {
-                        remappedTextureCoordinatesData.push_back(TextureCoordinatesData[TextureCoordinatesIndices.back()]);
+                        remappedTextureCoordinatesData.push_back(textureCoordinatesData[textureCoordinatesIndices.back()]);
                     }
                     if (hasNormals)
                     {
@@ -124,12 +129,13 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
         }
     }
 
+    spMesh3D->indices = remappedIndices;
     createOutputMatrices(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData);
     return std::move(spMesh3D);
 }
 
 void ObjFileParser::createOutputMatrices(std::vector<Eigen::Vector3f>& vertexData,
-                                         std::vector<Eigen::Vector2f>& TextureCoordinatesData,
+                                         std::vector<Eigen::Vector2f>& textureCoordinatesData,
                                          std::vector<Eigen::Vector3f>& normalData)
 
 {
@@ -144,14 +150,12 @@ void ObjFileParser::createOutputMatrices(std::vector<Eigen::Vector3f>& vertexDat
         ++row;
     }
 
-    spMesh3D->indices  = vertexIndices;
-
     // @TODO Weitere Attribute noch einbauen.
     if (hasTextureCoordinates)
     {
-        spMesh3D->uvCoordinates.resize(TextureCoordinatesData.size(), 2);
+        spMesh3D->uvCoordinates.resize(textureCoordinatesData.size(), 2);
         row = 0;
-        for (const auto& t : TextureCoordinatesData)
+        for (const auto& t : textureCoordinatesData)
         {
             spMesh3D->uvCoordinates(row, 0) = t(0);
             spMesh3D->uvCoordinates(row, 1) = t(1);

@@ -13,10 +13,6 @@ class ObjFileParser
 public:
     std::unique_ptr<Mesh3D> Parse(std::unique_ptr<File> spObjFile);
 
-    std::vector<int> vertexIndices;
-    std::vector<int> TextureCoordinatesIndices;
-    std::vector<int> normalsIndices;
-
 private:
     void tokenize(std::string& line, char delim, std::vector<std::string>& tokens);
     void createOutputMatrices(std::vector<Eigen::Vector3f>& vertexData,

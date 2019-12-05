@@ -13,7 +13,7 @@ uniform mat4 projection;
 
 void main()
 {
-    vertexWorldPosition = vec3(model * vec4(inputVertexPosition, 1.0));
+    vertexWorldPosition = vec3(model * vec4(inputVertexPosition, 1.f));
     vertexColor = inputVertexColor;
     vertexNormal = inputVertexNormal;  
     

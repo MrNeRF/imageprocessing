@@ -1,6 +1,6 @@
 #include "Mesh3D.h"
 
-Mesh3D::Mesh3D(Eigen::MatrixX3f vertexMatrix, std::vector<int> indexVector)
+Mesh3D::Mesh3D(Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> vertexMatrix, std::vector<int> indexVector)
     : indices{indexVector}
     , vertices(vertexMatrix)
 {
