@@ -1,5 +1,4 @@
 #include "Object3D.h"
-#include "Color.h"
 #include "File.h"
 #include "ObjFileParser.h"
 #include <GL/glew.h>
@@ -22,8 +21,14 @@ Object3D::Object3D(const std::string& pathToModel)
             spOGLDataObject->InitializeTextureUVBuffer(spObjectMesh3D->uvCoordinates);
         }
 
-        spOGLDataObject->InitializeColorBuffer(Color(0.8f, 0.3f, 0.9));
+        spOGLDataObject->InitializeColorBuffer(vertexColor);
     }
+}
+
+void Object3D::SetColor(const Color& color)
+{
+    vertexColor = color;
+    spOGLDataObject->InitializeColorBuffer(vertexColor);
 }
 
 void Object3D::Draw(void)

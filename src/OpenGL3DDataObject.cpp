@@ -56,9 +56,12 @@ void OpenGL3DDataObject::InitializeVertexBuffer(const Eigen::Matrix<float, Eigen
 
 void OpenGL3DDataObject::InitializeColorBuffer(const Color& color)
 {
-    glGenBuffers(1, &colorBuffer);
-    checkBufferCreationError(colorBuffer);
-    buffersInUseVector.push_back(colorBuffer);
+    if (colorBuffer == 0)
+    {
+        glGenBuffers(1, &colorBuffer);
+        checkBufferCreationError(colorBuffer);
+        buffersInUseVector.push_back(colorBuffer);
+    }
 
     // Dimension of Color Data
     constexpr unsigned int dimension = 3;
@@ -77,9 +80,13 @@ void OpenGL3DDataObject::InitializeColorBuffer(const Color& color)
 
 void OpenGL3DDataObject::InitializeTextureUVBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>& uvCoordinates)
 {
-    glGenBuffers(1, &textureBuffer);
-    checkBufferCreationError(textureBuffer);
-    buffersInUseVector.push_back(textureBuffer);
+    if (textureBuffer == 0)
+    {
+        glGenBuffers(1, &textureBuffer);
+        checkBufferCreationError(textureBuffer);
+        buffersInUseVector.push_back(textureBuffer);
+    }
+
 
     // Dimension of Color Data
     constexpr unsigned int dimension = 2;
@@ -96,9 +103,12 @@ void OpenGL3DDataObject::InitializeTextureUVBuffer(const Eigen::Matrix<float, Ei
 
 void OpenGL3DDataObject::InitializeNormalBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& normals)
 {
-    glGenBuffers(1, &normalsBuffer);
-    checkBufferCreationError(normalsBuffer);
-    buffersInUseVector.push_back(normalsBuffer);
+    if (normalsBuffer == 0)
+    {
+        glGenBuffers(1, &normalsBuffer);
+        checkBufferCreationError(normalsBuffer);
+        buffersInUseVector.push_back(normalsBuffer);
+    }
 
     // Dimension of Color Data
     constexpr unsigned int dimension = 3;

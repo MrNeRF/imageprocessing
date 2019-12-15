@@ -1,5 +1,6 @@
 #include "Viewer.h"
 #include "Camera.h"
+#include "Color.h"
 #include "Object3D.h"
 #include "Shader.h"
 #include "Window.h"
@@ -21,12 +22,18 @@ void Viewer::Run(void)
 {
     Shader modelShader("3D Model Shader");
     modelShader.InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
+    Shader lightShader("Light Cube");
+    lightShader.InitShaders("../Shaders/lightShader.vs", "../Shaders/lightShader.fs");
 
-    Eigen::Vector3f lightPos   = Eigen::Vector3f(50.f, 50.f, 10.0f);
-    Eigen::Vector3f lightColor = Eigen::Vector3f(0.8f, 0.8f, .8f);
+    lightShader.UseShader();
+    Eigen::Vector3f lightPos = Eigen::Vector3f(10.f, 10.f, 0.0f);
+    Color           lightColor(1.f, 1.f, 1.f);
+    lightShader.SetVector("lightPosition", lightPos);
 
     glEnable(GL_DEPTH_TEST);
     Object3D suzanne("../models/suzanne.obj");
+    Object3D lightCube("../models/quader.obj");
+    lightCube.SetColor(lightColor);
 
     Eigen::Vector3f eye{0.f, 0.f, 4.f};
 
@@ -75,9 +82,19 @@ void Viewer::Run(void)
         modelShader.SetTransformationMatrix("model", model);
 
         modelShader.SetVector("lightPosition", lightPos);
-        modelShader.SetVector("lightColor", lightColor);
+        modelShader.SetVector("lightColor", lightColor.GetColor());
 
         suzanne.Draw();
+
+        lightShader.UseShader();
+        model = Eigen::Matrix4f::Identity();
+        lightShader.SetTransformationMatrix("view", view);
+        lightShader.SetTransformationMatrix("projection", projection);
+        lightShader.SetTransformationMatrix("model", model);
+
+        lightShader.SetVector("lightPosition", lightPos);
+        lightCube.Draw();
+
         glfwSwapBuffers(m_window->GetGLFWWindow());
         glfwPollEvents();
     }
