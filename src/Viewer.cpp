@@ -77,9 +77,19 @@ void Viewer::Run(void)
         Eigen::Matrix4f view  = Camera::LookAt(eye, target, up);
         Eigen::Matrix4f projection = Camera::PerspectiveProjection(45.f, 800.f / 600.f, 0.1f, 50.f);
 
+        modelShader.SetTransformationMatrix("cameraPos", eye);
         modelShader.SetTransformationMatrix("view", view);
         modelShader.SetTransformationMatrix("projection", projection);
         modelShader.SetTransformationMatrix("model", model);
+
+        modelShader.SetVector("light.ambient", Eigen::Vector3f(.5f, .5f, .5f));
+        modelShader.SetVector("light.diffuse", Eigen::Vector3f(.2f, .2f, .2f));
+        modelShader.SetVector("light.specular", Eigen::Vector3f(1.f, 1.f, 1.f));
+
+        modelShader.SetVector("material.ambient", Eigen::Vector3f(.2125f, 0.1275f, 0.054f));
+        modelShader.SetVector("material.diffuse", Eigen::Vector3f(.714f, 0.4284f, 0.18144f));
+        modelShader.SetVector("material.specular", Eigen::Vector3f(.393548f, 0.271906f, 0.166721f));
+        modelShader.SetValue("material.shininess", .2f);
 
         modelShader.SetVector("lightPosition", lightPos);
         modelShader.SetVector("lightColor", lightColor.GetColor());

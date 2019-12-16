@@ -5,23 +5,43 @@ out vec4 FragColor;
 in vec3 vertexWorldPosition;  
 in vec3 vertexNormal;  
 in vec3 vertexColor;
+
+struct Material
+{
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float shininess;
+};
   
-uniform vec3 lightPosition; 
-uniform vec3 lightColor;
+struct Light
+{
+	vec3 position;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+};
+
+uniform vec3 cameraPos;
+uniform Material material;
+uniform Light light;
 
 void main()
 {
     // ambient
-    float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * lightColor;
+    vec3 ambient = light.ambient * material.ambient;
   	
     // diffuse 
     vec3 norm = normalize(vertexNormal);
-    vec3 lightDir = normalize(lightPosition - vertexWorldPosition);
+    vec3 lightDir = normalize(light.position - vertexWorldPosition);
     float diff = max(dot(norm, lightDir), 0.f);
-    vec3 diffuse = diff * lightColor;
+    vec3 diffuse = light.diffuse * (diff * material.diffuse);
             
-    vec3 result = (ambient + diffuse) * vertexColor;
+    vec3 viewDir = normalize(cameraPos - vertexWorldPosition);
+    vec3 reflectDir = reflect(-lightDir, norm);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.f), material.shininess);
+	vec3 specular = light.specular * (spec * material.specular);
+
+    vec3 result = (ambient + diffuse + specular) * vertexColor; 
     FragColor = vec4(result, 1.f);
-    /* FragColor = vec4(0.9f, 0.7f, 0.6f, 1.f); */
 } 
