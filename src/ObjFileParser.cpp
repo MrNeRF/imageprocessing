@@ -1,4 +1,5 @@
 #include "ObjFileParser.h"
+#include "HalfEdgeDS.h"
 #include <algorithm>
 #include <fstream>
 #include <functional>
@@ -131,6 +132,8 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
 
     spMesh3D->indices = remappedIndices;
     createOutputMatrices(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData);
+    HalfEdgeDS halfEdge;
+    halfEdge.Initialize(spMesh3D.get());
     return std::move(spMesh3D);
 }
 
