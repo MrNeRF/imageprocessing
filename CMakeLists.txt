@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.10)
 project(imageprocessing)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # --verbose flag might be helpful in case something is broken during linking
-set(CMAKE_CXX_FLAGS "-Wall -Werror -Wno-write-strings -D_GLIBCXX_DEBUG")
+set(CMAKE_CXX_FLAGS "-ggdb3 -Wall -Werror -Wno-write-strings -D_GLIBCXX_DEBUG")
 message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
 
 # glfw

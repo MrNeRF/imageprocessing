@@ -15,6 +15,10 @@ Object3D::Object3D(const std::string& pathToModel)
         {
             spOGLDataObject->InitializeNormalBuffer(spObjectMesh3D->normals);
         }
+        else
+		{
+
+		}
 
         if (spObjectMesh3D->HasUVCoordinates())
         {

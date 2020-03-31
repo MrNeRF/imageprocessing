@@ -9,53 +9,39 @@ void HalfEdgeDS::Initialize(Mesh3D* meshData)
         return;
     }
 
-    // facecount ist indices / 3
-    int faceCount = meshData->indices.size();
+    // facecount ist indices / 3;
+    uint32_t faceCount = static_cast<uint32_t>(static_cast<float>(meshData->indices.size()) / 3.f);
+	uint32_t vIdx = 0;
+    for(uint32_t faceIdx = 0; faceIdx < faceCount; ++faceIdx)
+	{
+        int i0 = meshData->indices[vIdx++];
+        int i1 = meshData->indices[vIdx++];
+        int i2 = meshData->indices[vIdx++];
 
-    // die indices liefern die Position der Vertices.
-    for (int i = 0; i < faceCount; i += 3)
-    {
-        const Eigen::Vector3f& v0 = meshData->vertices.block(i, 0, 1, 3).transpose();
-        const Eigen::Vector3f& v1 = meshData->vertices.block(i + 1, 0, 1, 3).transpose();
-        const Eigen::Vector3f& v2 = meshData->vertices.block(i + 2, 0, 1, 3).transpose();
+        const Eigen::Vector3f& v0 = meshData->vertices.block(i0, 0, 1, 3).transpose();
+        const Eigen::Vector3f& v1 = meshData->vertices.block(i1, 0, 1, 3).transpose();
+        const Eigen::Vector3f& v2 = meshData->vertices.block(i2, 0, 1, 3).transpose();
 
-        Eigen::Vector3f faceNormal = meshData->normals.block(i, 0, 1, 3).transpose() + meshData->vertices.block(i + 1, 0, 1, 3).transpose() + meshData->vertices.block(i + 2, 0, 1, 3).transpose();
-        faceNormal.normalize();
-        faces.emplace_back(std::make_shared<Face>(i));
+        faces.emplace_back(std::make_shared<Face>(faceIdx));
         // We need to take the dot product between the face normal and the boundary sides of the triangle to determine
         // the correct winding order.
         // (from, to)
-        if (faceNormal.dot((v1 - v0).cross(v2 - v0)) >= 0)
-        {
-            /* edge0 = v1 - v0; */
-            const std::pair<int, int> e0 = std::make_pair(i, i + 1);
-            /* edge1 = v2 - v1; */
-            const std::pair<int, int> e1 = std::make_pair(i + 1, i + 2);
-            /* edge2 = v0 - v2; */
-            const std::pair<int, int> e2 = std::make_pair(i + 2, i);
+		/* edge0 = v1 - v0; */
+		const std::pair<int, int> e0 = std::make_pair(i0, i1);
+		/* edge1 = v2 - v1; */
+		const std::pair<int, int> e1 = std::make_pair(i1, i2);
+		/* edge2 = v0 - v2; */
+		const std::pair<int, int> e2 = std::make_pair(i2, i0);
 
-            auto vertex0 = std::make_shared<Vertex>(i, v0);
-            auto vertex1 = std::make_shared<Vertex>(i + 1, v1);
-            auto vertex2 = std::make_shared<Vertex>(i + 2, v2);
+		auto vertex0 = std::make_shared<Vertex>(i0, v0);
+		auto vertex1 = std::make_shared<Vertex>(i1, v1);
+		auto vertex2 = std::make_shared<Vertex>(i2, v2);
 
-            fillDataByFace(e0, e1, e2, vertex0, vertex1, vertex2);
-        }
-        else
-        {
-            /* edge0 = v2 - v0; */
-            const std::pair<int, int> e0 = std::make_pair(i, i + 2);
-            /* edge1 = v1 - v2; */
-            const std::pair<int, int> e1 = std::make_pair(i + 2, i + 1);
-            /* edge2 = v0 - v1; */
-            const std::pair<int, int> e2 = std::make_pair(i + 1, i);
+		fillDataByFace(e0, e1, e2, vertex0, vertex1, vertex2);
 
-            auto vertex0 = std::make_shared<Vertex>(i, v0);
-            auto vertex1 = std::make_shared<Vertex>(i + 2, v2);
-            auto vertex2 = std::make_shared<Vertex>(i + 1, v1);
+	}
+    // die indices liefern die Position der Vertices.
 
-            fillDataByFace(e0, e1, e2, vertex0, vertex1, vertex2);
-        }
-    }
 }
 
 void HalfEdgeDS::fillDataByFace(const std::pair<int, int>& e0,
