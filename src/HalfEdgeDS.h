@@ -46,12 +46,15 @@ public:
     void Initialize(Mesh3D* meshData);
 
 private:
-    void fillDataByFace(const std::pair<int, int>& e0,
-                        const std::pair<int, int>& e1,
-                        const std::pair<int, int>& e2,
-                        std::shared_ptr<Vertex>    vertex0,
-                        std::shared_ptr<Vertex>    vertex1,
-                        std::shared_ptr<Vertex>    vertex2);
+    void createFace(const std::pair<int, int>& e0,
+                    const std::pair<int, int>& e1,
+                    const std::pair<int, int>& e2,
+                    std::shared_ptr<Vertex>    vertex0,
+                    std::shared_ptr<Vertex>    vertex1,
+                    std::shared_ptr<Vertex>    vertex2,
+                    uint32_t                   faceIdx);
+
+    void printFaceData(uint32_t faceIDx);
 
 private:
     std::map<std::pair<int, int>, std::shared_ptr<HalfEdge>> edges;

@@ -1,5 +1,6 @@
 #include "HalfEdgeDS.h"
 #include <cassert>
+#include <iostream>
 
 void HalfEdgeDS::Initialize(Mesh3D* meshData)
 {
@@ -9,11 +10,13 @@ void HalfEdgeDS::Initialize(Mesh3D* meshData)
         return;
     }
 
-    // facecount ist indices / 3;
+    // faceCount ist indices / 3;
     uint32_t faceCount = static_cast<uint32_t>(static_cast<float>(meshData->indices.size()) / 3.f);
-	uint32_t vIdx = 0;
+    faces.resize(faceCount);
+    vertices.resize(meshData->vertices.size());
+    uint32_t vIdx = 0;
     for(uint32_t faceIdx = 0; faceIdx < faceCount; ++faceIdx)
-	{
+    {
         int i0 = meshData->indices[vIdx++];
         int i1 = meshData->indices[vIdx++];
         int i2 = meshData->indices[vIdx++];
@@ -22,51 +25,67 @@ void HalfEdgeDS::Initialize(Mesh3D* meshData)
         const Eigen::Vector3f& v1 = meshData->vertices.block(i1, 0, 1, 3).transpose();
         const Eigen::Vector3f& v2 = meshData->vertices.block(i2, 0, 1, 3).transpose();
 
-        faces.emplace_back(std::make_shared<Face>(faceIdx));
+        faces[faceIdx] = std::make_shared<Face>(faceIdx);
         // We need to take the dot product between the face normal and the boundary sides of the triangle to determine
         // the correct winding order.
         // (from, to)
-		/* edge0 = v1 - v0; */
-		const std::pair<int, int> e0 = std::make_pair(i0, i1);
-		/* edge1 = v2 - v1; */
-		const std::pair<int, int> e1 = std::make_pair(i1, i2);
-		/* edge2 = v0 - v2; */
-		const std::pair<int, int> e2 = std::make_pair(i2, i0);
+        /* edge0 = v1 - v0; */
+        const std::pair<int, int> e0 = std::make_pair(i0, i1);
+        /* edge1 = v2 - v1; */
+        const std::pair<int, int> e1 = std::make_pair(i1, i2);
+        /* edge2 = v0 - v2; */
+        const std::pair<int, int> e2 = std::make_pair(i2, i0);
 
-		auto vertex0 = std::make_shared<Vertex>(i0, v0);
-		auto vertex1 = std::make_shared<Vertex>(i1, v1);
-		auto vertex2 = std::make_shared<Vertex>(i2, v2);
+        auto vertex0 = vertices[i0];
+        if (vertex0 == nullptr)
+        {
+            vertex0 = std::make_shared<Vertex>(i0, v0);
+            vertices[i0] = vertex0;
+        }
 
-		fillDataByFace(e0, e1, e2, vertex0, vertex1, vertex2);
+        auto vertex1 = vertices[i1];
+        if (vertex1 == nullptr)
+        {
+            vertex1 = std::make_shared<Vertex>(i1, v1);
+            vertices[i1] = vertex1;
+        }
 
-	}
+        auto vertex2 = vertices[i2];
+        if (vertex2 == nullptr)
+        {
+            vertex2 = std::make_shared<Vertex>(i2, v2);
+            vertices[i2] = vertex2;
+        }
+
+        createFace(e0, e1, e2, vertex0, vertex1, vertex2, faceIdx);
+    }
     // die indices liefern die Position der Vertices.
 
+    printFaceData(1);
+    printFaceData(10);
 }
 
-void HalfEdgeDS::fillDataByFace(const std::pair<int, int>& e0,
-                                const std::pair<int, int>& e1,
-                                const std::pair<int, int>& e2,
-                                std::shared_ptr<Vertex>    vertex0,
-                                std::shared_ptr<Vertex>    vertex1,
-                                std::shared_ptr<Vertex>    vertex2)
+void HalfEdgeDS::createFace(const std::pair<int, int>& e0,
+                            const std::pair<int, int>& e1,
+                            const std::pair<int, int>& e2,
+                            std::shared_ptr<Vertex>    vertex0,
+                            std::shared_ptr<Vertex>    vertex1,
+                            std::shared_ptr<Vertex>    vertex2,
+                            uint32_t                   faceIdx)
 {
     edges[e0]                    = std::make_shared<HalfEdge>();
     vertex0->wspOutgoingHalfEdge = edges[e0];
-    vertices.push_back(vertex0);
-    edges[e0]->spFace = faces.back();
+    edges[e0]->spFace            = faces[faceIdx];
 
     edges[e1]                    = std::make_shared<HalfEdge>();
     vertex1->wspOutgoingHalfEdge = edges[e1];
-    vertices.push_back(vertex1);
-    edges[e1]->spFace = faces.back();
+    edges[e1]->spFace            = faces[faceIdx];
 
     edges[e2]                    = std::make_shared<HalfEdge>();
     vertex2->wspOutgoingHalfEdge = edges[e2];
-    vertices.push_back(vertex2);
-    edges[e2]->spFace = faces.back();
+    edges[e2]->spFace            = faces[faceIdx];
 
-    faces.back()->wspBoundingHalfEdge = edges[e0];
+    faces[faceIdx]->wspBoundingHalfEdge = edges[e0];
 
     edges[e0]->spDestinationVertex = vertex1;
     edges[e1]->spDestinationVertex = vertex2;
@@ -100,5 +119,9 @@ void HalfEdgeDS::fillDataByFace(const std::pair<int, int>& e0,
         edges[e2]->wspOppositeHalfeEdge                = edges[oppositeHalfEdge2];
         edges[oppositeHalfEdge2]->wspOppositeHalfeEdge = edges[e2];
     }
+}
+
+void HalfEdgeDS::printFaceData(uint32_t faceIDx)
+{
 }
 
