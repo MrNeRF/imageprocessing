@@ -2,28 +2,24 @@
 #include <cassert>
 #include <iostream>
 
-void HalfEdgeDS::Initialize(Mesh3D* meshData)
+void HalfEdgeDS::Initialize(Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& vertexData,
+                            std::vector<int>&                                         indexData)
 {
-    if (meshData == nullptr)
-    {
-        assert(meshData != nullptr && "Meshdata is empty");
-        return;
-    }
 
     // faceCount ist indices / 3;
-    uint32_t faceCount = static_cast<uint32_t>(static_cast<float>(meshData->indices.size()) / 3.f);
+    uint32_t faceCount = static_cast<uint32_t>(static_cast<float>(indexData.size()) / 3.f);
     faces.resize(faceCount);
-    vertices.resize(meshData->vertices.size());
+    vertices.resize(indexData.size());
     uint32_t vIdx = 0;
     for(uint32_t faceIdx = 0; faceIdx < faceCount; ++faceIdx)
     {
-        int i0 = meshData->indices[vIdx++];
-        int i1 = meshData->indices[vIdx++];
-        int i2 = meshData->indices[vIdx++];
+        int i0 = indexData[vIdx++];
+        int i1 = indexData[vIdx++];
+        int i2 = indexData[vIdx++];
 
-        const Eigen::Vector3f& v0 = meshData->vertices.block(i0, 0, 1, 3).transpose();
-        const Eigen::Vector3f& v1 = meshData->vertices.block(i1, 0, 1, 3).transpose();
-        const Eigen::Vector3f& v2 = meshData->vertices.block(i2, 0, 1, 3).transpose();
+        const Eigen::Vector3f& v0 = vertexData.block(i0, 0, 1, 3).transpose();
+        const Eigen::Vector3f& v1 = vertexData.block(i1, 0, 1, 3).transpose();
+        const Eigen::Vector3f& v2 = vertexData.block(i2, 0, 1, 3).transpose();
 
         faces[faceIdx] = std::make_shared<Face>(faceIdx);
         // We need to take the dot product between the face normal and the boundary sides of the triangle to determine

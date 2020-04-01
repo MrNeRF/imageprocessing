@@ -1,5 +1,6 @@
 #include "ObjFileParser.h"
 #include "HalfEdgeDS.h"
+#include "Mesh3D.h"
 #include <algorithm>
 #include <fstream>
 #include <functional>
@@ -45,6 +46,7 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
 {
     std::string buffer;
     spObjFile->GetContents(buffer);
+    std::unique_ptr<Mesh3D> spMesh3D = std::make_unique<Mesh3D>();
 
     std::vector<Eigen::Vector3f> vertexData;
     std::vector<Eigen::Vector2f> textureCoordinatesData;
@@ -131,50 +133,50 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
     }
 
     spMesh3D->indices = remappedIndices;
-    createOutputMatrices(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData);
-    HalfEdgeDS halfEdge;
-    halfEdge.Initialize(spMesh3D.get());
-    return std::move(spMesh3D);
+    createOutputMatrices(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, *spMesh3D);
+    spMesh3D->initializeMeshDS();
+    return spMesh3D;
 }
 
 void ObjFileParser::createOutputMatrices(std::vector<Eigen::Vector3f>& vertexData,
                                          std::vector<Eigen::Vector2f>& textureCoordinatesData,
-                                         std::vector<Eigen::Vector3f>& normalData)
+                                         std::vector<Eigen::Vector3f>& normalData,
+                                         Mesh3D&                       mesh)
 
 {
-    spMesh3D->vertices.resize(vertexData.size(), 3);
+    mesh.vertices.resize(vertexData.size(), 3);
 
     int row = 0;
     for (const auto& v : vertexData)
     {
-        spMesh3D->vertices(row, 0) = v(0);
-        spMesh3D->vertices(row, 1) = v(1);
-        spMesh3D->vertices(row, 2) = v(2);
+        mesh.vertices(row, 0) = v(0);
+        mesh.vertices(row, 1) = v(1);
+        mesh.vertices(row, 2) = v(2);
         ++row;
     }
 
     // @TODO Weitere Attribute noch einbauen.
     if (hasTextureCoordinates)
     {
-        spMesh3D->uvCoordinates.resize(textureCoordinatesData.size(), 2);
+        mesh.uvCoordinates.resize(textureCoordinatesData.size(), 2);
         row = 0;
         for (const auto& t : textureCoordinatesData)
         {
-            spMesh3D->uvCoordinates(row, 0) = t(0);
-            spMesh3D->uvCoordinates(row, 1) = t(1);
+            mesh.uvCoordinates(row, 0) = t(0);
+            mesh.uvCoordinates(row, 1) = t(1);
             ++row;
         }
     }
 
     if (hasNormals)
     {
-        spMesh3D->normals.resize(normalData.size(), 3);
+        mesh.normals.resize(normalData.size(), 3);
         row = 0;
         for (const auto& n : normalData)
         {
-            spMesh3D->normals(row, 0) = n(0);
-            spMesh3D->normals(row, 1) = n(1);
-            spMesh3D->normals(row, 2) = n(2);
+            mesh.normals(row, 0) = n(0);
+            mesh.normals(row, 1) = n(1);
+            mesh.normals(row, 2) = n(2);
             row++;
         }
     }

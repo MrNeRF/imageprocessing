@@ -1,7 +1,6 @@
 #ifndef HALF_EDGE_DS_H
 #define HALF_EDGE_DS_H
 
-#include "Mesh3D.h"
 #include <Eigen/Dense>
 #include <map>
 #include <memory>
@@ -43,7 +42,8 @@ public:
     };
 
 public:
-    void Initialize(Mesh3D* meshData);
+    void Initialize(Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& vertexData,
+                    std::vector<int>&                                         indexData);
 
 private:
     void createFace(const std::pair<int, int>& e0,
