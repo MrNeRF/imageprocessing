@@ -1,5 +1,4 @@
 #include "ObjFileParser.h"
-#include "HalfEdgeDS.h"
 #include "Mesh3D.h"
 #include <algorithm>
 #include <fstream>
@@ -46,7 +45,6 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
 {
     std::string buffer;
     spObjFile->GetContents(buffer);
-    std::unique_ptr<Mesh3D> spMesh3D = std::make_unique<Mesh3D>();
 
     std::vector<Eigen::Vector3f> vertexData;
     std::vector<Eigen::Vector2f> textureCoordinatesData;
@@ -60,7 +58,7 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
     std::vector<Eigen::Vector2f> remappedTextureCoordinatesData;
     std::vector<Eigen::Vector3f> remappedNormalData;
     // Vector of new Indices
-    std::vector<int> remappedIndices;
+    std::vector<uint32_t> remappedIndices;
     // New Index Number
     int newIndex = 0;
     // The map with the key value tuples
@@ -132,54 +130,53 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
         }
     }
 
-    spMesh3D->indices = remappedIndices;
-    createOutputMatrices(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, *spMesh3D);
-    spMesh3D->initializeMeshDS();
-    return spMesh3D;
+    return createMeshObject(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, remappedIndices);
 }
 
-void ObjFileParser::createOutputMatrices(std::vector<Eigen::Vector3f>& vertexData,
-                                         std::vector<Eigen::Vector2f>& textureCoordinatesData,
-                                         std::vector<Eigen::Vector3f>& normalData,
-                                         Mesh3D&                       mesh)
+std::unique_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vector3f>& vertices,
+                                                        std::vector<Eigen::Vector2f>& textureCoordinates,
+                                                        std::vector<Eigen::Vector3f>& normals,
+                                                        std::vector<uint32_t>&        indices)
 
 {
-    mesh.vertices.resize(vertexData.size(), 3);
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> meshVertexData;
+    meshVertexData.resize(vertices.size(), 3);
 
     int row = 0;
-    for (const auto& v : vertexData)
+    for (const auto& v : vertices)
     {
-        mesh.vertices(row, 0) = v(0);
-        mesh.vertices(row, 1) = v(1);
-        mesh.vertices(row, 2) = v(2);
+        meshVertexData(row, 0) = v(0);
+        meshVertexData(row, 1) = v(1);
+        meshVertexData(row, 2) = v(2);
         ++row;
     }
 
     // @TODO Weitere Attribute noch einbauen.
-    if (hasTextureCoordinates)
-    {
-        mesh.uvCoordinates.resize(textureCoordinatesData.size(), 2);
-        row = 0;
-        for (const auto& t : textureCoordinatesData)
-        {
-            mesh.uvCoordinates(row, 0) = t(0);
-            mesh.uvCoordinates(row, 1) = t(1);
-            ++row;
-        }
-    }
+    /* if (hasTextureCoordinates) */
+    /* { */
+    /*     mesh.uvCoordinates.resize(textureCoordinatesData.size(), 2); */
+    /*     row = 0; */
+    /*     for (const auto& t : textureCoordinatesData) */
+    /*     { */
+    /*         mesh.uvCoordinates(row, 0) = t(0); */
+    /*         mesh.uvCoordinates(row, 1) = t(1); */
+    /*         ++row; */
+    /*     } */
+    /* } */
 
-    if (hasNormals)
-    {
-        mesh.normals.resize(normalData.size(), 3);
-        row = 0;
-        for (const auto& n : normalData)
-        {
-            mesh.normals(row, 0) = n(0);
-            mesh.normals(row, 1) = n(1);
-            mesh.normals(row, 2) = n(2);
-            row++;
-        }
-    }
+    /* if (hasNormals) */
+    /* { */
+    /*     mesh.normals.resize(normalData.size(), 3); */
+    /*     row = 0; */
+    /*     for (const auto& n : normalData) */
+    /*     { */
+    /*         mesh.normals(row, 0) = n(0); */
+    /*         mesh.normals(row, 1) = n(1); */
+    /*         mesh.normals(row, 2) = n(2); */
+    /*         row++; */
+    /*     } */
+    /* } */
+    return std::make_unique<Mesh3D>(meshVertexData, indices);
 }
 
 void ObjFileParser::tokenize(std::string& line, char delim, std::vector<std::string>& tokens)

@@ -16,10 +16,10 @@ public:
 
 private:
     void tokenize(std::string& line, char delim, std::vector<std::string>& tokens);
-    void createOutputMatrices(std::vector<Eigen::Vector3f>& vertexData,
-                              std::vector<Eigen::Vector2f>& TextureCoordinatesData,
-                              std::vector<Eigen::Vector3f>& normalData,
-                              Mesh3D&                       mesh);
+    std::unique_ptr<Mesh3D> createMeshObject(std::vector<Eigen::Vector3f>& vertices,
+                                             std::vector<Eigen::Vector2f>& textureCoordinates,
+                                             std::vector<Eigen::Vector3f>& normal,
+                                             std::vector<uint32_t>&        indices);
 
 private:
     bool                    hasTextureCoordinates = false;

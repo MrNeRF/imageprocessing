@@ -6,13 +6,14 @@
 #include <GL/glew.h>
 #include <vector>
 
+class Mesh3D;
+
 class OpenGL3DDataObject
 {
 public:
     OpenGL3DDataObject() { glGenVertexArrays(1, &VAO); }
     ~OpenGL3DDataObject(void);
-    void InitializeVertexBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& vertices,
-                                std::vector<int>                                                indices);
+    void InitializeVertexBuffer(Mesh3D& mesh);
 
     void InitializeColorBuffer(const Color& color);
     void InitializeNormalBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& normals);

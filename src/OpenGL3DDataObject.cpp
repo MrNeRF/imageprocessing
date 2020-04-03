@@ -1,4 +1,5 @@
 #include "OpenGL3DDataObject.h"
+#include "Mesh3D.h"
 #include <cassert>
 
 static void checkBufferCreationError(unsigned int bufferObjectID)
@@ -17,13 +18,10 @@ OpenGL3DDataObject::~OpenGL3DDataObject(void)
     glDeleteBuffers(1, &indexBuffer);
 }
 
-void OpenGL3DDataObject::InitializeVertexBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& vertices, std::vector<int> indices)
+void OpenGL3DDataObject::InitializeVertexBuffer(Mesh3D& mesh)
 {
-    if (indices.empty() || vertices.size() == 0)
-    {
-        assert(false && "There are no vertices indexed");
-    }
-
+    const auto& indices  = mesh.GetIndices();
+    const auto& vertices = mesh.GetVertices();
     numberOfIndices  = indices.size();
     numberOfVertices = vertices.size();
 
@@ -86,7 +84,6 @@ void OpenGL3DDataObject::InitializeTextureUVBuffer(const Eigen::Matrix<float, Ei
         checkBufferCreationError(textureBuffer);
         buffersInUseVector.push_back(textureBuffer);
     }
-
 
     // Dimension of Color Data
     constexpr unsigned int dimension = 2;

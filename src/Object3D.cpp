@@ -6,24 +6,24 @@
 Object3D::Object3D(const std::string& pathToModel)
     : path{pathToModel}
 {
-    spObjectMesh3D = ObjFileParser().Parse(std::make_unique<File>(path));
-    if (spObjectMesh3D != nullptr)
+    spMesh3D = ObjFileParser().Parse(std::make_unique<File>(path));
+    if (spMesh3D != nullptr)
     {
-        spOGLDataObject->InitializeVertexBuffer(spObjectMesh3D->vertices, spObjectMesh3D->indices);
+        spOGLDataObject->InitializeVertexBuffer(*spMesh3D);
 
-        if (spObjectMesh3D->HasNormals())
-        {
-            spOGLDataObject->InitializeNormalBuffer(spObjectMesh3D->normals);
-        }
-        else
-		{
+        /* if (spObjectMesh3D->HasNormals()) */
+        /* { */
+        /*     spOGLDataObject->InitializeNormalBuffer(spObjectMesh3D->normals); */
+        /* } */
+        /* else */
+        /* { */
 
-		}
+        /* } */
 
-        if (spObjectMesh3D->HasUVCoordinates())
-        {
-            spOGLDataObject->InitializeTextureUVBuffer(spObjectMesh3D->uvCoordinates);
-        }
+        /* if (spObjectMesh3D->HasUVCoordinates()) */
+        /* { */
+        /*     spOGLDataObject->InitializeTextureUVBuffer(spObjectMesh3D->uvCoordinates); */
+        /* } */
 
         spOGLDataObject->InitializeColorBuffer(vertexColor);
     }

@@ -16,7 +16,7 @@ public:
 
 private:
     std::string path;
-    std::unique_ptr<Mesh3D> spObjectMesh3D;
+    std::unique_ptr<Mesh3D>             spMesh3D;
     std::unique_ptr<OpenGL3DDataObject> spOGLDataObject = std::make_unique<OpenGL3DDataObject>();
 
     Color vertexColor = Color(0.8f, 0.f, 0.f);
