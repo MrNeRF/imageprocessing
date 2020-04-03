@@ -11,10 +11,10 @@ Object3D::Object3D(const std::string& pathToModel)
     {
         spOGLDataObject->InitializeVertexBuffer(*spMesh3D);
 
-        /* if (spObjectMesh3D->HasNormals()) */
-        /* { */
-        /*     spOGLDataObject->InitializeNormalBuffer(spObjectMesh3D->normals); */
-        /* } */
+        if (spMesh3D->HasNormals())
+        {
+            spOGLDataObject->InitializeNormalBuffer(*spMesh3D);
+        }
         /* else */
         /* { */
 

@@ -1,6 +1,7 @@
 #include "Mesh3D.h"
 #include <cassert>
 #include <iostream>
+#include <typeinfo>
 
 Mesh3D::Mesh3D(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& vertexData,
                const std::vector<uint32_t>&                                    indexVector)
@@ -13,6 +14,55 @@ Mesh3D::Mesh3D(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& v
         assert(false && "There are no vertices indexed");
     }
     m_halfEdgeDS.InitHalfEdgeDS();
+}
+
+void Mesh3D::AddVertexAttribute(std::unique_ptr<VertexAttribute> spVertexAttribute)
+{
+    m_vertexAttributes.push_back(std::move(spVertexAttribute));
+}
+
+VertexAttribute* Mesh3D::GetVertexAttribute(EVertexAttribute vertexAttribute)
+{
+    switch (vertexAttribute)
+    {
+        case EVertexAttribute::Normal:
+            for (auto const& attribute : m_vertexAttributes)
+            {
+                if (typeid(*attribute) == typeid(VertexNormalAttribute))
+                {
+                    return attribute.get();
+                }
+            }
+            return nullptr;
+            break;
+        case EVertexAttribute::Color:
+            for (auto const& attribute : m_vertexAttributes)
+            {
+                if (typeid(*attribute) == typeid(VertexColorAttribute))
+                {
+                    return attribute.get();
+                }
+            }
+            return nullptr;
+            break;
+        case EVertexAttribute::UVCoordinates:
+            /* for (auto const& attribute : m_vertexAttributes) */
+            /* { */
+            /* 	if (typeid(*attribute)	 == typeid(Vertex)) */
+            /* 	{ */
+            /* 		return attribute.get(); */
+            /* 	} */
+            /* } */
+            return nullptr;
+            break;
+        default:
+            return nullptr;
+    }
+}
+
+TriangleAttribute* Mesh3D::GetTriangleAttribute(ETriangleAttribute triangleAttribute)
+{
+    return nullptr;
 }
 
 void Mesh3D::HalfEdgeDS::InitHalfEdgeDS(void)

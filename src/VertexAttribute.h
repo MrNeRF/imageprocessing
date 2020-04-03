@@ -10,11 +10,17 @@ struct VertexAttribute
 
 struct VertexColorAttribute : public VertexAttribute
 {
-    Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor> vertexColor = Eigen::MatrixX2f::Zero(1, 2);
+    VertexColorAttribute(void) = default;
+    VertexColorAttribute(Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>& vertexColorAttribute)
+        : m_vertexColor{vertexColorAttribute} {};
+    Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor> m_vertexColor = Eigen::MatrixX2f::Zero(1, 2);
 };
 
 struct VertexNormalAttribute : public VertexAttribute
 {
-    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> vertices      = Eigen::MatrixX3f::Zero(1, 3);
+    VertexNormalAttribute(void) = default;
+    VertexNormalAttribute(Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& vertexNormalAttribute)
+        : m_vertexColor{vertexNormalAttribute} {};
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> m_vertexColor = Eigen::MatrixX3f::Zero(1, 3);
 };
 #endif

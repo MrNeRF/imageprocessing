@@ -14,9 +14,9 @@ public:
     OpenGL3DDataObject() { glGenVertexArrays(1, &VAO); }
     ~OpenGL3DDataObject(void);
     void InitializeVertexBuffer(Mesh3D& mesh);
+    void InitializeNormalBuffer(Mesh3D& mesh);
 
     void InitializeColorBuffer(const Color& color);
-    void InitializeNormalBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& normals);
     void InitializeTextureUVBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>& uvCoordinates);
     void DrawObject(GLenum mode) const;
 

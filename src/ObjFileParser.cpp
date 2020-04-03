@@ -150,6 +150,7 @@ std::unique_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vecto
         meshVertexData(row, 2) = v(2);
         ++row;
     }
+    std::unique_ptr<Mesh3D> spMesh = std::make_unique<Mesh3D>(meshVertexData, indices);
 
     // @TODO Weitere Attribute noch einbauen.
     /* if (hasTextureCoordinates) */
@@ -164,19 +165,21 @@ std::unique_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vecto
     /*     } */
     /* } */
 
-    /* if (hasNormals) */
-    /* { */
-    /*     mesh.normals.resize(normalData.size(), 3); */
-    /*     row = 0; */
-    /*     for (const auto& n : normalData) */
-    /*     { */
-    /*         mesh.normals(row, 0) = n(0); */
-    /*         mesh.normals(row, 1) = n(1); */
-    /*         mesh.normals(row, 2) = n(2); */
-    /*         row++; */
-    /*     } */
-    /* } */
-    return std::make_unique<Mesh3D>(meshVertexData, indices);
+    if (hasNormals)
+    {
+        Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> meshNormalData;
+        meshNormalData.resize(normals.size(), 3);
+        row = 0;
+        for (const auto& n : normals)
+        {
+            meshNormalData(row, 0) = n(0);
+            meshNormalData(row, 1) = n(1);
+            meshNormalData(row, 2) = n(2);
+            row++;
+        }
+        spMesh->AddVertexAttribute(std::make_unique<VertexNormalAttribute>(meshNormalData));
+    }
+    return spMesh;
 }
 
 void ObjFileParser::tokenize(std::string& line, char delim, std::vector<std::string>& tokens)

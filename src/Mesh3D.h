@@ -1,6 +1,8 @@
 #ifndef MESH_3D_H
 #define MESH_3D_H
 
+#include "TriangleAttribute.h"
+#include "VertexAttribute.h"
 #include <Eigen/Dense>
 #include <map>
 #include <memory>
@@ -9,6 +11,20 @@
 
 class Mesh3D
 {
+public:
+    enum class EVertexAttribute
+    {
+        Normal,
+        Color,
+        UVCoordinates
+    };
+
+    enum class ETriangleAttribute
+    {
+        Normal,
+        Color
+    };
+
 private:
     class HalfEdgeDS
     {
@@ -72,17 +88,23 @@ public:
 
     bool HasVertices(void) { return !vertices.isZero(); };
     bool HasUVCoordinates(void) { return !uvCoordinates.isZero(); };
-    bool HasNormals(void) { return !normals.isZero(); };
+    bool HasNormals(void) { return GetVertexAttribute(EVertexAttribute::Normal) != nullptr; };
+
+    void AddVertexAttribute(std::unique_ptr<VertexAttribute> spVertexAttribute);
 
     const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& GetVertices() { return vertices; }
     const std::vector<uint32_t>&                                    GetIndices() { return indices; };
-    // Indices for element buffer object (EBO)
+
+    VertexAttribute*   GetVertexAttribute(EVertexAttribute vertexAttribute);
+    TriangleAttribute* GetTriangleAttribute(ETriangleAttribute triangleAttribute);
+
 private:
-    std::vector<uint32_t> indices;
+    std::vector<uint32_t>                           indices;
+    std::vector<std::unique_ptr<VertexAttribute>>   m_vertexAttributes;
+    std::vector<std::unique_ptr<TriangleAttribute>> m_TriangleAttributes;
 
     Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> vertices      = Eigen::MatrixX3f::Zero(1, 3);
     Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor> uvCoordinates = Eigen::MatrixX2f::Zero(1, 2);
-    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> normals       = Eigen::MatrixX3f::Zero(1, 3);
 
 private:
     HalfEdgeDS m_halfEdgeDS;

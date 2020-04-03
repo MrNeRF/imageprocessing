@@ -1,5 +1,6 @@
 #include "OpenGL3DDataObject.h"
 #include "Mesh3D.h"
+#include "VertexAttribute.h"
 #include <cassert>
 
 static void checkBufferCreationError(unsigned int bufferObjectID)
@@ -98,7 +99,7 @@ void OpenGL3DDataObject::InitializeTextureUVBuffer(const Eigen::Matrix<float, Ei
     glBindVertexArray(0);
 }
 
-void OpenGL3DDataObject::InitializeNormalBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& normals)
+void OpenGL3DDataObject::InitializeNormalBuffer(Mesh3D& mesh)
 {
     if (normalsBuffer == 0)
     {
@@ -107,13 +108,18 @@ void OpenGL3DDataObject::InitializeNormalBuffer(const Eigen::Matrix<float, Eigen
         buffersInUseVector.push_back(normalsBuffer);
     }
 
+    VertexNormalAttribute* pVertexNormalAttribute = dynamic_cast<VertexNormalAttribute*>(mesh.GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
+    if (pVertexNormalAttribute == nullptr)
+    {
+        return;
+    }
     // Dimension of Color Data
     constexpr unsigned int dimension = 3;
 
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * normals.size(), normals.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * pVertexNormalAttribute->m_vertexColor.size(), pVertexNormalAttribute->m_vertexColor.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(normalAttrIdx, dimension, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(normalAttrIdx);
