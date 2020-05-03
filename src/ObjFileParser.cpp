@@ -1,9 +1,11 @@
 #include "ObjFileParser.h"
 #include "Mesh3D.h"
+#include "VertexNormalAttribute.h"
 #include <algorithm>
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <iterator>
 #include <unordered_map>
 
 // See Stackoverflow for description of this custom hash function
@@ -139,18 +141,7 @@ std::unique_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vecto
                                                         std::vector<uint32_t>&        indices)
 
 {
-    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> meshVertexData;
-    meshVertexData.resize(vertices.size(), 3);
-
-    int row = 0;
-    for (const auto& v : vertices)
-    {
-        meshVertexData(row, 0) = v(0);
-        meshVertexData(row, 1) = v(1);
-        meshVertexData(row, 2) = v(2);
-        ++row;
-    }
-    std::unique_ptr<Mesh3D> spMesh = std::make_unique<Mesh3D>(meshVertexData, indices);
+    std::unique_ptr<Mesh3D> spMesh = std::make_unique<Mesh3D>(vertices, indices);
 
     // @TODO Weitere Attribute noch einbauen.
     /* if (hasTextureCoordinates) */
@@ -167,17 +158,13 @@ std::unique_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vecto
 
     if (hasNormals)
     {
-        Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> meshNormalData;
-        meshNormalData.resize(normals.size(), 3);
-        row = 0;
-        for (const auto& n : normals)
+        auto hNormals = dynamic_cast<VertexNormalAttribute&>(spMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Normal));
+        auto it       = normals.begin();
+        for (const auto& vertex : vertexIterator(*spMesh))
         {
-            meshNormalData(row, 0) = n(0);
-            meshNormalData(row, 1) = n(1);
-            meshNormalData(row, 2) = n(2);
-            row++;
+            hNormals[vertex] = *it;
+            it               = std::next(it);
         }
-        spMesh->AddVertexAttribute(std::make_unique<VertexNormalAttribute>(meshNormalData));
     }
     return spMesh;
 }

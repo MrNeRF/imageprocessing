@@ -9,6 +9,8 @@
 #include <utility>
 #include <vector>
 
+using Vertex = uint32_t*;
+
 class Mesh3D
 {
 public:
@@ -83,31 +85,36 @@ private:
     }; // class HalfEdgeDS END
 
 public:
-    explicit Mesh3D(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& vertexMatrix,
-                    const std::vector<uint32_t>&                                    indexVector);
+    explicit Mesh3D(const std::vector<Eigen::Vector3f>& vertexMatrix,
+                    const std::vector<uint32_t>&        indexVector);
 
-    bool HasVertices(void) { return !vertices.isZero(); };
-    bool HasUVCoordinates(void) { return !uvCoordinates.isZero(); };
+    bool HasVertices(void) { return !m_vertices.empty(); };
+    bool HasUVCoordinates(void) { return !m_uvCoordinates.empty(); };
     bool HasNormals(void) { return GetVertexAttribute(EVertexAttribute::Normal) != nullptr; };
 
-    void AddVertexAttribute(std::unique_ptr<VertexAttribute> spVertexAttribute);
-
-    const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& GetVertices() { return vertices; }
-    const std::vector<uint32_t>&                                    GetIndices() { return indices; };
+    VertexAttribute& AddVertexAttribute(EVertexAttribute vertexAttribute);
 
     VertexAttribute*   GetVertexAttribute(EVertexAttribute vertexAttribute);
     TriangleAttribute* GetTriangleAttribute(ETriangleAttribute triangleAttribute);
 
+    friend const std::vector<uint32_t>& vertexIterator(Mesh3D& mesh);
+
 private:
-    std::vector<uint32_t>                           indices;
+    std::vector<uint32_t>        m_indices;
+    std::vector<Eigen::Vector3f> m_vertices;
+    std::vector<Eigen::Vector2f> m_uvCoordinates;
+
     std::vector<std::unique_ptr<VertexAttribute>>   m_vertexAttributes;
     std::vector<std::unique_ptr<TriangleAttribute>> m_TriangleAttributes;
 
-    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> vertices      = Eigen::MatrixX3f::Zero(1, 3);
-    Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor> uvCoordinates = Eigen::MatrixX2f::Zero(1, 2);
 
 private:
     HalfEdgeDS m_halfEdgeDS;
 };
+
+const std::vector<uint32_t>& vertexIterator(Mesh3D& mesh)
+{
+    return mesh.m_indices;
+}
 
 #endif

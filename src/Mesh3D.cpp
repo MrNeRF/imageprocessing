@@ -1,24 +1,42 @@
 #include "Mesh3D.h"
+#include "VertexColorAttribute.h"
+#include "VertexNormalAttribute.h"
 #include <cassert>
 #include <iostream>
 #include <typeinfo>
 
-Mesh3D::Mesh3D(const Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor>& vertexData,
-               const std::vector<uint32_t>&                                    indexVector)
-    : indices{indexVector}
-    , vertices(vertexData)
+Mesh3D::Mesh3D(const std::vector<Eigen::Vector3f>& vertexData,
+               const std::vector<uint32_t>&        indexVector)
+    : m_indices{indexVector}
+    , m_vertices(vertexData)
     , m_halfEdgeDS(*this)
 {
-    if (indices.empty() || vertexData.size() == 0)
+    if (m_indices.empty() || vertexData.size() == 0)
     {
         assert(false && "There are no vertices indexed");
     }
     m_halfEdgeDS.InitHalfEdgeDS();
 }
 
-void Mesh3D::AddVertexAttribute(std::unique_ptr<VertexAttribute> spVertexAttribute)
+VertexAttribute& Mesh3D::AddVertexAttribute(EVertexAttribute vertexAttribute)
 {
+    std::unique_ptr<VertexAttribute> spVertexAttribute;
+    switch (vertexAttribute)
+    {
+        case EVertexAttribute::Normal:
+            spVertexAttribute = std::make_unique<VertexNormalAttribute>(m_vertices, m_indices);
+            break;
+        case EVertexAttribute::Color:
+            spVertexAttribute = std::make_unique<VertexColorAttribute>(m_vertices, m_indices);
+            break;
+        case EVertexAttribute::UVCoordinates:
+            break;
+            /* default: */
+            /* return nullptr; */
+    }
+
     m_vertexAttributes.push_back(std::move(spVertexAttribute));
+    return *m_vertexAttributes.back();
 }
 
 VertexAttribute* Mesh3D::GetVertexAttribute(EVertexAttribute vertexAttribute)
@@ -28,7 +46,8 @@ VertexAttribute* Mesh3D::GetVertexAttribute(EVertexAttribute vertexAttribute)
         case EVertexAttribute::Normal:
             for (auto const& attribute : m_vertexAttributes)
             {
-                if (typeid(*attribute) == typeid(VertexNormalAttribute))
+                auto pAttri = attribute.get();
+                if (typeid(*pAttri) == typeid(VertexNormalAttribute))
                 {
                     return attribute.get();
                 }
@@ -38,7 +57,8 @@ VertexAttribute* Mesh3D::GetVertexAttribute(EVertexAttribute vertexAttribute)
         case EVertexAttribute::Color:
             for (auto const& attribute : m_vertexAttributes)
             {
-                if (typeid(*attribute) == typeid(VertexColorAttribute))
+                auto pAttri = attribute.get();
+                if (typeid(*pAttri) == typeid(VertexColorAttribute))
                 {
                     return attribute.get();
                 }
@@ -68,19 +88,19 @@ TriangleAttribute* Mesh3D::GetTriangleAttribute(ETriangleAttribute triangleAttri
 void Mesh3D::HalfEdgeDS::InitHalfEdgeDS(void)
 {
     // faceCount ist indices / 3;
-    uint32_t faceCount = static_cast<uint32_t>(static_cast<float>(m_mesh.indices.size()) / 3.f);
+    uint32_t faceCount = static_cast<uint32_t>(static_cast<float>(m_mesh.m_indices.size()) / 3.f);
     faces.resize(faceCount);
-    vertices.resize(m_mesh.indices.size());
+    vertices.resize(m_mesh.m_indices.size());
     uint32_t vIdx = 0;
     for (uint32_t faceIdx = 0; faceIdx < faceCount; ++faceIdx)
     {
-        int i0 = m_mesh.indices[vIdx++];
-        int i1 = m_mesh.indices[vIdx++];
-        int i2 = m_mesh.indices[vIdx++];
+        int i0 = m_mesh.m_indices[vIdx++];
+        int i1 = m_mesh.m_indices[vIdx++];
+        int i2 = m_mesh.m_indices[vIdx++];
 
-        const Eigen::Vector3f& v0 = m_mesh.vertices.block(i0, 0, 1, 3).transpose();
-        const Eigen::Vector3f& v1 = m_mesh.vertices.block(i1, 0, 1, 3).transpose();
-        const Eigen::Vector3f& v2 = m_mesh.vertices.block(i2, 0, 1, 3).transpose();
+        const Eigen::Vector3f& v0 = m_mesh.m_vertices[i0];
+        const Eigen::Vector3f& v1 = m_mesh.m_vertices[i1];
+        const Eigen::Vector3f& v2 = m_mesh.m_vertices[i2];
 
         faces[faceIdx] = std::make_shared<Face>(faceIdx);
         // We need to take the dot product between the face normal and the boundary sides of the triangle to determine
