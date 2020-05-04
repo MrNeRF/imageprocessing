@@ -2,6 +2,8 @@
 #include "Mesh3D.h"
 #include "VertexNormalAttribute.h"
 #include <algorithm>
+#include "Macros.h"
+#include <cassert>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -132,6 +134,16 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
         }
     }
 
+	ASSERT(vertexIndices.size() == remappedIndices.size());
+	if (hasNormals)
+	{
+		ASSERT(remappedNormalData.size() == remappedVertexData.size());
+	}
+	int i = 0;
+	for (const auto& idx : vertexIndices)
+	{
+		assert(vertexData[idx] == remappedVertexData[remappedIndices[i++]]);
+	}
     return createMeshObject(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, remappedIndices);
 }
 
@@ -159,12 +171,7 @@ std::unique_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vecto
     if (hasNormals)
     {
         auto hNormals = dynamic_cast<VertexNormalAttribute&>(spMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Normal));
-        auto it       = normals.begin();
-        for (const auto& vertex : vertexIterator(*spMesh))
-        {
-            hNormals[vertex] = *it;
-            it               = std::next(it);
-        }
+    	hNormals.SetVertexNormals(normals);
     }
     return spMesh;
 }

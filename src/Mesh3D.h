@@ -97,9 +97,10 @@ public:
     VertexAttribute*   GetVertexAttribute(EVertexAttribute vertexAttribute);
     TriangleAttribute* GetTriangleAttribute(ETriangleAttribute triangleAttribute);
 
-    friend const std::vector<uint32_t>& vertexIterator(Mesh3D& mesh);
 
 private:
+	friend class OpenGL3DDataObject;
+	friend class vertexIterator;
     std::vector<uint32_t>        m_indices;
     std::vector<Eigen::Vector3f> m_vertices;
     std::vector<Eigen::Vector2f> m_uvCoordinates;
@@ -107,14 +108,28 @@ private:
     std::vector<std::unique_ptr<VertexAttribute>>   m_vertexAttributes;
     std::vector<std::unique_ptr<TriangleAttribute>> m_TriangleAttributes;
 
-
-private:
     HalfEdgeDS m_halfEdgeDS;
 };
 
-const std::vector<uint32_t>& vertexIterator(Mesh3D& mesh)
-{
-    return mesh.m_indices;
-}
-
 #endif
+
+class vertexIterator
+{
+public:
+	explicit vertexIterator(Mesh3D& rMesh) : m_rMesh(rMesh){}
+		
+	int operator*() {return m_rMesh.m_indices[idx];}
+	vertexIterator& operator++() { ++idx; return *this; }
+	bool operator != (const vertexIterator& other) {  return idx != other.idx; }
+
+	vertexIterator begin() {return vertexIterator(0, m_rMesh);};
+	vertexIterator end() {return vertexIterator(endIdx, m_rMesh);};
+private:
+	explicit vertexIterator(uint32_t i, Mesh3D& rMesh) :  m_rMesh(rMesh), idx{i} {};
+
+private:
+	Mesh3D& m_rMesh;
+	uint32_t idx = 0;
+	uint32_t endIdx = m_rMesh.m_indices.size();
+};
+

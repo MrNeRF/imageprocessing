@@ -1,6 +1,7 @@
 #include "OpenGL3DDataObject.h"
 #include "Mesh3D.h"
 #include "VertexAttribute.h"
+#include "VertexNormalAttribute.h"
 #include <cassert>
 
 static void checkBufferCreationError(unsigned int bufferObjectID)
@@ -21,8 +22,8 @@ OpenGL3DDataObject::~OpenGL3DDataObject(void)
 
 void OpenGL3DDataObject::InitializeVertexBuffer(Mesh3D& mesh)
 {
-    const auto& indices  = mesh.GetIndices();
-    const auto& vertices = mesh.GetVertices();
+    const auto& indices  = mesh.m_indices;
+    const auto& vertices = mesh.m_vertices;
     numberOfIndices  = indices.size();
     numberOfVertices = vertices.size();
 
@@ -37,15 +38,15 @@ void OpenGL3DDataObject::InitializeVertexBuffer(Mesh3D& mesh)
 
     glBindVertexArray(VAO);
 
+    constexpr unsigned int dimension = 3;
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numberOfVertices, vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, dimension * sizeof(float) * numberOfVertices, vertices[0].data(), GL_STATIC_DRAW);
 
     // In Opengl there is only one index Buffer per VAO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * numberOfIndices, &indices[0], GL_STATIC_DRAW);
 
     // Dimension of Vertex Data
-    constexpr unsigned int dimension = 3;
     glVertexAttribPointer(vertexAttrIdx, dimension, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(vertexAttrIdx);
 
@@ -113,13 +114,13 @@ void OpenGL3DDataObject::InitializeNormalBuffer(Mesh3D& mesh)
     {
         return;
     }
-    // Dimension of Color Data
+    // Dimension of Normals Data
     constexpr unsigned int dimension = 3;
 
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * pVertexNormalAttribute->m_vertexColor.size(), pVertexNormalAttribute->m_vertexColor.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * dimension * pVertexNormalAttribute->m_vertexNormals.size(), pVertexNormalAttribute->m_vertexNormals.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(normalAttrIdx, dimension, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(normalAttrIdx);

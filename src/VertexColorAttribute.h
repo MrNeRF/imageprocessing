@@ -1,7 +1,6 @@
 #ifndef VERTEX_COLOR_ATTRIBUTE
 #define VERTEX_COLOR_ATTRIBUTE
 
-#include "Defs.h"
 #include "Eigen/Dense"
 #include "VertexAttribute.h"
 #include <vector>
