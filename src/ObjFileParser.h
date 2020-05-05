@@ -19,7 +19,8 @@ private:
     std::unique_ptr<Mesh3D> createMeshObject(std::vector<Eigen::Vector3f>& vertices,
                                              std::vector<Eigen::Vector2f>& textureCoordinates,
                                              std::vector<Eigen::Vector3f>& normal,
-                                             std::vector<uint32_t>&        indices);
+                                             std::vector<uint32_t>&        indices,
+                                             const std::string& name);
 
 private:
     bool                    hasTextureCoordinates = false;

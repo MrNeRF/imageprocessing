@@ -6,8 +6,10 @@
 #include <typeinfo>
 
 Mesh3D::Mesh3D(const std::vector<Eigen::Vector3f>& vertexData,
-               const std::vector<uint32_t>&        indexVector)
-    : m_indices{indexVector}
+               const std::vector<uint32_t>&        indexVector,
+               const std::string name)
+    : m_name{name}
+	, m_indices{indexVector}
     , m_vertices(vertexData)
     , m_halfEdgeDS(*this)
 {
@@ -20,14 +22,13 @@ Mesh3D::Mesh3D(const std::vector<Eigen::Vector3f>& vertexData,
 
 VertexAttribute& Mesh3D::AddVertexAttribute(EVertexAttribute vertexAttribute)
 {
-    std::unique_ptr<VertexAttribute> spVertexAttribute;
     switch (vertexAttribute)
     {
         case EVertexAttribute::Normal:
-            spVertexAttribute = std::make_unique<VertexNormalAttribute>(m_vertices, m_indices);
+            m_vertexAttributes.emplace_back(std::make_unique<VertexNormalAttribute>(m_vertices, m_indices));
             break;
         case EVertexAttribute::Color:
-            spVertexAttribute = std::make_unique<VertexColorAttribute>(m_vertices, m_indices);
+            m_vertexAttributes.emplace_back(std::make_unique<VertexColorAttribute>(m_vertices, m_indices));
             break;
         case EVertexAttribute::UVCoordinates:
             break;
@@ -35,8 +36,7 @@ VertexAttribute& Mesh3D::AddVertexAttribute(EVertexAttribute vertexAttribute)
             /* return nullptr; */
     }
 
-    m_vertexAttributes.push_back(std::move(spVertexAttribute));
-    return *m_vertexAttributes.back();
+    return *(m_vertexAttributes.back());
 }
 
 VertexAttribute* Mesh3D::GetVertexAttribute(EVertexAttribute vertexAttribute)

@@ -7,6 +7,8 @@
 #include <map>
 #include <memory>
 #include <utility>
+#include "Defs.h"
+#include <string>
 #include <vector>
 
 using Vertex = uint32_t*;
@@ -86,7 +88,8 @@ private:
 
 public:
     explicit Mesh3D(const std::vector<Eigen::Vector3f>& vertexMatrix,
-                    const std::vector<uint32_t>&        indexVector);
+                    const std::vector<uint32_t>&        indexVector,
+                    const std::string name);
 
     bool HasVertices(void) { return !m_vertices.empty(); };
     bool HasUVCoordinates(void) { return !m_uvCoordinates.empty(); };
@@ -101,6 +104,7 @@ public:
 private:
 	friend class OpenGL3DDataObject;
 	friend class vertexIterator;
+	std::string m_name;
     std::vector<uint32_t>        m_indices;
     std::vector<Eigen::Vector3f> m_vertices;
     std::vector<Eigen::Vector2f> m_uvCoordinates;

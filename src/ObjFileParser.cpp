@@ -144,16 +144,17 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
 	{
 		assert(vertexData[idx] == remappedVertexData[remappedIndices[i++]]);
 	}
-    return createMeshObject(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, remappedIndices);
+    return createMeshObject(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, remappedIndices, spObjFile->filename);
 }
 
 std::unique_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vector3f>& vertices,
                                                         std::vector<Eigen::Vector2f>& textureCoordinates,
                                                         std::vector<Eigen::Vector3f>& normals,
-                                                        std::vector<uint32_t>&        indices)
+                                                        std::vector<uint32_t>&        indices,
+                                                        const std::string& name)
 
 {
-    std::unique_ptr<Mesh3D> spMesh = std::make_unique<Mesh3D>(vertices, indices);
+    std::unique_ptr<Mesh3D> spMesh = std::make_unique<Mesh3D>(vertices, indices, name);
 
     // @TODO Weitere Attribute noch einbauen.
     /* if (hasTextureCoordinates) */
@@ -170,8 +171,9 @@ std::unique_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vecto
 
     if (hasNormals)
     {
-        auto hNormals = dynamic_cast<VertexNormalAttribute&>(spMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Normal));
-    	hNormals.SetVertexNormals(normals);
+	spMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Normal);
+        auto pNormal = dynamic_cast<VertexNormalAttribute*>(spMesh->GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
+    	pNormal->SetVertexNormals(normals);
     }
     return spMesh;
 }
