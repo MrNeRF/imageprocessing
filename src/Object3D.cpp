@@ -1,6 +1,7 @@
 #include "Object3D.h"
 #include "File.h"
 #include "ObjFileParser.h"
+#include <iostream>
 #include <GL/glew.h>
 
 Object3D::Object3D(const std::string& pathToModel)
@@ -40,3 +41,16 @@ void Object3D::Draw(void)
     spOGLDataObject->DrawObject(GL_TRIANGLES);
 }
 
+
+void Object3D::onNotify(const EventType& eventType, std::unique_ptr<IEvent> spEventData)
+{
+	MouseDragEvent* pMouseDragEvent = dynamic_cast<MouseDragEvent*>(spEventData.get());
+	if(pMouseDragEvent != nullptr)
+	{
+		std::cout << pMouseDragEvent->m_endCoordinates - pMouseDragEvent->m_startCoordinates << std::endl;
+	}
+	else
+	{
+		std::cout << "Cast fehlgeschlagen" << std::endl;
+	}
+}

@@ -13,16 +13,16 @@ Window::Window(const std::string name)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    windowInstance = glfwCreateWindow(winHeight, winWidth, "Window", NULL, NULL);
+    m_windowInstance = glfwCreateWindow(winHeight, winWidth, "Window", NULL, NULL);
 
-    if (windowInstance == NULL)
+    if (m_windowInstance == NULL)
     {
         std::puts("Failed to create GLFW window\n");
         glfwTerminate();
         return;
     }
 
-    glfwMakeContextCurrent(windowInstance);
+    glfwMakeContextCurrent(m_windowInstance);
     glewExperimental = GL_TRUE;
 
     if (glewInit() != GLEW_OK)
@@ -38,13 +38,13 @@ Window::Window(const std::string name)
     std::cout << "OpenGL version supported \n"
               << version << std::endl;
     // Userpointer -> Necessary to for casting
-    glfwSetWindowUserPointer(windowInstance, this);
+    glfwSetWindowUserPointer(m_windowInstance, this);
 
     // Register Callbacks
-    glfwSetFramebufferSizeCallback(windowInstance, WindowResizeCallback);
-    glfwSetMouseButtonCallback(windowInstance, MouseInputCallback);
-    glfwSetCursorPosCallback(windowInstance, CursorPositionCallback);
-    glfwSetKeyCallback(windowInstance, KeyboardCallback);
+    glfwSetFramebufferSizeCallback(m_windowInstance, WindowResizeCallback);
+    glfwSetMouseButtonCallback(m_windowInstance, MouseInputCallback);
+    glfwSetCursorPosCallback(m_windowInstance, CursorPositionCallback);
+    glfwSetKeyCallback(m_windowInstance, KeyboardCallback);
 }
 
 Window::~Window(void)
@@ -61,76 +61,6 @@ void Window::ViewPortResized(int width, int height)
     glLoadIdentity();
     glMatrixMode(GL_MODELVIEW);
     aspectRatio = static_cast<float>(winWidth) / static_cast<float>(winHeight);
-}
-
-void Window::MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods)
-{
-    switch (button)
-    {
-        case GLFW_MOUSE_BUTTON_LEFT:
-            mouseDevice.currentButton = MouseDevice::MouseButton::LEFTMOUSEBUTTON;
-            break;
-        case GLFW_MOUSE_BUTTON_MIDDLE:
-            mouseDevice.currentButton = MouseDevice::MouseButton::MIDDLEMOUSEBUTTON;
-            break;
-        case GLFW_MOUSE_BUTTON_RIGHT:
-            mouseDevice.currentButton = MouseDevice::MouseButton::RIGHTMOUSEBUTTON;
-            break;
-        default:
-            mouseDevice.currentButton = MouseDevice::MouseButton::NONE;
-    }
-
-    switch (action)
-    {
-        case GLFW_RELEASE:
-            mouseDevice.currentAction = MouseDevice::MouseAction::RELEASE;
-            break;
-        case GLFW_PRESS:
-            mouseDevice.currentAction = MouseDevice::MouseAction::PRESS;
-            break;
-        case GLFW_REPEAT:
-            mouseDevice.currentAction = MouseDevice::MouseAction::REPEAT;
-            break;
-    }
-
-    glfwGetCursorPos(win, &mouseDevice.clickedPosX, &mouseDevice.clickedPosY);
-    //@TODO Modifier Keys alt, shift, etc...
-}
-
-void Window::KeyboardDeviceUpdate(int key, int scancode, int action, int mods)
-{
-    switch (key)
-    {
-        case GLFW_KEY_W:
-        case GLFW_KEY_A:
-        case GLFW_KEY_S:
-        case GLFW_KEY_D:
-            keyboardDevice.key = key;
-            break;
-        default:
-            keyboardDevice.key = -1;
-    }
-
-    switch (action)
-    {
-        case GLFW_RELEASE:
-            keyboardDevice.currentAction = KeyboardDevice::KeyAction::RELEASE;
-            break;
-        case GLFW_PRESS:
-            keyboardDevice.currentAction = KeyboardDevice::KeyAction::PRESS;
-            break;
-        case GLFW_REPEAT:
-            keyboardDevice.currentAction = KeyboardDevice::KeyAction::REPEAT;
-            break;
-    }
-
-    //@TODO Modifier Keys alt, shift, etc...
-}
-
-void Window::UpdateCursorPosition(double xCursorPos, double yCursorPos)
-{
-    mouseDevice.cursorPosX = xCursorPos;
-    mouseDevice.cursorPosY = yCursorPos;
 }
 
 void Window::WindowResizeCallback(GLFWwindow* win, int h, int w)
@@ -155,4 +85,73 @@ void Window::KeyboardCallback(GLFWwindow* win, int key, int scancode, int action
 {
     Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
     window->KeyboardDeviceUpdate(key, scancode, action, mods);
+}
+
+void Window::MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods)
+{
+    bool leftMouseButtonReleased = false;
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
+	{
+		if (action == GLFW_PRESS)
+		{
+			double x, y;
+			glfwGetCursorPos(win, &x, &y);
+			m_MouseDragInfo.startPos = {static_cast<float>(x), static_cast<float>(y)};
+			m_MouseDragInfo.tic = std::chrono::steady_clock::now();
+		}
+		else
+		{
+			double x, y;
+			glfwGetCursorPos(win, &x, &y);
+			m_MouseDragInfo.toc = std::chrono::steady_clock::now();
+			m_MouseDragInfo.endPos = {static_cast<float>(x), static_cast<float>(y)};
+			leftMouseButtonReleased = true;	
+		}
+	}
+
+	if (leftMouseButtonReleased && milliseconds(m_MouseDragInfo.toc - m_MouseDragInfo.tic).count() > 500)
+	{
+		notify(EventType::MOUSEDRAG, std::make_unique<MouseDragEvent>(m_MouseDragInfo.startPos,m_MouseDragInfo.endPos ));
+	}
+
+}
+
+void Window::KeyboardDeviceUpdate(int key, int scancode, int action, int mods)
+{
+	
+}
+
+void Window::UpdateCursorPosition(double xCursorPos, double yCursorPos)
+{
+
+}
+
+void Window::attach(std::shared_ptr<IObserver> spObserver)
+{
+	m_observerList.emplace_back(spObserver);
+}
+
+void Window::detach(std::shared_ptr<IObserver> spObserver)
+{
+	m_observerList.remove(std::weak_ptr<IObserver>(spObserver));
+}
+
+void Window::detach(std::list<std::weak_ptr<IObserver>>::const_iterator iter)
+{
+	m_observerList.erase(iter);
+}
+
+void Window::notify(const EventType &eventType, std::unique_ptr<IEvent> spEvent)
+{
+	for (auto it = std::cbegin(m_observerList); it != std::cend(m_observerList); ++it)
+	{
+		if(auto observer = it->lock())
+		{
+			observer->onNotify(eventType, std::move(spEvent));
+		}
+		else
+		{
+
+		}
+	}
 }

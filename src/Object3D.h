@@ -6,11 +6,13 @@
 #include "Eigen/src/Geometry/Quaternion.h"
 #include "Mesh3D.h"
 #include "OpenGL3DDataObject.h"
+#include "IObserver.h"
 #include <Eigen/Dense>
+#include "IEvent.h"
 #include <memory>
 #include <string>
 
-class Object3D
+class Object3D : public IObserver
 {
 public:
     Object3D(const std::string& pathToModel);
@@ -21,6 +23,8 @@ public:
     void                      SetPosition(const Eigen::Vector4f& pos) { position = pos; }
     void                      Draw(void);
 
+	// Observer
+	void onNotify(const EventType& eventType, std::unique_ptr<IEvent> spEventData) override;	
 private:
     Eigen::Vector4f                     position{0.f, 0.f, 0.f, 0.f};
     Eigen::Quaternionf                  orientation{Eigen::AngleAxis{0.f, Eigen::Vector3f::UnitX()}};

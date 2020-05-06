@@ -3,66 +3,29 @@
 
 #include "GLFW/glfw3.h"
 #include <Eigen/Dense>
+#include "IObservable.h"
+#include "IEvent.h"
+#include <chrono>
+#include <ratio>
 #include <cstdint>
 #include <string>
+#include <list>
 
-class Window
+class Window : public IObservable
 {
-public:
-    struct MouseDevice
-    {
-        enum class MouseButton
-        {
-            NONE,
-            LEFTMOUSEBUTTON,
-            MIDDLEMOUSEBUTTON,
-            RIGHTMOUSEBUTTON
-        };
-
-        enum class MouseAction
-        {
-            RELEASE,
-            PRESS,
-            REPEAT
-        };
-
-        double clickedPosX = 0.;
-        double clickedPosY = 0.;
-        double cursorPosX  = 0.;
-        double cursorPosY  = 0.;
-        bool   isPressed   = false;
-        bool   isReleased  = true;
-
-        MouseButton currentButton = MouseButton::NONE;
-        MouseAction currentAction = MouseAction::RELEASE;
-    };
-
-    struct KeyboardDevice
-    {
-        enum class KeyAction
-        {
-            RELEASE,
-            PRESS,
-            REPEAT
-        };
-
-        KeyAction currentAction = KeyAction::RELEASE;
-        int  key        = -1;
-        bool isPressed  = false;
-        bool isReleased = true;
-    };
+	using seconds = std::chrono::duration<double>;
+	using milliseconds = std::chrono::duration<double, std::ratio_multiply<seconds::period, std::milli>>;
+	struct MouseDragInfo
+	{
+		Eigen::Vector2f startPos;
+		Eigen::Vector2f endPos;
+		decltype(std::chrono::steady_clock::now()) tic;
+		decltype(std::chrono::steady_clock::now()) toc;
+	};
 
 public:
     Window(const std::string name);
     ~Window(void);
-
-    void ViewPortResized(int width, int height);
-    void MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods);
-    void UpdateCursorPosition(double xCursorPos, double yCursorPos);
-    void KeyboardDeviceUpdate(int key, int scancode, int action, int mods);
-
-    GLFWwindow*     GetGLFWWindow(void) { return windowInstance; }
-    Eigen::Vector2f GetCursorPosition(void) { return Eigen::Vector2f(static_cast<float>(mouseDevice.cursorPosX), static_cast<float>(mouseDevice.cursorPosY)); }
 
     // Callbacks
     static void WindowResizeCallback(GLFWwindow* win, int h, int w);
@@ -70,18 +33,30 @@ public:
     static void CursorPositionCallback(GLFWwindow* win, double xCursorPos, double yCursorPos);
     static void KeyboardCallback(GLFWwindow* win, int key, int scancode, int action, int mods);
 
+    GLFWwindow*     GetGLFWWindow(void) { return m_windowInstance; }
+
+    void ViewPortResized(int width, int height);
+    void MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods);
+    void UpdateCursorPosition(double xCursorPos, double yCursorPos);
+    void KeyboardDeviceUpdate(int key, int scancode, int action, int mods);
+	
+	// Observable overrides
+	void attach(std::shared_ptr<IObserver> spObserver) override;	
+	void detach(std::shared_ptr<IObserver> spObserver) override;
+	void detach(std::list<std::weak_ptr<IObserver>>::const_iterator iter);
+    void notify(const EventType& eventType, std::unique_ptr<IEvent> spEvent) override;
+
+
 public:
     int   winHeight   = 800;
     int   winWidth    = 600;
     float aspectRatio = winWidth / winHeight;
-
-    MouseDevice    mouseDevice;
-    KeyboardDevice keyboardDevice;
-
     const std::string windowName;
 
 private:
-    GLFWwindow* windowInstance = nullptr;
+	MouseDragInfo m_MouseDragInfo;
+    GLFWwindow* m_windowInstance = nullptr;
+	std::list<std::weak_ptr<IObserver>> m_observerList;
 };
 
 #endif

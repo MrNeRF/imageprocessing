@@ -12,12 +12,6 @@ public:
         m_vertexNormals.resize(m_vertices.size());
 		std::cout << "VertexNormalAttribute created\n";
     }
-	~VertexNormalAttribute()
-	{
-
-		std::cout << "VertexNormalAttribute destroyed\n";
-		ASSERT(0)
-	}
 
     Eigen::Vector3f& operator[](uint32_t i)
     {
