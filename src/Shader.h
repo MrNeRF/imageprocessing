@@ -37,6 +37,10 @@ public:
 
     template<typename T>
     void SetValue(const std::string& name, T value);
+    void SetQuat(const std::string& name, const Eigen::Quaternionf& v)
+    {
+        glUniform4f(glGetUniformLocation(shaderProgramID, name.c_str()), v.x(), v.y(), v.z(), v.w());
+    }
     template<typename T, int N = 1>
     void SetVector(const std::string& name, const T& v);
     template<typename T>

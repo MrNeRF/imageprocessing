@@ -2,35 +2,31 @@
 #define OBJECT3D_H
 
 #include "Color.h"
+#include "Eigen/src/Geometry/AngleAxis.h"
+#include "Eigen/src/Geometry/Quaternion.h"
 #include "Mesh3D.h"
-#include <Eigen/Dense>
 #include "OpenGL3DDataObject.h"
+#include <Eigen/Dense>
 #include <memory>
 #include <string>
 
 class Object3D
 {
-	struct Transform
-	{
-		Eigen::Vector4f position{0.f,0.f,0.f,0.f};
-		Eigen::Vector4f axis_angle{0.f, 1.f, 0.f, 0.f};
-	};
-
 public:
     Object3D(const std::string& pathToModel);
-    void SetColor(const Color& color);
-	void SetAxisAngle(Eigen::Vector3f axis, float angle) {m_transform.axis_angle = Eigen::Vector4f(axis.x(), axis.y(), axis.z(), angle);}
-	const Eigen::Vector4f GetAxisAngle() {return m_transform.axis_angle;}
-	const Eigen::Vector4f GetPosition() {return m_transform.position;}
-	void SetPosition(Eigen::Vector4f pos) {m_transform.position = pos;}
-    void Draw(void);
+    void                      SetColor(const Color& color);
+    const Eigen::Vector4f&    GetPosition() const { return position; }
+    const Eigen::Quaternionf& GetOrientation() const { return orientation; }
+    void                      UpdateOrientation(const Eigen::AngleAxisf& angleAxis) { orientation = orientation * Eigen::Quaternionf(angleAxis); }
+    void                      SetPosition(const Eigen::Vector4f& pos) { position = pos; }
+    void                      Draw(void);
 
 private:
-    Transform m_transform;
-    std::string path;
+    Eigen::Vector4f                     position{0.f, 0.f, 0.f, 0.f};
+    Eigen::Quaternionf                  orientation{Eigen::AngleAxis{0.f, Eigen::Vector3f::UnitX()}};
+    std::string                         path;
     std::unique_ptr<Mesh3D>             spMesh3D;
     std::unique_ptr<OpenGL3DDataObject> spOGLDataObject = std::make_unique<OpenGL3DDataObject>();
-
 
     Color vertexColor = Color(0.8f, 0.f, 0.f);
 };

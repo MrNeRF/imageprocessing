@@ -1,6 +1,7 @@
 #include "Viewer.h"
 #include "Camera.h"
 #include "Color.h"
+#include "Macros.h"
 #include "Object3D.h"
 #include "Shader.h"
 #include "Window.h"
@@ -50,22 +51,22 @@ void Viewer::Run(void)
         if (m_window->keyboardDevice.key == GLFW_KEY_W
             && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
         {
-            suzanne.SetAxisAngle({1.f, 0.f, 0.f}, 30.f);
+            suzanne.UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(5.f), Eigen::Vector3f::UnitX()));
         }
         if (m_window->keyboardDevice.key == GLFW_KEY_S
             && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
         {
-            suzanne.SetAxisAngle({1.f, 0.f, 0.f}, -30.f);
+            suzanne.UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(-5.f), Eigen::Vector3f::UnitX()));
         }
         if (m_window->keyboardDevice.key == GLFW_KEY_D
             && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
         {
-            suzanne.SetAxisAngle({0.f, 1.f, 0.f}, -30.f);
+            suzanne.UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(5.f), Eigen::Vector3f::UnitY()));
         }
         if (m_window->keyboardDevice.key == GLFW_KEY_A
             && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
         {
-            suzanne.SetAxisAngle({0.f, 1.f, 0.f}, 30.f);
+            suzanne.UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(-5.f), Eigen::Vector3f::UnitY()));
         }
 
         modelShader.UseShader();
@@ -76,7 +77,8 @@ void Viewer::Run(void)
 
 		suzanne.SetPosition({0.f,0.f, 0.f, 10.f});
         modelShader.SetVector("transform.position", suzanne.GetPosition());
-        modelShader.SetVector("transform.axis_angle", suzanne.GetAxisAngle());
+        modelShader.SetQuat("transform.qOrientation", suzanne.GetOrientation());
+        modelShader.SetQuat("transform.qconjOrientation", suzanne.GetOrientation().conjugate());
 
         modelShader.SetTransformationMatrix("cameraPos", eye);
         modelShader.SetTransformationMatrix("view", view);

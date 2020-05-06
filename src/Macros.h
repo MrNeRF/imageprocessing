@@ -1,14 +1,25 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-#include <sys/stat.h>
+#include <cmath>
+#include <cstring>
 #include <fcntl.h>
 #include <iostream>
+#include <sys/stat.h>
 #include <unistd.h>
-#include <cstring>
+
+namespace MathHelper
+{
+template<typename T>
+constexpr T degreeToRadians(const T degree)
+{
+    T radians = degree * M_PI / 180.f;
+    return radians;
+}
+}
 
 // Checks if a debugger is attached
-static bool CheckForDebugger(void) 
+[[maybe_unused]] static bool CheckForDebugger(void)
 {    
   char buf[256];   
   int fd = open("/proc/self/status", O_RDONLY);
@@ -54,5 +65,4 @@ static bool CheckForDebugger(void)
 #endif
 
 #endif
-
 
