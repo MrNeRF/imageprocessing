@@ -50,37 +50,37 @@ void Viewer::Run(void)
         if (m_window->keyboardDevice.key == GLFW_KEY_W
             && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
         {
-            eye += Eigen::Vector3f(0.0f, 0.f, 0.1f);
+            suzanne.SetAxisAngle({1.f, 0.f, 0.f}, 30.f);
         }
         if (m_window->keyboardDevice.key == GLFW_KEY_S
             && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
         {
-            eye += Eigen::Vector3f(0.0f, 0.f, -0.1f);
+            suzanne.SetAxisAngle({1.f, 0.f, 0.f}, -30.f);
         }
         if (m_window->keyboardDevice.key == GLFW_KEY_D
             && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
         {
-            eye += Eigen::Vector3f(-0.1f, 0.f, 0.f);
+            suzanne.SetAxisAngle({0.f, 1.f, 0.f}, -30.f);
         }
         if (m_window->keyboardDevice.key == GLFW_KEY_A
             && m_window->keyboardDevice.currentAction == Window::KeyboardDevice::KeyAction::PRESS)
         {
-            eye += Eigen::Vector3f(.1f, 0.f, 0.f);
+            suzanne.SetAxisAngle({0.f, 1.f, 0.f}, 30.f);
         }
 
         modelShader.UseShader();
         Eigen::Vector3f target{0.f, 0.f, 0.f};
         Eigen::Vector3f up{0.f, 1.f, 0.f};
-        Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
-        model(0, 0)           = 1.5f;
-        model(2, 3)           = 2.f;
         Eigen::Matrix4f view  = Camera::LookAt(eye, target, up);
         Eigen::Matrix4f projection = Camera::PerspectiveProjection(45.f, 800.f / 600.f, 0.1f, 50.f);
+
+		suzanne.SetPosition({0.f,0.f, 0.f, 10.f});
+        modelShader.SetVector("transform.position", suzanne.GetPosition());
+        modelShader.SetVector("transform.axis_angle", suzanne.GetAxisAngle());
 
         modelShader.SetTransformationMatrix("cameraPos", eye);
         modelShader.SetTransformationMatrix("view", view);
         modelShader.SetTransformationMatrix("projection", projection);
-        modelShader.SetTransformationMatrix("model", model);
 
         modelShader.SetVector("light.ambient", Eigen::Vector3f(.5f, .5f, .5f));
         modelShader.SetVector("light.diffuse", Eigen::Vector3f(.2f, .2f, .2f));
@@ -96,14 +96,14 @@ void Viewer::Run(void)
 
         suzanne.Draw();
 
-        lightShader.UseShader();
-        model = Eigen::Matrix4f::Identity();
-        lightShader.SetTransformationMatrix("view", view);
-        lightShader.SetTransformationMatrix("projection", projection);
-        lightShader.SetTransformationMatrix("model", model);
+		/* lightCube.SetPosition({2.f,2.f, 6.f, 0.f}); */
+        /* lightShader.UseShader(); */
+        /* modelShader.SetVector("transform.position", lightCube.GetPosition()); */
+        /* modelShader.SetVector("transform.axis_angle", lightCube.GetAxisAngle()); */
+        /* lightShader.SetTransformationMatrix("view", view); */
+        /* lightShader.SetTransformationMatrix("projection", projection); */
 
-        lightShader.SetVector("lightPosition", lightPos);
-        lightCube.Draw();
+        /* lightCube.Draw(); */
 
         glfwSwapBuffers(m_window->GetGLFWWindow());
         glfwPollEvents();
