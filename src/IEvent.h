@@ -6,7 +6,8 @@
 enum class EventType
 {
 	MOUSEDRAG,
-	MOUSECLICK
+	MOUSECLICK,
+	MOUSEWHEEL
 };
 
 struct IEvent
@@ -23,6 +24,11 @@ struct MouseDragEvent : public IEvent
 	Eigen::Vector2f m_endCoordinates;		
 };
 
-
+struct MouseWheelEvent : public IEvent
+{
+	MouseWheelEvent(int xoffset, int yoffset) : m_xoffset{xoffset}, m_yoffset{yoffset} {};
+	int m_xoffset = 0;
+	int m_yoffset = 0;
+};
 
 #endif

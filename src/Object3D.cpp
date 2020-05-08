@@ -43,21 +43,25 @@ void Object3D::Draw(void)
 }
 
 
-void Object3D::onNotify(const EventType& eventType, std::unique_ptr<IEvent> spEventData)
+void Object3D::onNotify(const EventType& eventType, IEvent* pEventData)
 {
-	MouseDragEvent* pMouseDragEvent = dynamic_cast<MouseDragEvent*>(spEventData.get());
-	if(pMouseDragEvent != nullptr)
+	std::cout << "Obecjt: ";
+	if (eventType == EventType::MOUSEDRAG)
 	{
-		Eigen::Vector2f difference = (pMouseDragEvent->m_endCoordinates - pMouseDragEvent->m_startCoordinates).normalized();
-		std::cout << difference.x() << ", " << difference.y() << '\n';
-		/* UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(5.f), */ 
-		/* 			Eigen::Vector3f(-difference[1], difference[0], 0.f))); */
-		UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(10.f), 
-					Eigen::Vector3f(difference.y(), difference.x(), 0.f)));
-	}
-	else
-	{
-		// We should not get here -> BUG
-		ASSERT(0);
+		MouseDragEvent* pMouseDragEvent = dynamic_cast<MouseDragEvent*>(pEventData);
+		if(pMouseDragEvent != nullptr)
+		{
+			Eigen::Vector2f difference = (pMouseDragEvent->m_endCoordinates - pMouseDragEvent->m_startCoordinates).normalized();
+			std::cout << difference.x() << ", " << difference.y() << '\n';
+			/* UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(5.f), */ 
+			/* 			Eigen::Vector3f(-difference[1], difference[0], 0.f))); */
+			UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(10.f), 
+						Eigen::Vector3f(difference.y(), difference.x(), 0.f)));
+		}
+		else
+		{
+			// We should not get here -> BUG
+			ASSERT(0);
+		}
 	}
 }

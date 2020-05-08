@@ -31,14 +31,17 @@ public:
     // Callbacks
     static void WindowResizeCallback(GLFWwindow* win, int h, int w);
     static void MouseInputCallback(GLFWwindow* win, int button, int action, int mods);
+    static void MouseWheelCallback(GLFWwindow* win, double xoffset, double yoffset);
     static void CursorPositionCallback(GLFWwindow* win, double xCursorPos, double yCursorPos);
     static void KeyboardCallback(GLFWwindow* win, int key, int scancode, int action, int mods);
 
     GLFWwindow*     GetGLFWWindow(void) { return m_windowInstance; }
 
-    void ViewPortResized(int width, int height);
+    // Associated class methods invoked by registered callbacks.
+    void ViewPortUpdate(int width, int height);
     void MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods);
-    void UpdateCursorPosition(double xCursorPos, double yCursorPos);
+    void MouseWheelUpdate(double xoffset, double yoffset);
+    void CursorPositionUpdate(double xCursorPos, double yCursorPos);
     void KeyboardDeviceUpdate(int key, int scancode, int action, int mods);
 	
 	// Observable overrides

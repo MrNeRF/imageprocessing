@@ -43,6 +43,7 @@ Window::Window(const std::string name)
     // Register Callbacks
     glfwSetFramebufferSizeCallback(m_windowInstance, WindowResizeCallback);
     glfwSetMouseButtonCallback(m_windowInstance, MouseInputCallback);
+    glfwSetScrollCallback(m_windowInstance, MouseWheelCallback);
     glfwSetCursorPosCallback(m_windowInstance, CursorPositionCallback);
     glfwSetKeyCallback(m_windowInstance, KeyboardCallback);
 }
@@ -52,7 +53,7 @@ Window::~Window(void)
     glfwTerminate();
 }
 
-void Window::ViewPortResized(int width, int height)
+void Window::ViewPortUpdate(int width, int height)
 {
     winWidth  = width;
     winHeight = height;
@@ -66,7 +67,7 @@ void Window::ViewPortResized(int width, int height)
 void Window::WindowResizeCallback(GLFWwindow* win, int h, int w)
 {
     Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
-    window->ViewPortResized(w, h);
+    window->ViewPortUpdate(w, h);
 }
 
 void Window::MouseInputCallback(GLFWwindow* win, int button, int action, int mods)
@@ -75,10 +76,16 @@ void Window::MouseInputCallback(GLFWwindow* win, int button, int action, int mod
     window->MouseDeviceUpdate(win, button, action, mods);
 }
 
+void Window::MouseWheelCallback(GLFWwindow *win, double xoffset, double yoffset)
+{
+    Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
+    window->MouseWheelUpdate(xoffset, yoffset);
+}
+
 void Window::CursorPositionCallback(GLFWwindow* win, double xCursorPos, double yCursorPos)
 {
     Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
-    window->UpdateCursorPosition(xCursorPos, yCursorPos);
+    window->CursorPositionUpdate(xCursorPos, yCursorPos);
 }
 
 void Window::KeyboardCallback(GLFWwindow* win, int key, int scancode, int action, int mods)
@@ -121,7 +128,12 @@ void Window::KeyboardDeviceUpdate(int key, int scancode, int action, int mods)
 	m_key = key;
 }
 
-void Window::UpdateCursorPosition(double xCursorPos, double yCursorPos)
+void Window::MouseWheelUpdate(double xoffset, double yoffset)
+{
+	notify(EventType::MOUSEWHEEL, std::make_unique<MouseWheelEvent>(xoffset, yoffset));
+}
+
+void Window::CursorPositionUpdate(double xCursorPos, double yCursorPos)
 {
 	m_cursorPos[0] = static_cast<float>(xCursorPos);
 	m_cursorPos[1]	= static_cast<float>(yCursorPos);
@@ -138,7 +150,7 @@ void Window::UpdateCursorPosition(double xCursorPos, double yCursorPos)
 
 void Window::attach(std::shared_ptr<IObserver> spObserver)
 {
-	m_observerList.emplace_back(spObserver);
+	m_observerList.push_back(spObserver);
 }
 
 void Window::detach(std::shared_ptr<IObserver> spObserver)
@@ -160,7 +172,7 @@ void Window::notify(const EventType &eventType, std::unique_ptr<IEvent> spEvent)
 	{
 		if(auto observer = it->lock())
 		{
-			observer->onNotify(eventType, std::move(spEvent));
+			observer->onNotify(eventType, spEvent.get());
 		}
 		else
 		{

@@ -25,7 +25,7 @@ public:
     void                      Draw(void);
 
 	// Observer
-	void onNotify(const EventType& eventType, std::unique_ptr<IEvent> spEventData) override;	
+	void onNotify(const EventType& eventType, IEvent* pEventData) override;	
 private:
     Eigen::Vector4f                     position{0.f, 0.f, 0.f, 0.f};
     Eigen::Quaternionf                  orientation{Eigen::AngleAxis{0.f, Eigen::Vector3f::UnitX()}};

@@ -30,6 +30,8 @@ void Viewer::Run(void)
     Eigen::Vector3f lightPos = Eigen::Vector3f(10.f, 10.f, 0.0f);
     Color           lightColor(1.f, 1.f, 1.f);
     lightShader.SetVector("lightPosition", lightPos);
+	std::shared_ptr<Camera> spCamera = std::make_shared<Camera>();
+	m_window->attach(spCamera);
 
     glEnable(GL_DEPTH_TEST);
 	std::shared_ptr<Object3D> suzanne = std::make_shared<Object3D>("../models/suzanne.obj");
@@ -37,7 +39,6 @@ void Viewer::Run(void)
     Object3D lightCube("../models/quader.obj");
     lightCube.SetColor(lightColor);
 
-    Eigen::Vector3f eye{0.f, 0.f, 4.f};
 
     while (!glfwWindowShouldClose(m_window->GetGLFWWindow()))
     {
@@ -77,17 +78,15 @@ void Viewer::Run(void)
         }
 
         modelShader.UseShader();
-        Eigen::Vector3f target{0.f, 0.f, 0.f};
-        Eigen::Vector3f up{0.f, 1.f, 0.f};
-        Eigen::Matrix4f view  = Camera::LookAt(eye, target, up);
-        Eigen::Matrix4f projection = Camera::PerspectiveProjection(45.f, 800.f / 600.f, 0.1f, 50.f);
+        const Eigen::Matrix4f view  = spCamera->GetLookAt();
+        const Eigen::Matrix4f projection = spCamera->PerspectiveProjection(45.f, 800.f / 600.f, 0.1f, 50.f);
 
-		suzanne->SetPosition({0.f,0.f, 0.f, 10.f});
+		suzanne->SetPosition({0.f,0.f, 2.f, 0.f});
         modelShader.SetVector("transform.position", suzanne->GetPosition());
         modelShader.SetQuat("transform.qOrientation", suzanne->GetOrientation());
         modelShader.SetQuat("transform.qconjOrientation", suzanne->GetOrientation().conjugate());
 
-        modelShader.SetTransformationMatrix("cameraPos", eye);
+        modelShader.SetTransformationMatrix("cameraPos", spCamera->GetCameraPosition());
         modelShader.SetTransformationMatrix("view", view);
         modelShader.SetTransformationMatrix("projection", projection);
 

@@ -1,36 +1,31 @@
 #include "Camera.h"
 #include <cmath>
+#include "Macros.h"
 #include <iostream>
 
 #ifndef M_PI
 #define M_PI (4.0 * std::atan2(1.0, 1.0))
 #endif
 
-template<typename N>
-inline N deg2rad(N d)
-{
-    return M_PI * d / 180.0;
-}
 
 static Eigen::Matrix4f Frustum(float left, float right, float bottom, float top, float near, float far);
 
-Eigen::Matrix4f Camera::LookAt(Eigen::Vector3f& eye, Eigen::Vector3f& target, Eigen::Vector3f& up)
+const Eigen::Matrix4f& Camera::GetLookAt() const
 {
     // Right Hand Coordinate System
-    Eigen::Vector3f camDir   = (eye - target).normalized();
-    Eigen::Vector3f camRight = (up.cross(camDir)).normalized();
+    Eigen::Vector3f camDir   = (m_eye - m_target).normalized();
+    Eigen::Vector3f camRight = (m_up.cross(camDir)).normalized();
     Eigen::Vector3f camUp    = camDir.cross(camRight);
 
-    Eigen::Matrix4f view                             = Eigen::Matrix4f::Zero(4, 4);
-    view.block(0, 0, 1, 3)                           = camRight.transpose();
-    view.block(1, 0, 1, 3)                           = camUp.transpose();
-    view.block(2, 0, 1, 3)                           = camDir.transpose();
-    view(0, 3)                                       = -camRight.dot(eye);
-    view(1, 3)                                       = -camUp.dot(eye);
-    view(2, 3)                                       = -camDir.dot(eye);
-    view(3, 3)                                       = 1.f;
+    m_view.block(0, 0, 1, 3)                           = camRight.transpose();
+    m_view.block(1, 0, 1, 3)                           = camUp.transpose();
+    m_view.block(2, 0, 1, 3)                           = camDir.transpose();
+    m_view(0, 3)                                       = -camRight.dot(m_eye);
+    m_view(1, 3)                                       = -camUp.dot(m_eye);
+    m_view(2, 3)                                       = -camDir.dot(m_eye);
+    m_view(3, 3)                                       = 1.f;
 
-    return view;
+    return m_view;
 }
 
 Eigen::Matrix4f Camera::PerspectiveProjection(float fov, float aspectRatio, float zNearPlane, float zFarPlane)
@@ -40,6 +35,26 @@ Eigen::Matrix4f Camera::PerspectiveProjection(float fov, float aspectRatio, floa
 
     return Frustum(-width, width, -height, height, zNearPlane, zFarPlane);
 }
+
+void Camera::onNotify(const EventType &eventType, IEvent* pEventData)
+{
+	std::cout << "Cam: ";
+	if(eventType == EventType::MOUSEWHEEL)
+	{
+
+		MouseWheelEvent* pMouseWheelEvent = dynamic_cast<MouseWheelEvent*>(pEventData);
+		if(pMouseWheelEvent != nullptr)
+		{
+			m_eye.z() += -0.1f * static_cast<float>(pMouseWheelEvent->m_yoffset);
+			std::cout << m_eye.z() << '\n';
+		}
+		else
+		{
+			ASSERT(0);
+		}
+	}
+}
+
 
 Eigen::Matrix4f Frustum(float left, float right, float bottom, float top, float near, float far)
 {
