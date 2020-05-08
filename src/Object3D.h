@@ -19,8 +19,9 @@ public:
     void                      SetColor(const Color& color);
     const Eigen::Vector4f&    GetPosition() const { return position; }
     const Eigen::Quaternionf& GetOrientation() const { return orientation; }
-    void                      UpdateOrientation(const Eigen::AngleAxisf& angleAxis) { orientation = orientation * Eigen::Quaternionf(angleAxis); }
+    void                      UpdateOrientation(const Eigen::AngleAxisf& angleAxis) { orientation = Eigen::Quaternionf(angleAxis) * orientation   ; }
     void                      SetPosition(const Eigen::Vector4f& pos) { position = pos; }
+    void					  ResetRotation() {orientation = Eigen::AngleAxis(0.f, Eigen::Vector3f::UnitX());}
     void                      Draw(void);
 
 	// Observer
@@ -28,6 +29,7 @@ public:
 private:
     Eigen::Vector4f                     position{0.f, 0.f, 0.f, 0.f};
     Eigen::Quaternionf                  orientation{Eigen::AngleAxis{0.f, Eigen::Vector3f::UnitX()}};
+	Eigen::Vector2f dragAxis;
     std::string                         path;
     std::unique_ptr<Mesh3D>             spMesh3D;
     std::unique_ptr<OpenGL3DDataObject> spOGLDataObject = std::make_unique<OpenGL3DDataObject>();

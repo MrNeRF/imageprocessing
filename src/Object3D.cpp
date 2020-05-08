@@ -1,5 +1,6 @@
 #include "Object3D.h"
 #include "File.h"
+#include "Macros.h"
 #include "ObjFileParser.h"
 #include <iostream>
 #include <GL/glew.h>
@@ -47,10 +48,16 @@ void Object3D::onNotify(const EventType& eventType, std::unique_ptr<IEvent> spEv
 	MouseDragEvent* pMouseDragEvent = dynamic_cast<MouseDragEvent*>(spEventData.get());
 	if(pMouseDragEvent != nullptr)
 	{
-		std::cout << pMouseDragEvent->m_endCoordinates - pMouseDragEvent->m_startCoordinates << std::endl;
+		Eigen::Vector2f difference = (pMouseDragEvent->m_endCoordinates - pMouseDragEvent->m_startCoordinates).normalized();
+		std::cout << difference.x() << ", " << difference.y() << '\n';
+		/* UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(5.f), */ 
+		/* 			Eigen::Vector3f(-difference[1], difference[0], 0.f))); */
+		UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(10.f), 
+					Eigen::Vector3f(difference.y(), difference.x(), 0.f)));
 	}
 	else
 	{
-		std::cout << "Cast fehlgeschlagen" << std::endl;
+		// We should not get here -> BUG
+		ASSERT(0);
 	}
 }

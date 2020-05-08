@@ -1,6 +1,6 @@
 #include <GL/glew.h>
-
 #include "Window.h"
+#include <algorithm>
 #include <cstdio>
 #include <iostream>
 
@@ -89,40 +89,50 @@ void Window::KeyboardCallback(GLFWwindow* win, int key, int scancode, int action
 
 void Window::MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods)
 {
-    bool leftMouseButtonReleased = false;
     if (button == GLFW_MOUSE_BUTTON_LEFT)
 	{
 		if (action == GLFW_PRESS)
 		{
-			double x, y;
-			glfwGetCursorPos(win, &x, &y);
-			m_MouseDragInfo.startPos = {static_cast<float>(x), static_cast<float>(y)};
+			m_MouseDragInfo.bIsDragging = true;
+			m_MouseDragInfo.startPos = m_cursorPos; 
 			m_MouseDragInfo.tic = std::chrono::steady_clock::now();
 		}
-		else
+		else if (action == GLFW_RELEASE)
 		{
-			double x, y;
-			glfwGetCursorPos(win, &x, &y);
+			m_MouseDragInfo.bIsDragging = false;
 			m_MouseDragInfo.toc = std::chrono::steady_clock::now();
-			m_MouseDragInfo.endPos = {static_cast<float>(x), static_cast<float>(y)};
-			leftMouseButtonReleased = true;	
 		}
-	}
-
-	if (leftMouseButtonReleased && milliseconds(m_MouseDragInfo.toc - m_MouseDragInfo.tic).count() > 500)
-	{
-		notify(EventType::MOUSEDRAG, std::make_unique<MouseDragEvent>(m_MouseDragInfo.startPos,m_MouseDragInfo.endPos ));
 	}
 
 }
 
 void Window::KeyboardDeviceUpdate(int key, int scancode, int action, int mods)
 {
-	
+	if(action == GLFW_PRESS)
+	{
+		m_bKeyPressed = true;	
+	}
+	else if (action == GLFW_RELEASE)
+	{
+
+		m_bKeyPressed = false;	
+	}
+
+	m_key = key;
 }
 
 void Window::UpdateCursorPosition(double xCursorPos, double yCursorPos)
 {
+	m_cursorPos[0] = static_cast<float>(xCursorPos);
+	m_cursorPos[1]	= static_cast<float>(yCursorPos);
+
+	m_MouseDragInfo.toc = std::chrono::steady_clock::now();
+	if(m_MouseDragInfo.bIsDragging && milliseconds(m_MouseDragInfo.toc - m_MouseDragInfo.tic).count() > 40)
+	{
+		notify(EventType::MOUSEDRAG, std::make_unique<MouseDragEvent>(m_MouseDragInfo.startPos, m_cursorPos));
+		m_MouseDragInfo.startPos = m_cursorPos;
+		m_MouseDragInfo.tic = m_MouseDragInfo.toc;
+	}
 
 }
 
@@ -133,7 +143,10 @@ void Window::attach(std::shared_ptr<IObserver> spObserver)
 
 void Window::detach(std::shared_ptr<IObserver> spObserver)
 {
-	m_observerList.remove(std::weak_ptr<IObserver>(spObserver));
+	std::remove_if(std::begin(m_observerList), std::end(m_observerList), [](std::weak_ptr<IObserver> o)
+			{
+				return o.expired();
+			});
 }
 
 void Window::detach(std::list<std::weak_ptr<IObserver>>::const_iterator iter)

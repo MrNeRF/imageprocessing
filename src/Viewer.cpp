@@ -33,6 +33,7 @@ void Viewer::Run(void)
 
     glEnable(GL_DEPTH_TEST);
 	std::shared_ptr<Object3D> suzanne = std::make_shared<Object3D>("../models/suzanne.obj");
+    m_window->attach(suzanne);
     Object3D lightCube("../models/quader.obj");
     lightCube.SetColor(lightColor);
 
@@ -68,6 +69,12 @@ void Viewer::Run(void)
         /* { */
         /*     suzanne.UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(-5.f), Eigen::Vector3f::UnitY())); */
         /* } */
+
+        if (m_window->m_key == GLFW_KEY_R
+            && m_window->m_bKeyPressed == true)
+        {
+        	suzanne->ResetRotation();
+        }
 
         modelShader.UseShader();
         Eigen::Vector3f target{0.f, 0.f, 0.f};

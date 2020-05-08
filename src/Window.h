@@ -19,6 +19,7 @@ class Window : public IObservable
 	{
 		Eigen::Vector2f startPos;
 		Eigen::Vector2f endPos;
+		bool bIsDragging = false;
 		decltype(std::chrono::steady_clock::now()) tic;
 		decltype(std::chrono::steady_clock::now()) toc;
 	};
@@ -52,10 +53,13 @@ public:
     int   winWidth    = 600;
     float aspectRatio = winWidth / winHeight;
     const std::string windowName;
+    bool m_bKeyPressed = false;
+    int m_key = 0;;
 
 private:
 	MouseDragInfo m_MouseDragInfo;
     GLFWwindow* m_windowInstance = nullptr;
+	Eigen::Vector2f m_cursorPos;
 	std::list<std::weak_ptr<IObserver>> m_observerList;
 };
 
