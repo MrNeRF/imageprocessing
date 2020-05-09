@@ -1,102 +1,111 @@
 #include "Shader.h"
 #include <GL/glew.h>
 
-
-Shader::Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
-    : m_vertexShaderPath(vertexShaderPath), m_fragmentShaderPath(fragmentShaderPath)
+void Shader::InitShaders(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
 {
-    m_shaderTypeMapping[ShaderType::Vertex]     = "VERTEX";
-    m_shaderTypeMapping[ShaderType::Fragment]   = "FRAGMENT";
-    m_shaderTypeMapping[ShaderType::Program]    = "PROGRAM";
+    std::vector<unsigned int> shaderIDs;
 
-    initShaders();
+    // Vertex Shader Shader
+    std::string  vertexCode     = readShaderProgramCode(vertexShaderPath);
+    unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    createShader(vertexShaderID, vertexCode, ShaderType::VERTEX);
+    shaderIDs.push_back(vertexShaderID);
+
+    // Fragment Shader
+    std::string  fragmentCode     = readShaderProgramCode(fragmentShaderPath);
+    unsigned int fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+    createShader(fragmentShaderID, fragmentCode, ShaderType::FRAGMENT);
+    shaderIDs.push_back(fragmentShaderID);
+
+    // Shader Program
+    createShaderProgram(shaderIDs);
 }
 
-void Shader::initShaders(void)
+std::string Shader::readShaderProgramCode(const std::string& shaderPath)
 {
-    std::string vertexCode;
-    std::string fragmentCode;
-
-    std::ifstream vShaderFile;
-    std::ifstream fShaderFile;
-
-    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    std::string   shaderCode;
+    std::ifstream shaderFileStream;
+    shaderFileStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
     try
     {
-        vShaderFile.open(m_vertexShaderPath.c_str());
-        fShaderFile.open(m_fragmentShaderPath.c_str());
-        std::stringstream vShaderStream, fShaderStream;
+        shaderFileStream.open(shaderPath.c_str());
+        std::stringstream shaderStringStream;
 
-        vShaderStream << vShaderFile.rdbuf();
-        fShaderStream << fShaderFile.rdbuf();
+        shaderStringStream << shaderFileStream.rdbuf();
 
-        vShaderFile.close();
-        fShaderFile.close();
+        shaderFileStream.close();
 
-        vertexCode = vShaderStream.str();
-        fragmentCode = fShaderStream.str();
-
+        shaderCode = shaderStringStream.str();
     }
-    catch(const std::ifstream::failure& e)
+    catch (const std::ifstream::failure& e)
     {
         std::cerr << "ERROR: Shader file not successfully read: " << e.what() << '\n';
     }
 
-    unsigned int vertexShaderID, fragmentShaderID;
-
-    vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-    const GLchar *vertexShaderCode = vertexCode.c_str();
-    glShaderSource(vertexShaderID, 1, &vertexShaderCode, NULL);
-    glCompileShader(vertexShaderID);
-    checkCompileErrors(vertexShaderID, ShaderType::Vertex);
-
-    fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-    const GLchar *fragmentShaderCode = fragmentCode.c_str();
-    glShaderSource(fragmentShaderID, 1, &fragmentShaderCode, NULL);
-    glCompileShader(fragmentShaderID);
-    checkCompileErrors(fragmentShaderID, ShaderType::Fragment);
-
-    glLinkProgram(m_shaderProgramID);
-    checkCompileErrors(m_shaderProgramID, ShaderType::Program);
-    glDeleteShader(vertexShaderID);
-    glDeleteShader(fragmentShaderID);
-
+    return shaderCode;
 }
 
-void Shader::checkCompileErrors(unsigned int shaderID, Shader::ShaderType shaderType)
+void Shader::createShader(unsigned int shaderID, const std::string& shaderProgramCode, const Shader::ShaderType& shaderType)
 {
-    int success;
-    char infoLog[1024];
-    if(shaderType == ShaderType::Program)
-    {
-        glGetProgramiv(shaderID, GL_LINK_STATUS, &success);
-        if(!success)
-        {
-            glGetProgramInfoLog(shaderID, 1024, NULL, infoLog);
-            std::cout   << "ERROR::PROGRAM_LINKING_ERROR of type: "  
-                        << m_shaderTypeMapping[shaderType] << "\n"
-                        << infoLog 
-                        << "\n -- ----------------------------------- --\n";
-        }
-
-    }
-
-    else
-    {
-        glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
-        if(!success)
-        {
-            glGetProgramInfoLog(shaderID, 1024, NULL, infoLog);
-            std::cout   << "ERROR::SHADER_COMPILATION_ERROR of type: "  
-                        << m_shaderTypeMapping[shaderType] << "\n"
-                        << infoLog 
-                        << "\n -- ----------------------------------- --\n";
-        }
-    }
-
+    const GLchar* code = (const GLchar*)shaderProgramCode.c_str();
+    glShaderSource(shaderID, 1, &code, NULL);
+    glCompileShader(shaderID);
+    checkCompileErrors(shaderID, shaderType);
 }
 
+void Shader::createShaderProgram(const std::vector<unsigned int>& IDs)
+{
+    shaderProgramID = glCreateProgram();
+    for (const auto& id : IDs)
+    {
+        glAttachShader(shaderProgramID, id);
+    }
+    glLinkProgram(shaderProgramID);
+    checkCompileErrors(shaderProgramID, ShaderType::PROGRAM);
+    for (const auto& id : IDs)
+    {
+        glDeleteShader(id);
+    }
+}
 
+void Shader::checkCompileErrors(unsigned int shaderID, const Shader::ShaderType& shaderType)
+{
+    int  success;
+    char infoLog[GL_INFO_LOG_LENGTH];
+
+    // Lambda to print compile Error
+    auto printCompileError = [this](const Shader::ShaderType& type, char* infoLog) {
+        std::cout << shaderName << "\n"
+                  << "SHADER_LINKING_ERROR of type: "
+                  << shaderTypeMapping[type] << "\n"
+                  << infoLog
+                  << "\n -- ----------------------------------- --\n";
+    };
+
+    switch (shaderType)
+    {
+        case ShaderType::FRAGMENT:
+        case ShaderType::VERTEX:
+            glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+            if (!success)
+            {
+                glGetShaderInfoLog(shaderID, GL_INFO_LOG_LENGTH, NULL, &infoLog[0]);
+                printCompileError(shaderType, infoLog);
+            }
+            break;
+        case ShaderType::PROGRAM:
+            glGetProgramiv(shaderID, GL_LINK_STATUS, &success);
+            if (!success)
+            {
+                glGetProgramInfoLog(shaderID, GL_INFO_LOG_LENGTH, NULL, &infoLog[0]);
+                printCompileError(shaderType, infoLog);
+            }
+            break;
+        default:
+            std::cout << shaderTypeMapping[shaderType] << " successfully compiled!"
+                      << "\n"
+                      << "\n -- ----------------------------------- --\n";
+    };
+}
 

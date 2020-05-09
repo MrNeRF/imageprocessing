@@ -1,27 +1,30 @@
-cmake_minimum_required(VERSION 3.13.0)
-project(imageprocessing VERSION 0.1.0)
+cmake_minimum_required(VERSION 3.10)
+project(imageprocessing)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+# set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# --verbose flag might be helpful in case something is broken during linking
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "-Wall -Wno-write-strings -D_GLIBCXX_DEBUG")
+set(CMAKE_CXX_FLAGS "-ggdb3 -Wall -Werror -Wno-write-strings -D_GLIBCXX_DEBUG")
 message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
 
-#glfw 
+# glfw
 find_package(glfw3 REQUIRED)
-include_directories(${GLFW_INCLUDE_DIR})
+include_directories(${GLFW_INCLUDE_DIRS})
 link_libraries(${GLFW_LIBRARY_DIRS})
 
-#glew
-find_package(glfw3 REQUIRED)
+# glew
+find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 
-set(EigenHeaders "3rdParties/Eigen/Eigen")
+set(EigenHeaders "3rdParties/Eigen")
 file(GLOB eigen_include_directories ${EigenHeaders})
 include_directories(${eigen_include_directories})
 
 file(GLOB SOURCES "src/*.cpp")
-include_directories(include)
+include_directories(src)
 add_executable(imageprocessing ${SOURCES})
-target_link_libraries(imageprocessing  ${GLEW_LIBRARIES} -lGLU -lGL glfw)
+target_link_libraries(imageprocessing ${GLEW_LIBRARIES} -lGLU -lGL glfw)
