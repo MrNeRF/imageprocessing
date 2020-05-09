@@ -37,8 +37,12 @@ void Object3D::SetColor(const Color& color)
     spOGLDataObject->InitializeColorBuffer(vertexColor);
 }
 
-void Object3D::Draw(void)
+void Object3D::Draw(std::shared_ptr<Shader> spShader)
 {
+    if (m_spMaterial != nullptr)
+	{
+		m_spMaterial->Activate(spShader.get());
+	}
     spOGLDataObject->DrawObject(GL_TRIANGLES);
 }
 

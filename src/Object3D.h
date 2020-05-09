@@ -9,7 +9,9 @@
 #include "IObserver.h"
 #include <Eigen/Dense>
 #include "IEvent.h"
+#include "Material.h"
 #include <memory>
+#include "Shader.h"
 #include <string>
 
 class Object3D : public IObserver
@@ -19,10 +21,11 @@ public:
     void                      SetColor(const Color& color);
     const Eigen::Vector4f&    GetPosition() const { return position; }
     const Eigen::Quaternionf& GetOrientation() const { return orientation; }
+    void					  SetMaterial(std::shared_ptr<Material> spMaterial) {m_spMaterial = spMaterial;};
     void                      UpdateOrientation(const Eigen::AngleAxisf& angleAxis) { orientation = Eigen::Quaternionf(angleAxis) * orientation   ; }
     void                      SetPosition(const Eigen::Vector4f& pos) { position = pos; }
     void					  ResetRotation() {orientation = Eigen::AngleAxis(0.f, Eigen::Vector3f::UnitX());}
-    void                      Draw(void);
+    void                      Draw(std::shared_ptr<Shader> spShader);
 
 	// Observer
 	void onNotify(const EventType& eventType, IEvent* pEventData) override;	
@@ -33,6 +36,7 @@ private:
     std::string                         path;
     std::unique_ptr<Mesh3D>             spMesh3D;
     std::unique_ptr<OpenGL3DDataObject> spOGLDataObject = std::make_unique<OpenGL3DDataObject>();
+	std::shared_ptr<Material> m_spMaterial;
 
     Color vertexColor = Color(0.8f, 0.f, 0.f);
 };

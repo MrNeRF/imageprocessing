@@ -7,6 +7,7 @@
 #include <memory>
 #include "Window.h"
 #include <GLFW/glfw3.h>
+#include "Material.h"
 #include <cmath>
 
 #define GLM_FORCE_CXX14
@@ -22,8 +23,8 @@ Viewer::Viewer(std::unique_ptr<Window> window)
 
 void Viewer::Run(void)
 {
-	Shader modelShader("3D Model Shader");
-    modelShader.InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
+	std::shared_ptr<Shader> spModelShader = std::make_shared<Shader>("3D Model Shader");
+    spModelShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
     Shader lightShader("Light Cube");
     lightShader.InitShaders("../Shaders/lightShader.vs", "../Shaders/lightShader.fs");
     lightShader.UseShader();
@@ -77,32 +78,28 @@ void Viewer::Run(void)
         	suzanne->ResetRotation();
         }
 
-        modelShader.UseShader();
+        spModelShader->UseShader();
         const Eigen::Matrix4f view  = spCamera->GetLookAt();
         const Eigen::Matrix4f projection = spCamera->PerspectiveProjection(45.f, 800.f / 600.f, 0.1f, 50.f);
 
+		suzanne->SetMaterial(MaterialFactory().GetMaterial(MaterialType::GOLD));
 		suzanne->SetPosition({0.f,0.f, 2.f, 0.f});
-        modelShader.SetVector("transform.position", suzanne->GetPosition());
-        modelShader.SetQuat("transform.qOrientation", suzanne->GetOrientation());
-        modelShader.SetQuat("transform.qconjOrientation", suzanne->GetOrientation().conjugate());
+        spModelShader->SetVector("transform.position", suzanne->GetPosition());
+        spModelShader->SetQuat("transform.qOrientation", suzanne->GetOrientation());
+        spModelShader->SetQuat("transform.qconjOrientation", suzanne->GetOrientation().conjugate());
 
-        modelShader.SetTransformationMatrix("cameraPos", spCamera->GetCameraPosition());
-        modelShader.SetTransformationMatrix("view", view);
-        modelShader.SetTransformationMatrix("projection", projection);
+        spModelShader->SetTransformationMatrix("cameraPos", spCamera->GetCameraPosition());
+        spModelShader->SetTransformationMatrix("view", view);
+        spModelShader->SetTransformationMatrix("projection", projection);
 
-        modelShader.SetVector("light.ambient", Eigen::Vector3f(.5f, .5f, .5f));
-        modelShader.SetVector("light.diffuse", Eigen::Vector3f(.2f, .2f, .2f));
-        modelShader.SetVector("light.specular", Eigen::Vector3f(1.f, 1.f, 1.f));
+        spModelShader->SetVector("light.ambient", Eigen::Vector3f(.5f, .5f, .5f));
+        spModelShader->SetVector("light.diffuse", Eigen::Vector3f(.2f, .2f, .2f));
+        spModelShader->SetVector("light.specular", Eigen::Vector3f(1.f, 1.f, 1.f));
 
-        modelShader.SetVector("material.ambient", Eigen::Vector3f(.2125f, 0.1275f, 0.054f));
-        modelShader.SetVector("material.diffuse", Eigen::Vector3f(.714f, 0.4284f, 0.18144f));
-        modelShader.SetVector("material.specular", Eigen::Vector3f(.393548f, 0.271906f, 0.166721f));
-        modelShader.SetValue("material.shininess", .2f);
+        spModelShader->SetVector("lightPosition", lightPos);
+        spModelShader->SetVector("lightColor", lightColor.GetColor());
 
-        modelShader.SetVector("lightPosition", lightPos);
-        modelShader.SetVector("lightColor", lightColor.GetColor());
-
-        suzanne->Draw();
+        suzanne->Draw(spModelShader);
 
 		/* lightCube.SetPosition({2.f,2.f, 6.f, 0.f}); */
         /* lightShader.UseShader(); */
