@@ -11,6 +11,15 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "-ggdb3 -Wall -Werror -Wno-write-strings -D_GLIBCXX_DEBUG")
 message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
 
+
+find_program(CCACHE ccache)
+if(CCACHE)
+  message("using ccache")
+  set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
+else()
+  message("ccache not found cannot use")
+endif()
+
 # glfw
 find_package(glfw3 REQUIRED)
 include_directories(${GLFW_INCLUDE_DIRS})
