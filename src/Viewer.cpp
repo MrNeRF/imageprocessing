@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Color.h"
 #include "Light.h"
+#include "Logger.h"
 #include "Macros.h"
 #include "Material.h"
 #include "Object3D.h"
@@ -24,6 +25,9 @@ Viewer::Viewer(std::unique_ptr<Window> window)
 
 void Viewer::Run(void)
 {
+    auto& logger = Logger::GetInstance().GetLogger();
+    logger.info("Viewer::Run()");
+
     std::shared_ptr<Camera> spCamera = std::make_shared<Camera>();
     m_window->attach(spCamera);
 

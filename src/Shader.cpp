@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "Logger.h"
 #include <GL/glew.h>
 
 void Shader::InitShaders(const std::string& vertexShaderPath, const std::string& fragmentShaderPath)
@@ -40,7 +41,8 @@ std::string Shader::readShaderProgramCode(const std::string& shaderPath)
     }
     catch (const std::ifstream::failure& e)
     {
-        std::cerr << "ERROR: Shader file not successfully read: " << e.what() << '\n';
+        auto& rLogger = Logger::GetInstance().GetLogger();
+        rLogger.error("ERROR: Shader file not successfully read: {}", e.what());
     }
 
     return shaderCode;
@@ -76,11 +78,8 @@ void Shader::checkCompileErrors(unsigned int shaderID, const Shader::ShaderType&
 
     // Lambda to print compile Error
     auto printCompileError = [this](const Shader::ShaderType& type, char* infoLog) {
-        std::cout << shaderName << "\n"
-                  << "SHADER_LINKING_ERROR of type: "
-                  << shaderTypeMapping[type] << "\n"
-                  << infoLog
-                  << "\n -- ----------------------------------- --\n";
+        auto& rLogger = Logger::GetInstance().GetLogger();
+        rLogger.error("{}: Shader Link Error of Type: {}, {}", shaderName, shaderTypeMapping[type], infoLog);
     };
 
     switch (shaderType)
@@ -103,9 +102,8 @@ void Shader::checkCompileErrors(unsigned int shaderID, const Shader::ShaderType&
             }
             break;
         default:
-            std::cout << shaderTypeMapping[shaderType] << " successfully compiled!"
-                      << "\n"
-                      << "\n -- ----------------------------------- --\n";
+            auto& rLogger = Logger::GetInstance().GetLogger();
+            rLogger.info("{} successfully compile!", shaderTypeMapping[shaderType]);
     };
 }
 
