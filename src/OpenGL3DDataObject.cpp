@@ -102,6 +102,10 @@ void OpenGL3DDataObject::InitializeTextureUVBuffer(const Eigen::Matrix<float, Ei
 
 void OpenGL3DDataObject::InitializeNormalBuffer(Mesh3D& mesh)
 {
+    if (mesh.HasNormals())
+    {
+        return;
+    }
     if (normalsBuffer == 0)
     {
         glGenBuffers(1, &normalsBuffer);

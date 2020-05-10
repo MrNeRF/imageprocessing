@@ -1,5 +1,5 @@
-#ifndef MATERIAL
-#define MATERIAL
+#ifndef MATERIAL_H
+#define MATERIAL_H
 
 #include <Eigen/Dense>
 #include "Shader.h"
@@ -27,18 +27,8 @@ struct Material
         pShader->SetValue("material.shininess", m_shininess);
 	}
 
-	private:
-	const Eigen::Vector3f m_ambient;
-	const Eigen::Vector3f m_diffuse;
-	const Eigen::Vector3f m_specular;
-	const float m_shininess;
-};
-
-class MaterialFactory
-{
-public:
-	std::shared_ptr<Material> GetMaterial(const MaterialType& materialType)
-	{
+        static std::shared_ptr<Material> GetMaterial(const MaterialType& materialType)
+        {
 		switch(materialType)
 		{
 			case MaterialType::BRONZE: 
@@ -83,6 +73,12 @@ public:
 
 		return nullptr;
 	}
+
+    private:
+        const Eigen::Vector3f m_ambient;
+        const Eigen::Vector3f m_diffuse;
+        const Eigen::Vector3f m_specular;
+        const float           m_shininess;
 };
 
 #endif 

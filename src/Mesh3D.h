@@ -115,7 +115,6 @@ private:
     HalfEdgeDS m_halfEdgeDS;
 };
 
-#endif
 
 class vertexIterator
 {
@@ -137,3 +136,4 @@ private:
 	uint32_t endIdx = m_rMesh.m_indices.size();
 };
 
+#endif

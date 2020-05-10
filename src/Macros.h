@@ -16,6 +16,8 @@ constexpr T degreeToRadians(const T degree)
     T radians = degree * M_PI / 180.f;
     return radians;
 }
+
+const double PI = (4.0 * std::atan2(1.0, 1.0));
 }
 
 // Checks if a debugger is attached

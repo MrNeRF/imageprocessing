@@ -3,10 +3,6 @@
 #include "Macros.h"
 #include <iostream>
 
-#ifndef M_PI
-#define M_PI (4.0 * std::atan2(1.0, 1.0))
-#endif
-
 
 static Eigen::Matrix4f Frustum(float left, float right, float bottom, float top, float near, float far);
 
@@ -28,12 +24,12 @@ const Eigen::Matrix4f& Camera::GetLookAt() const
     return m_view;
 }
 
-Eigen::Matrix4f Camera::PerspectiveProjection(float fov, float aspectRatio, float zNearPlane, float zFarPlane)
+void Camera::SetPerspectiveProjection(float fov, float aspectRatio, float zNearPlane, float zFarPlane)
 {
     float height = zNearPlane * tanf(fov * .5f);
     float width  = height * aspectRatio;
 
-    return Frustum(-width, width, -height, height, zNearPlane, zFarPlane);
+    m_frustum = Frustum(-width, width, -height, height, zNearPlane, zFarPlane);
 }
 
 void Camera::onNotify(const EventType &eventType, IEvent* pEventData)
@@ -52,7 +48,6 @@ void Camera::onNotify(const EventType &eventType, IEvent* pEventData)
 		}
 	}
 }
-
 
 Eigen::Matrix4f Frustum(float left, float right, float bottom, float top, float near, float far)
 {
