@@ -14,10 +14,10 @@ message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
 
 find_program(CCACHE ccache)
 if(CCACHE)
-  message("using ccache")
-  set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
+	message("using ccache")
+	set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
 else()
-  message("ccache not found cannot use")
+	message("ccache not found! Not usable")
 endif()
 
 # glfw
@@ -29,11 +29,9 @@ link_libraries(${GLFW_LIBRARY_DIRS})
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 
-set(EigenHeaders "3rdParties/Eigen")
-file(GLOB eigen_include_directories ${EigenHeaders})
-include_directories(${eigen_include_directories})
+add_subdirectory(3rdParty)
 
 file(GLOB SOURCES "src/*.cpp")
 include_directories(src)
 add_executable(imageprocessing ${SOURCES})
-target_link_libraries(imageprocessing ${GLEW_LIBRARIES} -lGLU -lGL glfw)
+target_link_libraries(imageprocessing PUBLIC spdlog eigen3 ${GLEW_LIBRARIES} -lGLU -lGL glfw)

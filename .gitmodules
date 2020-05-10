@@ -1,3 +1,8 @@
-[submodule "3rdParties/Eigen"]
-	path = 3rdParties/Eigen
-	url = https://github.com/eigenteam/eigen-git-mirror
+[submodule "3rdParty/spdlog"]
+	path = 3rdParty/spdlog
+	url = https://github.com/gabime/spdlog
+	branch = master
+[submodule "3rdParty/Eigen"]
+	path = 3rdParty/Eigen
+	url = https://gitlab.com/libeigen/eigen
+	branch = master
