@@ -1,8 +1,9 @@
 #include "ObjFileParser.h"
+#include "Logger.h"
+#include "Macros.h"
 #include "Mesh3D.h"
 #include "VertexNormalAttribute.h"
 #include <algorithm>
-#include "Macros.h"
 #include <cassert>
 #include <fstream>
 #include <functional>
@@ -134,16 +135,18 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
         }
     }
 
-	ASSERT(vertexIndices.size() == remappedIndices.size());
-	if (hasNormals)
-	{
-		ASSERT(remappedNormalData.size() == remappedVertexData.size());
-	}
-	int i = 0;
-	for (const auto& idx : vertexIndices)
-	{
-		assert(vertexData[idx] == remappedVertexData[remappedIndices[i++]]);
-	}
+    ASSERT(vertexIndices.size() == remappedIndices.size());
+    if (hasNormals)
+    {
+        ASSERT(remappedNormalData.size() == remappedVertexData.size());
+    }
+    int i = 0;
+    for (const auto& idx : vertexIndices)
+    {
+        assert(vertexData[idx] == remappedVertexData[remappedIndices[i++]]);
+    }
+    auto& rLogger = Logger::GetInstance().GetLogger();
+    rLogger.info("Number of Vertice {}, number of indices {}", remappedVertexData.size(), remappedIndices.size());
     return createMeshObject(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, remappedIndices, spObjFile->filename);
 }
 
