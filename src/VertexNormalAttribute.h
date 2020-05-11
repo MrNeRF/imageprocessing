@@ -10,7 +10,6 @@ public:
         , m_vertices{vertices}
     {
         m_vertexNormals.resize(m_vertices.size());
-		std::cout << "VertexNormalAttribute created\n";
     }
 
     Eigen::Vector3f& operator[](uint32_t i)
