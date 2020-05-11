@@ -1,5 +1,6 @@
 #include "Object3D.h"
 #include "File.h"
+#include "Logger.h"
 #include "Macros.h"
 #include "ObjFileParser.h"
 #include <iostream>
@@ -10,6 +11,8 @@ void Object3D::Init(const std::string& pathToModel, std::shared_ptr<Camera> spCa
     m_modelPath = pathToModel;
     m_spCamera  = spCamera;
     m_spShader  = spShader;
+    
+	Logger::GetInstance().GetLogger().info("ShaderName: {}", spShader->shaderName);
     m_spMesh3D = ObjFileParser().Parse(std::make_unique<File>(m_modelPath));
     if (m_spMesh3D != nullptr)
     {
@@ -50,12 +53,12 @@ void Object3D::Render()
     m_spShader->SetVector("light.ambient", Eigen::Vector3f(.5f, .5f, .5f));
     m_spShader->SetVector("light.diffuse", Eigen::Vector3f(.2f, .2f, .2f));
     m_spShader->SetVector("light.specular", Eigen::Vector3f(1.f, 1.f, 1.f));
+    m_spShader->SetVector("light.position", m_spLight->GetPosition());
 
-    m_spShader->SetVector("lightPosition", m_spLight->GetPosition());
-    m_spShader->SetVector("lightColor", m_spLight->GetColor().GetColor());
     if (m_spMaterial != nullptr)
     {
         m_spMaterial->Activate(m_spShader.get());
+
     }
     m_spOGLDataObject->DrawObject(GL_TRIANGLES);
 }

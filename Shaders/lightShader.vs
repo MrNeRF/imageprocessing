@@ -12,10 +12,10 @@ uniform mat4 projection;
 struct Transform
 {
   vec4 position;
-  vec4 axis_angle;
   vec4 qOrientation;
   vec4 qconjOrientation;
-};
+;
+
 uniform Transform transform;
 
 vec4 quat_mult(vec4 q1, vec4 q2)

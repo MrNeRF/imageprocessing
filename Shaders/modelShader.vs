@@ -13,7 +13,6 @@ uniform mat4 projection;
 struct Transform
 {
   vec4 position;
-  vec4 axis_angle;
   vec4 qOrientation;
   vec4 qconjOrientation;
 };

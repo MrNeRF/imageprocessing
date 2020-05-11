@@ -33,6 +33,12 @@ void Camera::SetPerspectiveProjection(float fov, float aspectRatio, float zNearP
     m_frustum = Frustum(-width, width, -height, height, zNearPlane, zFarPlane);
 }
 
+const Eigen::Matrix4f& Camera::GetPerspectiveProjection() const
+{ 
+	ASSERT(!m_frustum.isZero());
+	return m_frustum; 
+}
+
 void Camera::onNotify(const EventType &eventType, IEvent* pEventData)
 {
 	if(eventType == EventType::MOUSEWHEEL)

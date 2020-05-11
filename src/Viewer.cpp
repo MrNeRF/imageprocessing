@@ -29,9 +29,9 @@ void Viewer::Run(void)
     logger.info("Viewer::Run()");
 
     std::shared_ptr<Camera> spCamera = std::make_shared<Camera>();
+    spCamera->SetPerspectiveProjection(45.f, 800.f / 600.f, 0.1f, 50.f);
     m_window->attach(spCamera);
 	
-
     std::shared_ptr<Shader> spLightShader = std::make_shared<Shader>("Light Cube");
     spLightShader->InitShaders("../Shaders/lightShader.vs", "../Shaders/lightShader.fs");
     std::shared_ptr<Light> spLightCube = std::make_shared<Light>();
