@@ -43,7 +43,7 @@ void Object3D::Render()
     m_spShader->SetQuat("transform.qOrientation", m_orientation);
     m_spShader->SetQuat("transform.qconjOrientation", m_orientation.conjugate());
 
-    m_spShader->SetTransformationMatrix("cameraPos", m_spCamera->GetCameraPosition());
+    m_spShader->SetVector("cameraPos", m_spCamera->GetCameraPosition());
     m_spShader->SetTransformationMatrix("view", m_spCamera->GetLookAt());
     m_spShader->SetTransformationMatrix("projection", m_spCamera->GetPerspectiveProjection());
 

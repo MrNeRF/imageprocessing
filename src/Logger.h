@@ -8,6 +8,7 @@
 #endif
 #include "spdlog/spdlog.h"
 #include <memory>
+#include "Macros.h"
 // this space is deliberately here because of the spdlog order. Do not remove
 #include "spdlog/sinks/stdout_color_sinks.h"
 
@@ -28,6 +29,7 @@ public:
         return instance;
     }
 
+	void Check_GL_ErrorCode();
     spdlog::logger& GetLogger()
     {
         return m_logger;
@@ -44,5 +46,12 @@ private:
     }
     spdlog::logger m_logger = spdlog::logger("Console", std::make_shared<consolLogger>());
 };
+
+
+#define CHECK_GL_ERROR_(expr) \
+{							\
+	expr;						\
+	Logger::GetInstance().Check_GL_ErrorCode();\
+}
 
 #endif

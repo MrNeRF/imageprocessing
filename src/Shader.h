@@ -6,6 +6,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include "Logger.h"
 #include <map>
 #include <sstream>
 #include <string>
@@ -39,7 +40,7 @@ public:
     void SetValue(const std::string& name, T value);
     void SetQuat(const std::string& name, const Eigen::Quaternionf& v)
     {
-        glUniform4f(glGetUniformLocation(shaderProgramID, name.c_str()), v.x(), v.y(), v.z(), v.w());
+        CHECK_GL_ERROR_(glUniform4f(glGetUniformLocation(shaderProgramID, name.c_str()), v.x(), v.y(), v.z(), v.w()));
     }
     template<typename T, int N = 1>
     void SetVector(const std::string& name, const T& v);
@@ -73,11 +74,11 @@ void Shader::SetValue(const std::string& name, T value)
 {
     if (std::is_floating_point<T>::value)
     {
-        glUniform1f(glGetUniformLocation(shaderProgramID, name.c_str()), value);
+        CHECK_GL_ERROR_(glUniform1f(glGetUniformLocation(shaderProgramID, name.c_str()), value));
     }
     else
     {
-        glUniform1i(glGetUniformLocation(shaderProgramID, name.c_str()), value);
+        CHECK_GL_ERROR_(glUniform1i(glGetUniformLocation(shaderProgramID, name.c_str()), value));
     }
 }
 
@@ -87,11 +88,11 @@ void Shader::SetVector(const std::string& name, const T& v)
 {
     if (std::is_same<Eigen::Vector3f, T>::value)
     {
-        glUniform3fv(glGetUniformLocation(shaderProgramID, name.c_str()), N, v.data());
+        CHECK_GL_ERROR_(glUniform3fv(glGetUniformLocation(shaderProgramID, name.c_str()), N, v.data()));
     }
     else if (std::is_same<Eigen::Vector4f, T>::value)
     {
-        glUniform4fv(glGetUniformLocation(shaderProgramID, name.c_str()), N, v.data());
+        CHECK_GL_ERROR_(glUniform4fv(glGetUniformLocation(shaderProgramID, name.c_str()), N, v.data()));
     }
     else
     {
@@ -103,7 +104,7 @@ void Shader::SetVector(const std::string& name, const T& v)
 template<typename T>
 void Shader::SetTransformationMatrix(const std::string& name, const T& mat)
 {
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data());
+    CHECK_GL_ERROR_(glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data()));
 }
 
 #endif

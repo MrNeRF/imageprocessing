@@ -49,8 +49,8 @@ std::string Shader::readShaderProgramCode(const std::string& shaderPath)
 void Shader::createShader(unsigned int shaderID, const std::string& shaderProgramCode, const Shader::ShaderType& shaderType)
 {
     const GLchar* code = (const GLchar*)shaderProgramCode.c_str();
-    glShaderSource(shaderID, 1, &code, NULL);
-    glCompileShader(shaderID);
+    CHECK_GL_ERROR_(glShaderSource(shaderID, 1, &code, NULL));
+    CHECK_GL_ERROR_(glCompileShader(shaderID));
     checkCompileErrors(shaderID, shaderType);
 }
 
@@ -59,13 +59,13 @@ void Shader::createShaderProgram(const std::vector<unsigned int>& IDs)
     shaderProgramID = glCreateProgram();
     for (const auto& id : IDs)
     {
-        glAttachShader(shaderProgramID, id);
+        CHECK_GL_ERROR_(glAttachShader(shaderProgramID, id));
     }
-    glLinkProgram(shaderProgramID);
+    CHECK_GL_ERROR_(glLinkProgram(shaderProgramID));
     checkCompileErrors(shaderProgramID, ShaderType::PROGRAM);
     for (const auto& id : IDs)
     {
-        glDeleteShader(id);
+        CHECK_GL_ERROR_(glDeleteShader(id));
     }
 }
 
