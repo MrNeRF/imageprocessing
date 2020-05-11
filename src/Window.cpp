@@ -1,5 +1,7 @@
 #include <GL/glew.h>
+//
 #include "Window.h"
+#include "Logger.h"
 #include <algorithm>
 #include <cstdio>
 #include <iostream>
@@ -15,9 +17,10 @@ Window::Window(const std::string name)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     m_windowInstance = glfwCreateWindow(winHeight, winWidth, "Window", NULL, NULL);
 
+    auto& rLogger = Logger::GetInstance().GetLogger();
     if (m_windowInstance == NULL)
     {
-        std::puts("Failed to create GLFW window\n");
+        rLogger.error("Failed to create GLFW window");
         glfwTerminate();
         return;
     }
@@ -27,16 +30,14 @@ Window::Window(const std::string name)
 
     if (glewInit() != GLEW_OK)
     {
-        std::puts("Failed to initialize GLEW\n");
+        rLogger.error("Failed to initialize GLEW");
         glfwTerminate();
         return;
     }
     // get version info
     const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
     const GLubyte* version  = glGetString(GL_VERSION);  // version as a string
-    std::cout << "Renderer: " << renderer << std::endl;
-    std::cout << "OpenGL version supported \n"
-              << version << std::endl;
+    rLogger.info("Renderer: {}, OpenGL version supported: {}", renderer, version);
     // Userpointer -> Necessary to for casting
     glfwSetWindowUserPointer(m_windowInstance, this);
 
