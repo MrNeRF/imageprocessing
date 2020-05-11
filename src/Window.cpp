@@ -34,7 +34,14 @@ Window::Window(const std::string name)
         glfwTerminate();
         return;
     }
-    // get version info
+
+	// glewInit() seems to pollute OpenGL with error codes
+	int errorCode;
+	while((errorCode = glGetError()) != GL_NO_ERROR)
+	{
+		rLogger.trace("Polluted by glewInit error: {}. Just ignore...",errorCode);
+	}
+	// get version info
     const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
     const GLubyte* version  = glGetString(GL_VERSION);  // version as a string
     rLogger.info("Renderer: {}, OpenGL version supported: {}", renderer, version);
@@ -58,10 +65,10 @@ void Window::ViewPortUpdate(int width, int height)
 {
     winWidth  = width;
     winHeight = height;
-    glViewport(0, 0, static_cast<GLsizei>(winWidth), static_cast<GLsizei>(winHeight));
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glMatrixMode(GL_MODELVIEW);
+    CHECK_GL_ERROR_(glViewport(0, 0, static_cast<GLsizei>(winWidth), static_cast<GLsizei>(winHeight)))
+    CHECK_GL_ERROR_(glMatrixMode(GL_PROJECTION))
+    CHECK_GL_ERROR_(glLoadIdentity())
+    CHECK_GL_ERROR_(glMatrixMode(GL_MODELVIEW))
     aspectRatio = static_cast<float>(winWidth) / static_cast<float>(winHeight);
 }
 

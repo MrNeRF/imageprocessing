@@ -30,6 +30,7 @@ void Viewer::Run(void)
 
     std::shared_ptr<Camera> spCamera = std::make_shared<Camera>();
     m_window->attach(spCamera);
+	
 
     std::shared_ptr<Shader> spLightShader = std::make_shared<Shader>("Light Cube");
     spLightShader->InitShaders("../Shaders/lightShader.vs", "../Shaders/lightShader.fs");
@@ -47,11 +48,11 @@ void Viewer::Run(void)
 
     m_window->attach(suzanne);
 
-    glEnable(GL_DEPTH_TEST);
+    CHECK_GL_ERROR_(glEnable(GL_DEPTH_TEST));
     while (!glfwWindowShouldClose(m_window->GetGLFWWindow()))
     {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        CHECK_GL_ERROR_(glClearColor(0.2f, 0.3f, 0.3f, 1.0f))
+        CHECK_GL_ERROR_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
         if (glfwGetKey(m_window->GetGLFWWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
@@ -64,8 +65,8 @@ void Viewer::Run(void)
         	suzanne->ResetRotation();
         }
 
-        suzanne->Render();
         spLightCube->Render();
+        suzanne->Render();
         glfwSwapBuffers(m_window->GetGLFWWindow());
         glfwPollEvents();
     }

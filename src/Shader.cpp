@@ -8,18 +8,24 @@ void Shader::InitShaders(const std::string& vertexShaderPath, const std::string&
 
     // Vertex Shader Shader
     std::string  vertexCode     = readShaderProgramCode(vertexShaderPath);
-    unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    unsigned int vertexShaderID;
+    CHECK_GL_ERROR_WITH_OUTPUT_(vertexShaderID, glCreateShader(GL_VERTEX_SHADER))
     createShader(vertexShaderID, vertexCode, ShaderType::VERTEX);
     shaderIDs.push_back(vertexShaderID);
+    auto& rLogger = Logger::GetInstance().GetLogger();
+    rLogger.info("Vertex Shader {} with ID {} created", vertexShaderPath, vertexShaderID);
 
     // Fragment Shader
     std::string  fragmentCode     = readShaderProgramCode(fragmentShaderPath);
-    unsigned int fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+    unsigned int fragmentShaderID;
+    CHECK_GL_ERROR_WITH_OUTPUT_(fragmentShaderID, glCreateShader(GL_FRAGMENT_SHADER))
     createShader(fragmentShaderID, fragmentCode, ShaderType::FRAGMENT);
     shaderIDs.push_back(fragmentShaderID);
+    rLogger.info("Fragment Shader {} with ID {} created", fragmentShaderPath, fragmentShaderID);
 
     // Shader Program
     createShaderProgram(shaderIDs);
+    rLogger.info("Shader Program created");
 }
 
 std::string Shader::readShaderProgramCode(const std::string& shaderPath)
@@ -58,7 +64,7 @@ void Shader::createShader(unsigned int shaderID, const std::string& shaderProgra
 
 void Shader::createShaderProgram(const std::vector<unsigned int>& IDs)
 {
-    shaderProgramID = glCreateProgram();
+    CHECK_GL_ERROR_WITH_OUTPUT_(shaderProgramID, glCreateProgram())
     for (const auto& id : IDs)
     {
         CHECK_GL_ERROR_(glAttachShader(shaderProgramID, id));
@@ -86,7 +92,7 @@ void Shader::checkCompileErrors(unsigned int shaderID, const Shader::ShaderType&
     {
         case ShaderType::FRAGMENT:
         case ShaderType::VERTEX:
-            glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+            CHECK_GL_ERROR_(glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success))
             if (!success)
             {
                 glGetShaderInfoLog(shaderID, GL_INFO_LOG_LENGTH, NULL, &infoLog[0]);

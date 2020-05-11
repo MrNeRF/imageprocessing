@@ -1,6 +1,7 @@
 #include "Camera.h"
 #include <cmath>
 #include "Macros.h"
+#include "Logger.h"
 #include <iostream>
 
 

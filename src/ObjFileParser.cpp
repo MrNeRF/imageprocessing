@@ -146,7 +146,7 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
         assert(vertexData[idx] == remappedVertexData[remappedIndices[i++]]);
     }
     auto& rLogger = Logger::GetInstance().GetLogger();
-    rLogger.info("Number of Vertice {}, number of indices {}", remappedVertexData.size(), remappedIndices.size());
+    rLogger.info("{}: Number of Vertice {}, number of indices {}",spObjFile->filename, remappedVertexData.size(), remappedIndices.size());
     return createMeshObject(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, remappedIndices, spObjFile->filename);
 }
 

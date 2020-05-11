@@ -5,8 +5,10 @@
 bool Logger::Check_GL_ErrorCode()
 {
 	GLenum errorCode;
+	GLenum lastErrorCode = GL_NO_ERROR;
 	while((errorCode = glGetError()) != GL_NO_ERROR)
 	{
+		lastErrorCode = errorCode;
 		switch(errorCode)
 		{
 			case GL_INVALID_ENUM:
@@ -34,6 +36,6 @@ bool Logger::Check_GL_ErrorCode()
 
 	}
 
-        return errorCode == GL_NO_ERROR ? true : false;
+        return lastErrorCode == GL_NO_ERROR ? true : false;
 }
 

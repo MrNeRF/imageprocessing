@@ -33,7 +33,7 @@ public:
         : shaderName(name){};
 
     void InitShaders(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
-    void UseShader(void) { glUseProgram(shaderProgramID); }
+    void UseShader(void) { CHECK_GL_ERROR_(glUseProgram(shaderProgramID)); }
     unsigned int GetShaderProgramID(void) { return shaderProgramID; };
 
     template<typename T>
@@ -48,7 +48,7 @@ public:
     void SetTransformationMatrix(const std::string& name, const T& mat);
     void SetTransformationMatrix(const std::string& name, glm::mat4& tran)
     {
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, &tran[0][0]);
+        CHECK_GL_ERROR_(glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, &tran[0][0]))
     }
 
 public:
