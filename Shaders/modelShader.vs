@@ -9,6 +9,7 @@ out vec3 vertexNormal;
 
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat3 normalRotationMatrix;
 
 struct Transform
 {
@@ -43,7 +44,7 @@ void main()
     vec3 pos = rotate_vertex_position(inputVertexPosition, transform.qOrientation.xyzw, transform.qconjOrientation.xyzw);
     pos += transform.position.xyz;
     vertexColor = inputVertexColor;
-    vertexNormal = inputVertexNormal;  
+    vertexNormal = transpose(inverse(normalRotationMatrix)) * inputVertexNormal;  
     
     gl_Position = projection * view  * vec4(pos, 1.f);
     vertexWorldPosition = pos;

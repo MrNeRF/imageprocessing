@@ -13,11 +13,6 @@
 #include <type_traits>
 #include <vector>
 
-#define GLM_FORCE_CXX14
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 class Shader
 {
 public:
@@ -50,12 +45,14 @@ public:
 	{
         CHECK_GL_ERROR_(glUniform4f(glGetUniformLocation(shaderProgramID, name.c_str()), v.x(), v.y(), v.z(), v.w()));
 	}
-    template<typename T>
-    void SetTransformationMatrix(const std::string& name, const T& mat);
-    void SetTransformationMatrix(const std::string& name, glm::mat4& tran)
-    {
-        CHECK_GL_ERROR_(glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, &tran[0][0]))
-    }
+	void SetTransformationMatrix(const std::string& name, const Eigen::Matrix4f& mat)
+	{
+		CHECK_GL_ERROR_(glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data()));
+	}
+	void SetTransformationMatrix(const std::string& name, const Eigen::Matrix3f& mat)
+	{
+		CHECK_GL_ERROR_(glUniformMatrix3fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data()));
+	}
 
 public:
     const std::string shaderName;
@@ -86,13 +83,6 @@ void Shader::SetValue(const std::string& name, T value)
     {
         CHECK_GL_ERROR_(glUniform1i(glGetUniformLocation(shaderProgramID, name.c_str()), value));
     }
-}
-
-// Matrices
-template<typename T>
-void Shader::SetTransformationMatrix(const std::string& name, const T& mat)
-{
-    CHECK_GL_ERROR_(glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data()));
 }
 
 #endif

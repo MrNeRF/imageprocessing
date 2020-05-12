@@ -12,12 +12,6 @@
 #include <cmath>
 #include <memory>
 
-#define GLM_FORCE_CXX14
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-
 Viewer::Viewer(std::unique_ptr<Window> window)
     : m_window(std::move(window))
 {

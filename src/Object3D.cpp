@@ -1,7 +1,7 @@
 #include "Object3D.h"
 #include "File.h"
 #include "Logger.h"
-#include "Macros.h"
+#include "Macros.h" 
 #include "ObjFileParser.h"
 #include <iostream>
 #include <GL/glew.h>
@@ -46,6 +46,8 @@ void Object3D::Render()
     m_spShader->SetQuat("transform.qOrientation", m_orientation);
     m_spShader->SetQuat("transform.qconjOrientation", m_orientation.conjugate());
 
+
+    m_spShader->SetTransformationMatrix("normalRotationMatrix", m_orientation.toRotationMatrix());
     m_spShader->SetVector("cameraPos", m_spCamera->GetCameraPosition());
     m_spShader->SetTransformationMatrix("view", m_spCamera->GetLookAt());
     m_spShader->SetTransformationMatrix("projection", m_spCamera->GetPerspectiveProjection());
