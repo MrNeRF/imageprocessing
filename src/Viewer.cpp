@@ -65,8 +65,8 @@ void Viewer::Run(void)
         	suzanne->ResetRotation();
         }
 
-        spLightCube->Render();
         suzanne->Render();
+        spLightCube->Render();
         glfwSwapBuffers(m_window->GetGLFWWindow());
         glfwPollEvents();
     }

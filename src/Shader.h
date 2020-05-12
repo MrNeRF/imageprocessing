@@ -42,8 +42,14 @@ public:
     {
         CHECK_GL_ERROR_(glUniform4f(glGetUniformLocation(shaderProgramID, name.c_str()), v.x(), v.y(), v.z(), v.w()));
     }
-    template<typename T, int N = 1>
-    void SetVector(const std::string& name, const T& v);
+    void SetVector(const std::string& name, const Eigen::Vector3f& v)
+	{
+		CHECK_GL_ERROR_(glUniform3f(glGetUniformLocation(shaderProgramID, name.c_str()), v.x(), v.y(), v.z()));
+	}
+    void SetVector(const std::string& name, const Eigen::Vector4f& v)
+	{
+        CHECK_GL_ERROR_(glUniform4f(glGetUniformLocation(shaderProgramID, name.c_str()), v.x(), v.y(), v.z(), v.w()));
+	}
     template<typename T>
     void SetTransformationMatrix(const std::string& name, const T& mat);
     void SetTransformationMatrix(const std::string& name, glm::mat4& tran)
@@ -79,24 +85,6 @@ void Shader::SetValue(const std::string& name, T value)
     else
     {
         CHECK_GL_ERROR_(glUniform1i(glGetUniformLocation(shaderProgramID, name.c_str()), value));
-    }
-}
-
-// Vector
-template<typename T, int N>
-void Shader::SetVector(const std::string& name, const T& v)
-{
-    if (std::is_same<Eigen::Vector3f, T>::value)
-    {
-        CHECK_GL_ERROR_(glUniform3fv(glGetUniformLocation(shaderProgramID, name.c_str()), N, v.data()));
-    }
-    else if (std::is_same<Eigen::Vector4f, T>::value)
-    {
-        CHECK_GL_ERROR_(glUniform4fv(glGetUniformLocation(shaderProgramID, name.c_str()), N, v.data()));
-    }
-    else
-    {
-        assert(false && "Neither Vectorf3f nor Vector4f");
     }
 }
 

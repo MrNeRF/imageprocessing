@@ -9,7 +9,10 @@ fi
 cd build
 cmake ..
 
-make -j8
+numberCPUs=$(lscpu | egrep "CPU\(s\):[[:space:]]*[1-9]+" | tr -dc '0-9')
+numberThread=$((numberCPUs * 2))
+echo "You have $numberCPUs CPUs and we use $numberThread"
+make -j$numberThread
 cd ..
 
 if [ ! -h compile_commands.json ]; then

@@ -1,10 +1,8 @@
 #version 420 core
 layout (location = 0) in vec3 inputVertexPosition;
 layout (location = 1) in vec3 inputVertexColor;
-layout (location = 3) in vec3 inputVertexNormal;
 
 out vec3 vertexColor;
-out vec3 vertexNormal;
 
 uniform mat4 view;
 uniform mat4 projection;
@@ -14,7 +12,7 @@ struct Transform
   vec4 position;
   vec4 qOrientation;
   vec4 qconjOrientation;
-;
+};
 
 uniform Transform transform;
 
@@ -43,7 +41,6 @@ void main()
     vec3 pos = rotate_vertex_position(inputVertexPosition, transform.qOrientation.xyzw, transform.qconjOrientation.xyzw);
     pos += transform.position.xzy;
     vertexColor = inputVertexColor;
-    vertexNormal = inputVertexNormal;  
     
     gl_Position = projection * view  * vec4(pos, 1.f);
 }

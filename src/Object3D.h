@@ -40,7 +40,7 @@ public:
     void onNotify(const EventType& eventType, IEvent* pEventData) override;	
 private:
     std::string                         m_modelPath;
-    Eigen::Vector4f                     m_position{0.f, 0.f, 0.f, 0.f};
+    Eigen::Vector4f                     m_position = Eigen::Vector4f(0.f, 0.f, 0.f, 0.f);
     Eigen::Quaternionf                  m_orientation{Eigen::AngleAxis{0.f, Eigen::Vector3f::UnitX()}};
     Eigen::Vector2f                     m_dragAxis;
     std::unique_ptr<Mesh3D>             m_spMesh3D;

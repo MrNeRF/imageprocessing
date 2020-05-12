@@ -75,10 +75,10 @@ struct Material
 	}
 
     private:
-        const Eigen::Vector3f m_ambient;
-        const Eigen::Vector3f m_diffuse;
-        const Eigen::Vector3f m_specular;
-        const float           m_shininess;
+        Eigen::Vector3f m_ambient;
+        Eigen::Vector3f m_diffuse;
+        Eigen::Vector3f m_specular;
+        float           m_shininess;
 };
 
 #endif 

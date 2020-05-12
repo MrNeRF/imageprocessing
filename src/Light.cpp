@@ -34,7 +34,9 @@ void Light::SetColor(const Color& color)
 void Light::Render()
 {
     m_spShader->UseShader();
-    m_spShader->SetVector("lightPosition", m_position);
+    m_spShader->SetVector("transform.position", m_position);
+    m_spShader->SetQuat("transform.qOrientation", m_orientation);
+    m_spShader->SetQuat("transform.qconjOrientation", m_orientation.conjugate());
     m_spShader->SetTransformationMatrix("view", m_spCamera->GetLookAt());
     m_spShader->SetTransformationMatrix("projection", m_spCamera->GetPerspectiveProjection());
     m_spOGLDataObject->DrawObject(GL_TRIANGLES);
