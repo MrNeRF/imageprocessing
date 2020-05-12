@@ -94,7 +94,7 @@ void OpenGL3DDataObject::InitializeTextureUVBuffer(const Eigen::Matrix<float, Ei
 
 void OpenGL3DDataObject::InitializeNormalBuffer(Mesh3D& mesh)
 {
-    if (mesh.HasNormals())
+    if (!mesh.HasNormals())
     {
         return;
     }
@@ -115,7 +115,7 @@ void OpenGL3DDataObject::InitializeNormalBuffer(Mesh3D& mesh)
     CHECK_GL_ERROR_(glBindVertexArray(VAO))
 
     CHECK_GL_ERROR_(glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer))
-    CHECK_GL_ERROR_(glBufferData(GL_ARRAY_BUFFER, sizeof(float) * dimension * pVertexNormalAttribute->m_vertexNormals.size(), pVertexNormalAttribute->m_vertexNormals.data(), GL_STATIC_DRAW))
+    CHECK_GL_ERROR_(glBufferData(GL_ARRAY_BUFFER, sizeof(float) * dimension * pVertexNormalAttribute->m_vertexNormals.size(), pVertexNormalAttribute->m_vertexNormals[0].data(), GL_STATIC_DRAW))
 
     CHECK_GL_ERROR_(glVertexAttribPointer(normalAttrIdx, dimension, GL_FLOAT, GL_FALSE, 0, (void*)0))
     CHECK_GL_ERROR_(glEnableVertexAttribArray(normalAttrIdx))
