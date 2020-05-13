@@ -1,10 +1,12 @@
+#include <GL/glew.h>
+///
+#include <GLFW/glfw3.h>
 #include "Object3D.h"
 #include "File.h"
 #include "Logger.h"
 #include "Macros.h" 
 #include "ObjFileParser.h"
 #include <iostream>
-#include <GL/glew.h>
 
 void Object3D::Init(const std::string& pathToModel, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader)
 {
@@ -67,21 +69,49 @@ void Object3D::Render()
 
 void Object3D::onNotify(const EventType& eventType, IEvent* pEventData)
 {
-	if (eventType == EventType::MOUSEDRAG)
+	switch(eventType)
 	{
-		MouseDragEvent* pMouseDragEvent = dynamic_cast<MouseDragEvent*>(pEventData);
-		if(pMouseDragEvent != nullptr)
+		case EventType::MOUSE_LEFT_BTN_DRAG:
 		{
-			Eigen::Vector2f difference = (pMouseDragEvent->m_endCoordinates - pMouseDragEvent->m_startCoordinates).normalized();
-			/* UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(5.f), */ 
-			/* 			Eigen::Vector3f(-difference[1], difference[0], 0.f))); */
-			UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(10.f), 
-						Eigen::Vector3f(difference.y(), difference.x(), 0.f)));
+			MouseLeftBtnDragEvent* pMouseDragEvent = dynamic_cast<MouseLeftBtnDragEvent*>(pEventData);
+			if(pMouseDragEvent != nullptr)
+			{
+				Eigen::Vector2f difference = (pMouseDragEvent->m_endCoordinates - pMouseDragEvent->m_startCoordinates).normalized();
+				/* UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(5.f), */ 
+				/* 			Eigen::Vector3f(-difference[1], difference[0], 0.f))); */
+				UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(10.f), 
+							Eigen::Vector3f(difference.y(), difference.x(), 0.f)));
+			}
+			else
+			{
+				// We should not get here -> BUG
+				ASSERT(0);
+			}
 		}
-		else
+		break;
+		case EventType::KEY_PRESS:
 		{
-			// We should not get here -> BUG
-			ASSERT(0);
+			KeyPressEvent* pKeyPressEvent = dynamic_cast<KeyPressEvent*>(pEventData);
+			if(pKeyPressEvent != nullptr)
+			{
+				switch(pKeyPressEvent->m_key)
+				{
+					case GLFW_KEY_R:
+						ResetRotation();
+				}
+			}
+			else
+			{
+				// We should not get here -> BUG
+				ASSERT(0);
+			}
+			break;
 		}
+		case EventType::MOUSE_MID_BTN_DRAG:
+			[[fallthrough]];
+		case EventType::MOUSE_CLICK:
+			[[fallthrough]];
+		case EventType::MOUSE_WHEEL:
+			break;	
 	}
 }

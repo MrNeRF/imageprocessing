@@ -158,19 +158,38 @@ void Window::KeyboardCallback(GLFWwindow* win, int key, int scancode, int action
 
 void Window::MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods)
 {
-    if (button == GLFW_MOUSE_BUTTON_LEFT)
+    switch(button)
 	{
-		if (action == GLFW_PRESS)
+		case GLFW_MOUSE_BUTTON_LEFT:
 		{
-			m_MouseDragInfo.bIsDragging = true;
-			m_MouseDragInfo.startPos = m_cursorPos; 
-			m_MouseDragInfo.tic = std::chrono::steady_clock::now();
+			if (action == GLFW_PRESS)
+			{
+				m_MouseLeftBtnDragInfo.bIsDragging = true;
+				m_MouseLeftBtnDragInfo.startPos = m_cursorPos; 
+				m_MouseLeftBtnDragInfo.tic = std::chrono::steady_clock::now();
+			}
+			else if (action == GLFW_RELEASE)
+			{
+				m_MouseLeftBtnDragInfo.bIsDragging = false;
+				m_MouseLeftBtnDragInfo.toc = std::chrono::steady_clock::now();
+			}
 		}
-		else if (action == GLFW_RELEASE)
+		break;
+		case GLFW_MOUSE_BUTTON_MIDDLE:
 		{
-			m_MouseDragInfo.bIsDragging = false;
-			m_MouseDragInfo.toc = std::chrono::steady_clock::now();
+			if (action == GLFW_PRESS)
+			{
+				m_MouseMidBtnDragInfo.bIsDragging = true;
+				m_MouseMidBtnDragInfo.startPos = m_cursorPos; 
+				m_MouseMidBtnDragInfo.tic = std::chrono::steady_clock::now();
+			}
+			else if (action == GLFW_RELEASE)
+			{
+				m_MouseMidBtnDragInfo.bIsDragging = false;
+				m_MouseMidBtnDragInfo.toc = std::chrono::steady_clock::now();
+			}
 		}
+
 	}
 
 }
@@ -188,11 +207,23 @@ void Window::KeyboardDeviceUpdate(int key, int scancode, int action, int mods)
 	}
 
 	m_key = key;
+
+	if (action == GLFW_PRESS)
+	{
+		switch(m_key)
+		{
+			case GLFW_KEY_ESCAPE:
+				glfwSetWindowShouldClose(m_windowInstance, true);
+				break;
+		}
+	}
+
+	notify(EventType::KEY_PRESS, std::make_unique<KeyPressEvent>(key, scancode, action, mods));
 }
 
 void Window::MouseWheelUpdate(double xoffset, double yoffset)
 {
-	notify(EventType::MOUSEWHEEL, std::make_unique<MouseWheelEvent>(xoffset, yoffset));
+	notify(EventType::MOUSE_WHEEL, std::make_unique<MouseWheelEvent>(xoffset, yoffset));
 }
 
 void Window::CursorPositionUpdate(double xCursorPos, double yCursorPos)
@@ -200,12 +231,20 @@ void Window::CursorPositionUpdate(double xCursorPos, double yCursorPos)
 	m_cursorPos[0] = static_cast<float>(xCursorPos);
 	m_cursorPos[1]	= static_cast<float>(yCursorPos);
 
-	m_MouseDragInfo.toc = std::chrono::steady_clock::now();
-	if(m_MouseDragInfo.bIsDragging && milliseconds(m_MouseDragInfo.toc - m_MouseDragInfo.tic).count() > 40)
+	m_MouseLeftBtnDragInfo.toc = std::chrono::steady_clock::now();
+	if(m_MouseLeftBtnDragInfo.bIsDragging && milliseconds(m_MouseLeftBtnDragInfo.toc - m_MouseLeftBtnDragInfo.tic).count() > 40)
 	{
-		notify(EventType::MOUSEDRAG, std::make_unique<MouseDragEvent>(m_MouseDragInfo.startPos, m_cursorPos));
-		m_MouseDragInfo.startPos = m_cursorPos;
-		m_MouseDragInfo.tic = m_MouseDragInfo.toc;
+		notify(EventType::MOUSE_LEFT_BTN_DRAG, std::make_unique<MouseLeftBtnDragEvent>(m_MouseLeftBtnDragInfo.startPos, m_cursorPos));
+		m_MouseLeftBtnDragInfo.startPos = m_cursorPos;
+		m_MouseLeftBtnDragInfo.tic = m_MouseLeftBtnDragInfo.toc;
+	}
+
+	m_MouseMidBtnDragInfo.toc = std::chrono::steady_clock::now();
+	if(m_MouseMidBtnDragInfo.bIsDragging && milliseconds(m_MouseMidBtnDragInfo.toc - m_MouseMidBtnDragInfo.tic).count() > 40)
+	{
+		notify(EventType::MOUSE_MID_BTN_DRAG, std::make_unique<MouseMidBtnDragEvent>(m_MouseMidBtnDragInfo.startPos, m_cursorPos));
+		m_MouseMidBtnDragInfo.startPos = m_cursorPos;
+		m_MouseMidBtnDragInfo.tic = m_MouseMidBtnDragInfo.toc;
 	}
 
 }

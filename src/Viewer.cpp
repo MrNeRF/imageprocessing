@@ -44,21 +44,11 @@ void Viewer::Run(void)
         CHECK_GL_ERROR_(glClearColor(0.2f, 0.3f, 0.3f, 1.0f))
         CHECK_GL_ERROR_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
-        if (glfwGetKey(m_spWindow->GetGLFWWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        {
-            glfwSetWindowShouldClose(m_spWindow->GetGLFWWindow(), true);
-        }
-
-        if (m_spWindow->m_key == GLFW_KEY_R
-            && m_spWindow->m_bKeyPressed == true)
-        {
-        	/* suzanne->ResetRotation(); */
-        }
-
 		for (const auto& o : m_renderObjects)
 		{
 			o->Render();
 		}
+
         glfwSwapBuffers(m_spWindow->GetGLFWWindow());
         glfwPollEvents();
     }

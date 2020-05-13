@@ -39,20 +39,57 @@ const Eigen::Matrix4f& Camera::GetPerspectiveProjection() const
 	return m_frustum; 
 }
 
+void Camera::UpdateOrientation(const Eigen::AngleAxisf &angleAxis)
+{
+	Eigen::Quaternionf rotationQuat = Eigen::Quaternionf(angleAxis);
+	Eigen::Quaternionf tmp = rotationQuat * Eigen::Quaternionf(m_eye.x(), m_eye.y(), m_eye.z(), 0.f) * rotationQuat.conjugate();
+	m_eye.x() = tmp.x();
+	m_eye.y() = tmp.y();
+	m_eye.z() = tmp.z();
+}
+
 void Camera::onNotify(const EventType &eventType, IEvent* pEventData)
 {
-	if(eventType == EventType::MOUSEWHEEL)
+	switch(eventType)
 	{
+		case EventType::MOUSE_WHEEL:
+		{
 
-		MouseWheelEvent* pMouseWheelEvent = dynamic_cast<MouseWheelEvent*>(pEventData);
-		if(pMouseWheelEvent != nullptr)
-		{
-			m_eye.z() += -0.1f * static_cast<float>(pMouseWheelEvent->m_yoffset);
+			MouseWheelEvent* pMouseWheelEvent = dynamic_cast<MouseWheelEvent*>(pEventData);
+			if(pMouseWheelEvent != nullptr)
+			{
+				m_eye.z() += -0.1f * static_cast<float>(pMouseWheelEvent->m_yoffset);
+			}
+			else
+			{
+				ASSERT(0);
+			}
 		}
-		else
+		break;
+		case EventType::MOUSE_MID_BTN_DRAG:
 		{
-			ASSERT(0);
+			MouseMidBtnDragEvent* pMouseDragEvent = dynamic_cast<MouseMidBtnDragEvent*>(pEventData);
+			if(pMouseDragEvent != nullptr)
+			{
+				Eigen::Vector2f difference = (pMouseDragEvent->m_endCoordinates - pMouseDragEvent->m_startCoordinates).normalized();
+				/* UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(5.f), */ 
+				/* 			Eigen::Vector3f(-difference[1], difference[0], 0.f))); */
+				UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(10.f), 
+							Eigen::Vector3f(difference.y(), difference.x(), 0.f)));
+			}
+			else
+			{
+				// We should not get here -> BUG
+				ASSERT(0);
+			}
+
 		}
+	case EventType::KEY_PRESS:
+		[[fallthrough]];
+	case EventType::MOUSE_LEFT_BTN_DRAG:
+		[[fallthrough]];
+	case EventType::MOUSE_CLICK:
+		break;	
 	}
 }
 
