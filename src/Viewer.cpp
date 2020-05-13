@@ -12,56 +12,54 @@
 #include <cmath>
 #include <memory>
 
-Viewer::Viewer(std::unique_ptr<Window> window)
-    : m_window(std::move(window))
+Window* Viewer::Init(const std::string& name)
 {
+	m_spWindow = std::make_unique<Window>(name);
+	return m_spWindow.get();
+}
+
+void Viewer::AddRenderObject(std::shared_ptr<IRenderable> spRenderObject)
+{
+	m_renderObjects.push_back(spRenderObject);
+}
+
+std::shared_ptr<IRenderable> Viewer::GetLastRenderObject()
+{
+	return m_renderObjects.back();
 }
 
 void Viewer::Run(void)
 {
-    auto& logger = Logger::GetInstance().GetLogger();
-    logger.info("Viewer::Run()");
-
-    std::shared_ptr<Camera> spCamera = std::make_shared<Camera>();
-    spCamera->SetPerspectiveProjection(45.f, 800.f / 600.f, 0.1f, 50.f);
-    m_window->attach(spCamera);
-	
-    std::shared_ptr<Shader> spLightShader = std::make_shared<Shader>("Light Cube");
-    spLightShader->InitShaders("../Shaders/lightShader.vs", "../Shaders/lightShader.fs");
-    std::shared_ptr<Light> spLightCube = std::make_shared<Light>();
-    spLightCube->Init("../models/quader.obj", spCamera, spLightShader);
-
-    std::shared_ptr<Shader> spModelShader = std::make_shared<Shader>("3DModelShader");
-    spModelShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
-    std::shared_ptr<Object3D> suzanne = std::make_shared<Object3D>();
-    suzanne->Init("../models/suzanne.obj", spCamera, spModelShader);
-
-    suzanne->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
-    suzanne->SetPosition({0.f, 0.f, 2.f, 0.f});
-    suzanne->SetLight(spLightCube);
-
-    m_window->attach(suzanne);
+    auto& rLogger = Logger::GetInstance().GetLogger();
+    rLogger.info("Viewer::Run()");
+	if (m_spWindow == nullptr)
+	{
+		rLogger.critical("No Window Object created!");
+		ASSERT(0);
+	}
 
     CHECK_GL_ERROR_(glEnable(GL_DEPTH_TEST));
-    while (!glfwWindowShouldClose(m_window->GetGLFWWindow()))
+    while (!glfwWindowShouldClose(m_spWindow->GetGLFWWindow()))
     {
         CHECK_GL_ERROR_(glClearColor(0.2f, 0.3f, 0.3f, 1.0f))
         CHECK_GL_ERROR_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
-        if (glfwGetKey(m_window->GetGLFWWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        if (glfwGetKey(m_spWindow->GetGLFWWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
-            glfwSetWindowShouldClose(m_window->GetGLFWWindow(), true);
+            glfwSetWindowShouldClose(m_spWindow->GetGLFWWindow(), true);
         }
 
-        if (m_window->m_key == GLFW_KEY_R
-            && m_window->m_bKeyPressed == true)
+        if (m_spWindow->m_key == GLFW_KEY_R
+            && m_spWindow->m_bKeyPressed == true)
         {
-        	suzanne->ResetRotation();
+        	/* suzanne->ResetRotation(); */
         }
 
-        suzanne->Render();
-        spLightCube->Render();
-        glfwSwapBuffers(m_window->GetGLFWWindow());
+		for (const auto& o : m_renderObjects)
+		{
+			o->Render();
+		}
+        glfwSwapBuffers(m_spWindow->GetGLFWWindow());
         glfwPollEvents();
     }
 }
