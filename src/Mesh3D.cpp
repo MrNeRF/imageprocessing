@@ -1,7 +1,7 @@
 #include "Mesh3D.h"
 #include "VertexColorAttribute.h"
 #include "VertexNormalAttribute.h"
-#include <cassert>
+#include "Logger.h"
 #include <iostream>
 #include <typeinfo>
 
@@ -15,7 +15,8 @@ Mesh3D::Mesh3D(const std::vector<Eigen::Vector3f>& vertexData,
 {
     if (m_indices.empty() || vertexData.size() == 0)
     {
-        assert(false && "There are no vertices indexed");
+		Logger::GetInstance().GetLogger().error("There are no vertices indexed");
+		ASSERT(0);
     }
     m_halfEdgeDS.InitHalfEdgeDS();
 }
@@ -192,4 +193,31 @@ void Mesh3D::HalfEdgeDS::createFace(const std::pair<int, int>& e0,
         edges[e2]->wspOppositeHalfeEdge                = edges[oppositeHalfEdge2];
         edges[oppositeHalfEdge2]->wspOppositeHalfeEdge = edges[e2];
     }
+}
+
+void Mesh3D::IterateAllFaces() const
+{
+	int counter = 0;
+	for(const auto spFace: m_halfEdgeDS.faces)
+	{
+		auto spEdgeBegin = spFace->wspBoundingHalfEdge.lock();
+		if(spEdgeBegin == nullptr)	
+		{
+			continue;
+		}
+		auto spEdgeNext = spEdgeBegin;
+		std::cout << "Face " << ++counter << "\n";
+		do
+		{
+			if(spEdgeNext == nullptr)
+			{
+				continue;
+			}
+			const Eigen::Vector3f& point = spEdgeNext->spDestinationVertex->position;
+			std::cout << "Vector: (" << point.x() << ", " << point.y() << ", " << point.z() << ")\n";
+			spEdgeNext = spEdgeNext->wspNextHalfeEdge.lock();
+		}
+		while(spEdgeBegin != spEdgeNext);
+	}
+	
 }

@@ -71,6 +71,7 @@ private:
         void InitHalfEdgeDS(void);
 
     private:
+    	friend class Mesh3D;
         void createFace(const std::pair<int, int>& e0,
                         const std::pair<int, int>& e1,
                         const std::pair<int, int>& e2,
@@ -99,6 +100,7 @@ public:
 
     VertexAttribute*   GetVertexAttribute(EVertexAttribute vertexAttribute);
     TriangleAttribute* GetTriangleAttribute(ETriangleAttribute triangleAttribute);
+    void IterateAllFaces() const;
 
 
 private:

@@ -70,6 +70,7 @@ int main()
 		viewer.AddRenderObject(spRenderObject);
 	}
 
+	spQuaderMesh->IterateAllFaces();	
 	// Render
     viewer.Run();
     return 0;
