@@ -12,11 +12,11 @@ class Mesh3D;
 class ObjFileParser
 {
 public:
-    std::unique_ptr<Mesh3D> Parse(std::unique_ptr<File> spObjFile);
+    std::shared_ptr<Mesh3D> Parse(std::unique_ptr<File> spObjFile);
 
 private:
     void tokenize(std::string& line, char delim, std::vector<std::string>& tokens);
-    std::unique_ptr<Mesh3D> createMeshObject(std::vector<Eigen::Vector3f>& vertices,
+    std::shared_ptr<Mesh3D> createMeshObject(std::vector<Eigen::Vector3f>& vertices,
                                              std::vector<Eigen::Vector2f>& textureCoordinates,
                                              std::vector<Eigen::Vector3f>& normal,
                                              std::vector<uint32_t>&        indices,

@@ -1,27 +1,26 @@
 #include "Light.h"
 #include "File.h"
 #include "Macros.h"
+#include "Logger.h"
 #include "ObjFileParser.h"
 #include <GL/glew.h>
 
-void Light::Init(const std::string& pathToModel, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader)
+void Light::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader)
 {
-    m_modelPath = pathToModel;
+    m_spMesh3D = spMesh3D;
     m_spCamera  = spCamera;
     m_spShader  = spShader;
 
-    m_spMesh3D = ObjFileParser().Parse(std::make_unique<File>(m_modelPath));
     if (m_spMesh3D != nullptr)
     {
         m_spOGLDataObject = std::make_unique<OpenGL3DDataObject>();
         m_spOGLDataObject->InitializeVertexBuffer(*m_spMesh3D);
-        m_spOGLDataObject->InitializeColorBuffer(m_vertexColor);
 
         SetColor(m_vertexColor);
     }
     else
     {
-        assert(0);
+        ASSERT(0);
     }
 }
 

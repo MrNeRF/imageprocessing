@@ -2,6 +2,8 @@
 #include "Viewer.h"
 #include "Window.h"
 #include "Camera.h"
+#include "File.h"
+#include "ObjFileParser.h"
 #include "Light.h"
 #include "Shader.h"
 #include <GLFW/glfw3.h>
@@ -21,15 +23,17 @@ int main()
     
     std::shared_ptr<Shader> spLightShader = std::make_shared<Shader>("Light Cube");
     spLightShader->InitShaders("../Shaders/lightShader.vs", "../Shaders/lightShader.fs");
-    std::shared_ptr<Light> spLightCube = std::make_shared<Light>();
-    spLightCube->Init("../models/quader.obj", spCamera, spLightShader);
+    std::shared_ptr<Light> spLightCube = std::make_shared<Light>("Light");
+	std::shared_ptr<Mesh3D> spLightMesh3D = ObjFileParser().Parse(std::make_unique<File>("../models/quader.obj"));
+    spLightCube->Init(spLightMesh3D, spCamera, spLightShader);
 
 	viewer.AddRenderObject(spLightCube);
     std::shared_ptr<Shader> spModelShader = std::make_shared<Shader>("3DModelShader");
     spModelShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
 
-    std::shared_ptr<Object3D> spSuzane = std::make_shared<Object3D>();
-    spSuzane->Init("../models/suzanne.obj", spCamera, spModelShader);
+	std::shared_ptr<Mesh3D> spSuzaneMesh3D = ObjFileParser().Parse(std::make_unique<File>("../models/suzanne.obj"));
+    std::shared_ptr<Object3D> spSuzane = std::make_shared<Object3D>("Suzanne");
+    spSuzane->Init(spSuzaneMesh3D, spCamera, spModelShader);
 	viewer.AddRenderObject(spSuzane);
 
     spSuzane->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
@@ -41,13 +45,12 @@ int main()
 		std::shared_ptr<Shader> spShader = std::make_shared<Shader>(std::string("3DModelShader") + std::to_string(i));
 		spShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
 
-		viewer.AddRenderObject(std::make_shared<Object3D>());
-		Object3D* pRenderObject = dynamic_cast<Object3D*>(viewer.GetLastRenderObject().get());
-
-		pRenderObject->Init("../models/suzanne.obj", spCamera, spShader);
-		pRenderObject->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
-		pRenderObject->SetPosition({(float)i, (float)i, 2.f + static_cast<float>(i - 4), 0.f});
-		pRenderObject->SetLight(spLightCube);
+		std::shared_ptr<Object3D> spRenderObject = std::make_shared<Object3D>(std::string("Suzanne") + std::to_string(i));
+		spRenderObject->Init(ObjFileParser().Parse(std::make_unique<File>("../models/suzanne.obj")), spCamera, spShader);
+		spRenderObject->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
+		spRenderObject->SetPosition({(float)i, (float)i, 2.f + static_cast<float>(i - 4), 0.f});
+		spRenderObject->SetLight(spLightCube);
+		viewer.AddRenderObject(spRenderObject);
 	}
     pWindow->attach(spCamera);
     pWindow->attach(spSuzane);

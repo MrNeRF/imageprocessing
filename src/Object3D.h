@@ -10,7 +10,6 @@
 #include "IRenderable.h"
 #include "Light.h"
 #include "Material.h"
-#include "Mesh3D.h"
 #include "OpenGL3DDataObject.h"
 #include "Shader.h"
 #include <Eigen/Dense>
@@ -21,11 +20,12 @@ class Object3D : public IRenderable
     , public IObserver
 {
 public:
+    Object3D(const std::string &name) : m_name{name} {}
     const Eigen::Vector4f&    GetPosition() const { return m_position; }
     const Eigen::Quaternionf& GetOrientation() const { return m_orientation; }
 
     // IRenderable override
-    void Init(const std::string& pathToModel, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader) override;
+    void Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader) override;
     void SetColor(const Color& color) override;
     void Render() override;
 
@@ -39,12 +39,12 @@ public:
     // Observer overrides
     void onNotify(const EventType& eventType, IEvent* pEventData) override;	
 private:
-    std::string                         m_modelPath;
+    const std::string                   m_name;
     Eigen::Vector4f                     m_position = Eigen::Vector4f(0.f, 0.f, 0.f, 0.f);
     Eigen::Quaternionf                  m_orientation{Eigen::AngleAxis{0.f, Eigen::Vector3f::UnitX()}};
     Eigen::Vector2f                     m_dragAxis;
-    std::unique_ptr<Mesh3D>             m_spMesh3D;
     std::unique_ptr<OpenGL3DDataObject> m_spOGLDataObject;
+    std::shared_ptr<Mesh3D>             m_spMesh3D;
     std::shared_ptr<Camera>             m_spCamera;
     std::shared_ptr<Material>           m_spMaterial;
     std::shared_ptr<Shader>             m_spShader;
