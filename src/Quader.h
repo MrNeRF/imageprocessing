@@ -10,6 +10,7 @@ class Quader : public Primitives3D
 {
 	public:
 		explicit Quader(float width, float height, float depth);
+		std::shared_ptr<Mesh3D> GetMesh() override;
 	
 	private:
 		std::vector<Eigen::Vector3f> m_vertices;

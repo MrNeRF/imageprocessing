@@ -89,7 +89,7 @@ private:
 public:
     explicit Mesh3D(const std::vector<Eigen::Vector3f>& vertexMatrix,
                     const std::vector<uint32_t>&        indexVector,
-                    const std::string name);
+                    const std::string& name);
 
     bool HasVertices(void) { return !m_vertices.empty(); };
     bool HasUVCoordinates(void) { return !m_uvCoordinates.empty(); };

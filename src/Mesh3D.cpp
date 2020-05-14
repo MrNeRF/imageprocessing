@@ -7,7 +7,7 @@
 
 Mesh3D::Mesh3D(const std::vector<Eigen::Vector3f>& vertexData,
                const std::vector<uint32_t>&        indexVector,
-               const std::string name)
+               const std::string& name)
     : m_name{name}
 	, m_indices{indexVector}
     , m_vertices(vertexData)

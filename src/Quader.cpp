@@ -12,9 +12,9 @@ Quader::Quader(float width, float height, float depth) : m_width{width}, m_heigh
 
 	// back vertices
 	m_vertices.emplace_back(Eigen::Vector3f(1.f, 1.f, 1.f));
-	m_vertices.emplace_back(Eigen::Vector3f(1.f, -1.f, 1.f));
-	m_vertices.emplace_back(Eigen::Vector3f(-1.f, -1.f, 1.f));
 	m_vertices.emplace_back(Eigen::Vector3f(-1.f, 1.f, 1.f));
+	m_vertices.emplace_back(Eigen::Vector3f(-1.f, -1.f, 1.f));
+	m_vertices.emplace_back(Eigen::Vector3f(1.f, -1.f, 1.f));
 
 	auto createTriangleIndices = 
 		[&indices = m_indices](uint32_t upperLeft, uint32_t upperRight, 
@@ -35,15 +35,19 @@ Quader::Quader(float width, float height, float depth) : m_width{width}, m_heigh
 	// front
 	createTriangleIndices(0, 1, 2, 3);
 	// right
-	createTriangleIndices(1, 4, 5, 2);
+	createTriangleIndices(1, 4, 7, 2);
 	// back
-	createTriangleIndices(4, 7, 6, 5);
+	createTriangleIndices(4, 5, 6, 7);
 	// left
-	createTriangleIndices(7, 0, 1, 5);
+	createTriangleIndices(5, 0, 3, 6);
 	// top 
-	createTriangleIndices(7, 4, 1, 0);
+	createTriangleIndices(5, 4, 1, 0);
 	// bottom
-	createTriangleIndices(1, 2, 5, 6);
+	createTriangleIndices(3, 2, 7, 6);
 }
 
 
+std::shared_ptr<Mesh3D> Quader::GetMesh()
+{
+	return std::make_shared<Mesh3D>(m_vertices, m_indices,"Quader");
+}

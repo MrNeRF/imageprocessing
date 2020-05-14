@@ -6,6 +6,7 @@
 #include "ObjFileParser.h"
 #include "Light.h"
 #include "Shader.h"
+#include "Quader.h"
 #include <GLFW/glfw3.h>
 #include <memory>
 #include <spdlog/spdlog.h>
@@ -34,12 +35,28 @@ int main()
 	std::shared_ptr<Mesh3D> spSuzaneMesh3D = ObjFileParser().Parse(std::make_unique<File>("../models/suzanne.obj"));
     std::shared_ptr<Object3D> spSuzane = std::make_shared<Object3D>("Suzanne");
     spSuzane->Init(spSuzaneMesh3D, spCamera, spModelShader);
-	viewer.AddRenderObject(spSuzane);
-
     spSuzane->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
     spSuzane->SetPosition({0.f, 0.f, 2.f, 0.f});
     spSuzane->SetLight(spLightCube);
+	/* viewer.AddRenderObject(spSuzane); */
 
+		
+    std::shared_ptr<Shader> spQuaderShader = std::make_shared<Shader>("Quader Shader");
+    spModelShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
+	Quader quader(1.f, 1.f, 1.f);
+	
+	std::shared_ptr<Mesh3D> spQuaderMesh = quader.GetMesh();
+    std::shared_ptr<Object3D> spBox = std::make_shared<Object3D>("Box");
+    spBox->Init(spQuaderMesh, spCamera, spModelShader);
+    spBox->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
+    spBox->SetPosition({0.f, 0.f, 2.f, 0.f});
+    spBox->SetLight(spLightCube);
+    viewer.AddRenderObject(spBox);
+
+
+    pWindow->attach(spCamera);
+    /* pWindow->attach(spSuzane); */
+    pWindow->attach(spBox);
 	for (int i = 4; i < 8; ++i )
 	{
 		std::shared_ptr<Shader> spShader = std::make_shared<Shader>(std::string("3DModelShader") + std::to_string(i));
@@ -52,8 +69,6 @@ int main()
 		spRenderObject->SetLight(spLightCube);
 		viewer.AddRenderObject(spRenderObject);
 	}
-    pWindow->attach(spCamera);
-    pWindow->attach(spSuzane);
 
 	// Render
     viewer.Run();
