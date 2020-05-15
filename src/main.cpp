@@ -70,7 +70,48 @@ int main()
 		viewer.AddRenderObject(spRenderObject);
 	}
 
-	spQuaderMesh->IterateAllFaces();	
+	/* spQuaderMesh->IterateAllFaces(); */	
+	std::cout << "\nVertex 0: "; 
+	for(const auto& faceID : oneRingFaceIterator(*spQuaderMesh, 0))
+	{
+		std::cout << faceID << ", ";
+	}
+	std::cout << "\nVertex 1: "; 
+	for(const auto& faceID : oneRingFaceIterator(*spQuaderMesh, 1))
+	{
+		std::cout << faceID << ", ";
+	}
+	std::cout << "\nVertex 2: "; 
+	for(const auto& faceID : oneRingFaceIterator(*spQuaderMesh, 2))
+	{
+		std::cout << faceID << ", ";
+	}
+	std::cout << "\nVertex 3: "; 
+	for(const auto& faceID : oneRingFaceIterator(*spQuaderMesh, 3))
+	{
+		std::cout << faceID << ", ";
+	}
+	std::cout << "\nVertex 4: "; 
+	for(const auto& faceID : oneRingFaceIterator(*spQuaderMesh, 4))
+	{
+		std::cout << faceID << ", ";
+	}
+	std::cout << "\nVertex 5: "; 
+	for(const auto& faceID : oneRingFaceIterator(*spQuaderMesh, 5))
+	{
+		std::cout << faceID << ", ";
+	}
+	std::cout << "\nVertex 6: "; 
+	for(const auto& faceID : oneRingFaceIterator(*spQuaderMesh, 6))
+	{
+		std::cout << faceID << ", ";
+	}
+	std::cout << "\nVertex 7: "; 
+	for(const auto& faceID : oneRingFaceIterator(*spQuaderMesh, 7))
+	{
+		std::cout << faceID << ", ";
+	}
+	std::cout << "\n"; 
 	// Render
     viewer.Run();
     return 0;

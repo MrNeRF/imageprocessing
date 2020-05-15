@@ -91,19 +91,22 @@ void Mesh3D::HalfEdgeDS::InitHalfEdgeDS(void)
     // faceCount ist indices / 3;
     uint32_t faceCount = static_cast<uint32_t>(static_cast<float>(m_mesh.m_indices.size()) / 3.f);
     faces.resize(faceCount);
-    vertices.resize(m_mesh.m_indices.size());
+    vertices.resize(m_mesh.m_vertices.size());
     uint32_t vIdx = 0;
     for (uint32_t faceIdx = 0; faceIdx < faceCount; ++faceIdx)
     {
+        // Get indices for the three face vertices
         int i0 = m_mesh.m_indices[vIdx++];
         int i1 = m_mesh.m_indices[vIdx++];
         int i2 = m_mesh.m_indices[vIdx++];
 
+		// Get the vertices
         const Eigen::Vector3f& v0 = m_mesh.m_vertices[i0];
         const Eigen::Vector3f& v1 = m_mesh.m_vertices[i1];
         const Eigen::Vector3f& v2 = m_mesh.m_vertices[i2];
 
         faces[faceIdx] = std::make_shared<Face>(faceIdx);
+        // @TODO
         // We need to take the dot product between the face normal and the boundary sides of the triangle to determine
         // the correct winding order.
         // (from, to)
@@ -174,9 +177,9 @@ void Mesh3D::HalfEdgeDS::createFace(const std::pair<int, int>& e0,
     edges[e2]->wspNextHalfeEdge     = edges[e0];
     edges[e2]->wspPreviousHalfeEdge = edges[e1];
 
-    std::pair<int, int> oppositeHalfEdge0 = std::make_pair(e0.second, e0.first);
-    std::pair<int, int> oppositeHalfEdge1 = std::make_pair(e1.second, e1.first);
-    std::pair<int, int> oppositeHalfEdge2 = std::make_pair(e2.second, e2.first);
+    std::pair<int, int> oppositeHalfEdge0{e0.second, e0.first};
+    std::pair<int, int> oppositeHalfEdge1{e1.second, e1.first};
+    std::pair<int, int> oppositeHalfEdge2{e2.second, e2.first};
 
     if (edges[oppositeHalfEdge0] != nullptr)
     {
@@ -197,27 +200,30 @@ void Mesh3D::HalfEdgeDS::createFace(const std::pair<int, int>& e0,
 
 void Mesh3D::IterateAllFaces() const
 {
-	int counter = 0;
 	for(const auto spFace: m_halfEdgeDS.faces)
 	{
 		auto spEdgeBegin = spFace->wspBoundingHalfEdge.lock();
-		if(spEdgeBegin == nullptr)	
-		{
-			continue;
-		}
+		ASSERT(spEdgeBegin != nullptr)	
 		auto spEdgeNext = spEdgeBegin;
-		std::cout << "Face " << ++counter << "\n";
+		std::cout << "Face " << spFace->id << "\n";
 		do
 		{
-			if(spEdgeNext == nullptr)
-			{
-				continue;
-			}
+			ASSERT(spEdgeNext != nullptr)
 			const Eigen::Vector3f& point = spEdgeNext->spDestinationVertex->position;
 			std::cout << "Vector: (" << point.x() << ", " << point.y() << ", " << point.z() << ")\n";
 			spEdgeNext = spEdgeNext->wspNextHalfeEdge.lock();
 		}
 		while(spEdgeBegin != spEdgeNext);
 	}
+
+	// Vertices
+	/* std::cout << "Vertices \n"; */
+	/* auto iter = m_vertices.begin(); */ 
+	/* for(const auto& v : m_halfEdgeDS.vertices) */
+	/* { */
+	/* 	std::cout << "HalfEdge: (" << v->position.x() << ", " << v->position.y() << ", " << v->position.z() << ")\n"; */
+	/* 	std::cout << "Mesh    : (" << (*iter).x() << ", " << (*iter).y() << ", " << (*iter).z() << ")\n"; */
+	/* 	iter = std::next(iter); */
+	/* } */
 	
 }
