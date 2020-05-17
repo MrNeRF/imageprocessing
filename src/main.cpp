@@ -41,13 +41,14 @@ int main()
 		std::shared_ptr<Shader> spShader = std::make_shared<Shader>(std::string("3DModelShader") + std::to_string(i));
 		spShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
 
-		viewer.AddRenderObject(std::make_shared<Object3D>());
-		Object3D* pRenderObject = dynamic_cast<Object3D*>(viewer.GetLastRenderObject().get());
+		auto spRenderObject = std::make_shared<Object3D>();
+		viewer.AddRenderObject(spRenderObject);
 
-		pRenderObject->Init("../models/suzanne.obj", spCamera, spShader);
-		pRenderObject->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
-		pRenderObject->SetPosition({(float)i, (float)i, 2.f + static_cast<float>(i - 4), 0.f});
-		pRenderObject->SetLight(spLightCube);
+		spRenderObject->Init("../models/suzanne.obj", spCamera, spShader);
+		spRenderObject->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
+		spRenderObject->SetPosition({(float)i, (float)i, 2.f + static_cast<float>(i - 4), 0.f});
+		spRenderObject->SetLight(spLightCube);
+		pWindow->attach(spRenderObject);
 	}
     pWindow->attach(spCamera);
     pWindow->attach(spSuzane);

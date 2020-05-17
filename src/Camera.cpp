@@ -58,7 +58,7 @@ void Camera::onNotify(const EventType &eventType, IEvent* pEventData)
 			MouseWheelEvent* pMouseWheelEvent = dynamic_cast<MouseWheelEvent*>(pEventData);
 			if(pMouseWheelEvent != nullptr)
 			{
-				m_eye.z() += -0.1f * static_cast<float>(pMouseWheelEvent->m_yoffset);
+				m_eye.z() += -0.5f * static_cast<float>(pMouseWheelEvent->m_yoffset);
 			}
 			else
 			{
@@ -66,24 +66,8 @@ void Camera::onNotify(const EventType &eventType, IEvent* pEventData)
 			}
 		}
 		break;
-		case EventType::MOUSE_MID_BTN_DRAG:
-		{
-			MouseMidBtnDragEvent* pMouseDragEvent = dynamic_cast<MouseMidBtnDragEvent*>(pEventData);
-			if(pMouseDragEvent != nullptr)
-			{
-				Eigen::Vector2f difference = (pMouseDragEvent->m_endCoordinates - pMouseDragEvent->m_startCoordinates).normalized();
-				/* UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(5.f), */ 
-				/* 			Eigen::Vector3f(-difference[1], difference[0], 0.f))); */
-				UpdateOrientation(Eigen::AngleAxisf(MathHelper::degreeToRadians(10.f), 
-							Eigen::Vector3f(difference.y(), difference.x(), 0.f)));
-			}
-			else
-			{
-				// We should not get here -> BUG
-				ASSERT(0);
-			}
-
-		}
+	case EventType::MOUSE_MID_BTN_DRAG:
+		[[fallthrough]];
 	case EventType::KEY_PRESS:
 		[[fallthrough]];
 	case EventType::MOUSE_LEFT_BTN_DRAG:

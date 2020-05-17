@@ -108,7 +108,24 @@ void Object3D::onNotify(const EventType& eventType, IEvent* pEventData)
 			break;
 		}
 		case EventType::MOUSE_MID_BTN_DRAG:
-			[[fallthrough]];
+		{
+			MouseMidBtnDragEvent* pMouseDragEvent = dynamic_cast<MouseMidBtnDragEvent*>(pEventData);
+			if(pMouseDragEvent != nullptr)
+			{
+				Eigen::Vector2f difference = (pMouseDragEvent->m_endCoordinates - pMouseDragEvent->m_startCoordinates).normalized();
+				difference *= 0.4f;
+				auto pos = GetPosition(); 
+				pos[0] += difference.x();
+				pos[1] += difference.y();
+				SetPosition(pos);
+			}
+			else
+			{
+				// We should not get here -> BUG
+				ASSERT(0);
+			}
+
+		}
 		case EventType::MOUSE_CLICK:
 			[[fallthrough]];
 		case EventType::MOUSE_WHEEL:
