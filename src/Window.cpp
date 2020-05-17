@@ -215,6 +215,9 @@ void Window::KeyboardDeviceUpdate(int key, int scancode, int action, int mods)
 			case GLFW_KEY_ESCAPE:
 				glfwSetWindowShouldClose(m_windowInstance, true);
 				break;
+			case GLFW_KEY_W:
+				m_bWireFrame = m_bWireFrame ? false : true; 
+				break;
 		}
 	}
 

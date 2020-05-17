@@ -67,6 +67,7 @@ public:
     const std::string windowName;
     bool m_bKeyPressed = false;
     int m_key = 0;;
+	bool m_bWireFrame = false;
 
 private:
 	MouseLeftBtnDragInfo m_MouseLeftBtnDragInfo;

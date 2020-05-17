@@ -30,20 +30,34 @@ Quader::Quader(float width, float height, float depth) : m_width{width}, m_heigh
 			indices.push_back(upperLeft);
 			indices.push_back(upperRight);
 		};
+	auto createTriangleIndicesReverse = 
+		[&indices = m_indices](uint32_t upperLeft, uint32_t upperRight, 
+				uint32_t lowerRight, uint32_t lowerLeft)
+		{
+			// First triangle
+			indices.push_back(upperRight);
+			indices.push_back(lowerLeft);
+			indices.push_back(upperLeft);
+			
+			// Second triangle
+			indices.push_back(upperRight);
+			indices.push_back(lowerRight);
+			indices.push_back(lowerLeft);
+		};
 	// indices
 
 	// front
 	createTriangleIndices(0, 1, 2, 3);
 	// right
-	createTriangleIndices(1, 4, 7, 2);
+	createTriangleIndicesReverse(1, 4, 7, 2);
 	// back
 	createTriangleIndices(4, 5, 6, 7);
 	// left
-	createTriangleIndices(5, 0, 3, 6);
-	// top 
-	createTriangleIndices(5, 4, 1, 0);
+	createTriangleIndicesReverse(5, 0, 3, 6);
 	// bottom
-	createTriangleIndices(3, 2, 7, 6);
+	createTriangleIndicesReverse(3, 2, 7, 6);
+	// top 
+	createTriangleIndicesReverse(5, 4, 1, 0);
 }
 
 
