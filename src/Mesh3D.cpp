@@ -21,15 +21,34 @@ Mesh3D::Mesh3D(const std::vector<Eigen::Vector3f>& vertexData,
     m_halfEdgeDS.InitHalfEdgeDS();
 }
 
+std::tuple<Eigen::Vector3f, Eigen::Vector3f, Eigen::Vector3f> Mesh3D::GetFaceVertices(uint32_t faceIndex)
+{
+    uint32_t faceCount = GetNumberOfFaces();
+	ASSERT(faceIndex >= 0 && faceIndex < faceCount);
+	faceIndex *=3;
+	return std::make_tuple(m_vertices[m_indices[faceIndex]], m_vertices[m_indices[faceIndex + 1]], m_vertices[m_indices[faceIndex + 2]]);
+}
+
 VertexAttribute& Mesh3D::AddVertexAttribute(EVertexAttribute vertexAttribute)
 {
+    VertexAttribute* pVertexAttribute = nullptr;
     switch (vertexAttribute)
     {
         case EVertexAttribute::Normal:
-            m_vertexAttributes.emplace_back(std::make_unique<VertexNormalAttribute>(m_vertices, m_indices));
+			pVertexAttribute = GetVertexAttribute(vertexAttribute);
+			if (pVertexAttribute != nullptr)
+			{
+				return *pVertexAttribute;
+			}
+            m_vertexAttributes.push_back(std::make_unique<VertexNormalAttribute>(m_vertices, m_indices));
             break;
         case EVertexAttribute::Color:
-            m_vertexAttributes.emplace_back(std::make_unique<VertexColorAttribute>(m_vertices, m_indices));
+			pVertexAttribute = GetVertexAttribute(vertexAttribute);
+			if (pVertexAttribute != nullptr)
+			{
+				return *pVertexAttribute;
+			}
+            m_vertexAttributes.push_back(std::make_unique<VertexColorAttribute>(m_vertices, m_indices));
             break;
         case EVertexAttribute::UVCoordinates:
             break;
@@ -89,7 +108,7 @@ TriangleAttribute* Mesh3D::GetTriangleAttribute(ETriangleAttribute triangleAttri
 void Mesh3D::HalfEdgeDS::InitHalfEdgeDS(void)
 {
     // faceCount ist indices / 3;
-    uint32_t faceCount = static_cast<uint32_t>(static_cast<float>(m_mesh.m_indices.size()) / 3.f);
+    uint32_t faceCount = m_mesh.GetNumberOfFaces();
     faces.resize(faceCount);
     vertices.resize(m_mesh.m_vertices.size());
     uint32_t vIdx = 0;

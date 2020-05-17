@@ -29,6 +29,8 @@ public:
     void SetColor(const Color& color) override;
     void Render() override;
 
+	void UpdateNormalBuffer();
+
     void SetMaterial(std::shared_ptr<Material> spMaterial) { m_spMaterial = spMaterial; }
     void SetCamera(std::shared_ptr<Camera> spCamera) { m_spCamera = spCamera; }
     void SetLight(std::shared_ptr<Light> spLight) { m_spLight = spLight; }

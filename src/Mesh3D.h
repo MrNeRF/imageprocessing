@@ -6,6 +6,7 @@
 #include "Logger.h"
 #include <Eigen/Dense>
 #include <map>
+#include <tuple>
 #include <memory>
 #include <utility>
 #include "Defs.h"
@@ -97,9 +98,11 @@ public:
     bool HasVertices(void) { return !m_vertices.empty(); };
     bool HasUVCoordinates(void) { return !m_uvCoordinates.empty(); };
     bool HasNormals(void) { return GetVertexAttribute(EVertexAttribute::Normal) != nullptr; };
-
+    std::tuple<Eigen::Vector3f, Eigen::Vector3f, Eigen::Vector3f> GetFaceVertices(uint32_t faceIndex);
     VertexAttribute& AddVertexAttribute(EVertexAttribute vertexAttribute);
 
+    uint32_t GetNumberOfVertice() const {return m_vertices.size();}
+    uint32_t GetNumberOfFaces() const {return static_cast<uint32_t>(static_cast<float>(m_indices.size()) / 3.f);}
     VertexAttribute*   GetVertexAttribute(EVertexAttribute vertexAttribute);
     TriangleAttribute* GetTriangleAttribute(ETriangleAttribute triangleAttribute);
     void IterateAllFaces() const;
@@ -126,7 +129,7 @@ class vertexIterator
 public:
 	explicit vertexIterator(Mesh3D& rMesh) : m_rMesh(rMesh){}
 		
-	uint32_t operator*() {return m_rMesh.m_indices[idx];}
+	uint32_t operator*() {return idx;}
 	vertexIterator& operator++() { ++idx; return *this; }
 	bool operator != (const vertexIterator& other) {  return idx != other.idx; }
 
@@ -138,27 +141,30 @@ private:
 private:
 	Mesh3D& m_rMesh;
 	uint32_t idx = 0;
-	uint32_t endIdx = m_rMesh.m_indices.size();
+	uint32_t endIdx = m_rMesh.m_vertices.size();
 };
 
 class faceIterator
 {
 public:
-	explicit faceIterator(Mesh3D& rMesh) : m_rMesh(rMesh){}
+	explicit faceIterator(Mesh3D& rMesh) : m_rMesh{rMesh}, 
+	endIdx{static_cast<uint32_t>(static_cast<float>(rMesh.m_indices.size()) / 3.f)}
+	{}
 		
-	uint32_t operator*() {return m_rMesh.m_indices[idx];}
-	faceIterator& operator++() { idx+=3; return *this; }
+	uint32_t operator*() {return idx;}
+	faceIterator& operator++() { ++idx; return *this; }
 	bool operator != (const faceIterator& other) {  return idx != other.idx; }
 
-	faceIterator begin() {return faceIterator(0, m_rMesh);};
-	faceIterator end() {return faceIterator(endIdx, m_rMesh);};
+	faceIterator begin() {return faceIterator(m_rMesh, idx, endIdx);};
+	faceIterator end() {return faceIterator(m_rMesh, endIdx, endIdx);};
 private:
-	explicit faceIterator(uint32_t i, Mesh3D& rMesh) :  m_rMesh(rMesh), idx{i} {};
+	explicit faceIterator(Mesh3D& rMesh, uint32_t start, uint32_t end) :  
+		m_rMesh(rMesh), idx{start}, endIdx{end} {}
 
 private:
 	Mesh3D& m_rMesh;
 	uint32_t idx = 0;
-	uint32_t endIdx = m_rMesh.m_indices.size();
+	uint32_t endIdx = 0;
 };
 
 class oneRingFaceIterator
@@ -166,7 +172,7 @@ class oneRingFaceIterator
 public:
 	explicit oneRingFaceIterator(Mesh3D& rMesh, uint32_t vertexID) : m_rMesh(rMesh), m_startVertexID(vertexID)
 	{
-		ASSERT(vertexID >= 0 || vertexID < rMesh.m_vertices.size()) 
+		ASSERT(vertexID >= 0 && vertexID < rMesh.m_vertices.size()) 
 		m_wspHalfEdge = m_rMesh.m_halfEdgeDS.vertices[vertexID]->wspOutgoingHalfEdge;
 		m_currentFaceID = m_wspHalfEdge.lock()->spFace->id;
 		m_startFaceID = m_currentFaceID;
@@ -177,6 +183,11 @@ public:
 	{ 
 		m_wspHalfEdge = m_wspHalfEdge.lock()->wspNextHalfeEdge.lock()->wspNextHalfeEdge;
 		m_wspHalfEdge = m_wspHalfEdge.lock()->wspOppositeHalfeEdge; 
+		if (!m_wspHalfEdge.lock())
+		{
+			m_currentFaceID = m_startFaceID;
+			return *this; 
+		}
 		m_currentFaceID = m_wspHalfEdge.lock()->spFace->id;
 		return *this; 
 	}
@@ -191,7 +202,7 @@ public:
 
 		auto wspTmpHalfEdge = m_wspHalfEdge.lock()->wspNextHalfeEdge.lock()->wspNextHalfeEdge;
 		wspTmpHalfEdge = wspTmpHalfEdge.lock()->wspOppositeHalfeEdge; 
-		if(wspTmpHalfEdge.lock()->spFace->id == other.m_startFaceID)
+		if(!wspTmpHalfEdge.lock() || wspTmpHalfEdge.lock()->spFace->id == other.m_startFaceID)
 		{
 			m_bStopIterating = true;
 		}

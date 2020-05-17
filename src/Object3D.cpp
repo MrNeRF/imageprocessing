@@ -33,6 +33,11 @@ void Object3D::SetColor(const Color& color)
     m_spOGLDataObject->InitializeColorBuffer(m_vertexColor);
 }
 
+void Object3D::UpdateNormalBuffer()
+{
+    m_spOGLDataObject->InitializeNormalBuffer(*m_spMesh3D);
+}
+
 void Object3D::Render()
 {
     m_spShader->UseShader();

@@ -1,7 +1,6 @@
 #include "VertexAttribute.h"
 #include "Macros.h"
 #include "Logger.h"
-#include <algorithm>
 
 class VertexNormalAttribute : public VertexAttribute
 {
