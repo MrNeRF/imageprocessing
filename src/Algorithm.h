@@ -4,10 +4,9 @@
 class Algorithm
 {
 public:
-    Algorithm(void)          = default;
     virtual ~Algorithm(void) = default;
 
-    [[nodiscard]] bool virtual Compute(void) = 0;
+    [[nodiscard]] virtual bool Compute(void) = 0;
 };
 
 #endif

@@ -8,30 +8,24 @@
 #include "ObjFileParser.h"
 #include <iostream>
 
-void Object3D::Init(const std::string& pathToModel, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader)
+void Object3D::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader)
 {
-    m_modelPath = pathToModel;
+	Logger::GetInstance().GetLogger().info("Object3D: {}", m_name);
+	Logger::GetInstance().GetLogger().info("ShaderName: {}", spShader->shaderName);
+    m_spMesh3D  = spMesh3D;
     m_spCamera  = spCamera;
     m_spShader  = spShader;
     
-	Logger::GetInstance().GetLogger().info("ShaderName: {}", spShader->shaderName);
-    m_spMesh3D = ObjFileParser().Parse(std::make_unique<File>(m_modelPath));
     if (m_spMesh3D != nullptr)
     {
         m_spOGLDataObject = std::make_unique<OpenGL3DDataObject>();
         m_spOGLDataObject->InitializeVertexBuffer(*m_spMesh3D);
         m_spOGLDataObject->InitializeNormalBuffer(*m_spMesh3D);
-        m_spOGLDataObject->InitializeColorBuffer(m_vertexColor);
-
-        /* if (spObjectMesh3D->HasUVCoordinates()) */
-        /* { */
-        /*     spOGLDataObject->InitializeTextureUVBuffer(spObjectMesh3D->uvCoordinates); */
-        /* } */
-
+        SetColor(m_vertexColor);
     }
     else
     {
-        assert(0);
+    	ASSERT(0);
     }
 }
 
@@ -39,6 +33,11 @@ void Object3D::SetColor(const Color& color)
 {
     m_vertexColor = color;
     m_spOGLDataObject->InitializeColorBuffer(m_vertexColor);
+}
+
+void Object3D::UpdateNormalBuffer()
+{
+    m_spOGLDataObject->InitializeNormalBuffer(*m_spMesh3D);
 }
 
 void Object3D::Render()

@@ -46,7 +46,7 @@ struct KeyHasher
 };
 } // namespace
 
-std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
+std::shared_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
 {
     std::string buffer;
     spObjFile->GetContents(buffer);
@@ -150,14 +150,14 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
     return createMeshObject(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, remappedIndices, spObjFile->filename);
 }
 
-std::unique_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vector3f>& vertices,
+std::shared_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vector3f>& vertices,
                                                         std::vector<Eigen::Vector2f>& textureCoordinates,
                                                         std::vector<Eigen::Vector3f>& normals,
                                                         std::vector<uint32_t>&        indices,
                                                         const std::string& name)
 
 {
-    std::unique_ptr<Mesh3D> spMesh = std::make_unique<Mesh3D>(vertices, indices, name);
+    std::shared_ptr<Mesh3D> spMesh = std::make_unique<Mesh3D>(vertices, indices, name);
 
     // @TODO Weitere Attribute noch einbauen.
     /* if (hasTextureCoordinates) */

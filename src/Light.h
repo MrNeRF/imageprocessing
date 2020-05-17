@@ -10,8 +10,9 @@
 class Light : public IRenderable
 {
 public:
+    Light(const std::string name) : m_name{name}{}
     // IRenderable overrides
-    void Init(const std::string& pathToModel, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader) override;
+    void Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader) override;
     void Render() override;
     void SetColor(const Color& color) override;
 
@@ -22,10 +23,10 @@ public:
     void SetPosition(const Eigen::Vector4f& pos) { m_position = pos; }
 
 private:
-    std::string                         m_modelPath;
+    const std::string                   m_name;
     Eigen::Vector4f                     m_position = Eigen::Vector4f(0.f, 10.f, 5.f, 0.f);
     Eigen::Quaternionf                  m_orientation{Eigen::AngleAxis{0.f, Eigen::Vector3f::UnitX()}};
-    std::unique_ptr<Mesh3D>             m_spMesh3D;
+    std::shared_ptr<Mesh3D>             m_spMesh3D;
     std::unique_ptr<OpenGL3DDataObject> m_spOGLDataObject;
     std::shared_ptr<Camera>             m_spCamera;
     std::shared_ptr<Shader>             m_spShader;
