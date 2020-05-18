@@ -17,11 +17,11 @@ int main()
 {
     Logger::GetInstance().GetLogger().info("main()");
 
-    std::shared_ptr<Camera> spCamera = std::make_shared<Camera>();
-    spCamera->SetPerspectiveProjection(45.f, 800.f / 600.f, 0.1f, 50.f);
-
     auto viewer = Viewer();
     Window* pWindow = viewer.Init("OpenGL Window");
+    std::shared_ptr<Camera> spCamera = std::make_shared<Camera>();
+    spCamera->SetPerspectiveProjection(45.f, pWindow->GetAspectRatio(), 1.f, 50.f);
+
     
     std::shared_ptr<Shader> spLightShader = std::make_shared<Shader>("Light Cube");
     spLightShader->InitShaders("../Shaders/lightShader.vs", "../Shaders/lightShader.fs");
@@ -42,7 +42,7 @@ int main()
     /* ASSERT(bOK); */
 
     spSuzane->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
-    spSuzane->SetPosition({0.f, 0.f, 2.f, 0.f});
+    spSuzane->SetPosition({0.f, 0.f, -5.f, 0.f});
     spSuzane->SetLight(spLightCube);
 	/* viewer.AddRenderObject(spSuzane); */
 

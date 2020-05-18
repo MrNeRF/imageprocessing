@@ -59,11 +59,12 @@ public:
 	void detach(std::list<std::weak_ptr<IObserver>>::const_iterator iter);
     void notify(const EventType& eventType, std::unique_ptr<IEvent> spEvent) override;
 
+	// ...
+	float GetAspectRatio() {return static_cast<float>(std::max(winHeight, winWidth)) / static_cast<float>(std::min(winHeight, winWidth));}
 
 public:
     int   winHeight   = 800;
     int   winWidth    = 600;
-    float aspectRatio = winWidth / winHeight;
     const std::string windowName;
     bool m_bKeyPressed = false;
     int m_key = 0;;

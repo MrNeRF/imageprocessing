@@ -7,11 +7,11 @@
 class Camera : public IObserver
 {
     public:
-        Camera() = default;
+    	Camera() = default;
         explicit Camera(Eigen::Vector3f& eye, Eigen::Vector3f& target, Eigen::Vector3f& up) : m_eye{eye}, m_target{target}, m_up{up}{};
         const Eigen::Matrix4f& GetLookAt() const;
         void                   SetPerspectiveProjection(float fov, float aspectRatio, float zNearPlane, float zFarPlane);
-        const Eigen::Matrix4f& GetPerspectiveProjection() const; 
+        const Eigen::Matrix4f& GetPerspectiveProjection(); 
 		void UpdateOrientation(const Eigen::AngleAxisf& angleAxis);
         const Eigen::Vector3f& GetCameraPosition() const {return m_eye;}
 
@@ -19,6 +19,10 @@ class Camera : public IObserver
         void onNotify(const EventType& eventType, IEvent* pEventData) override;
 
     private:
+        float m_fov = 45.f;
+        float m_zNear = 1.f;
+        float m_zFar = 50.f;
+        float m_aspectRatio = 0.75f;
         Eigen::Vector3f         m_eye = Eigen::Vector3f(0.f, 0.f, 5.f);
         Eigen::Vector3f         m_target = Eigen::Vector3f(0.f, 0.f, 0.f);
         Eigen::Vector3f         m_up = Eigen::Vector3f(0.f, 1.f, 0.f);

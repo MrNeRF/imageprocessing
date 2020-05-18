@@ -123,7 +123,6 @@ void Window::ViewPortUpdate(int width, int height)
     CHECK_GL_ERROR_(glMatrixMode(GL_PROJECTION))
     CHECK_GL_ERROR_(glLoadIdentity())
     CHECK_GL_ERROR_(glMatrixMode(GL_MODELVIEW))
-    aspectRatio = static_cast<float>(winWidth) / static_cast<float>(winHeight);
 }
 
 void Window::WindowResizeCallback(GLFWwindow* win, int h, int w)
@@ -164,6 +163,11 @@ void Window::MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods
 		{
 			if (action == GLFW_PRESS)
 			{
+				if(!m_MouseLeftBtnDragInfo.bIsDragging)
+				{
+					std::cout <<  "Clicked: (" << m_cursorPos.x() << ", " << m_cursorPos.y() << ")\n";
+					notify(EventType::MOUSE_LEFT_BTN_CLICK, std::make_unique<MouseLeftBtnClickEvent>(m_cursorPos));
+				}
 				m_MouseLeftBtnDragInfo.bIsDragging = true;
 				m_MouseLeftBtnDragInfo.startPos = m_cursorPos; 
 				m_MouseLeftBtnDragInfo.tic = std::chrono::steady_clock::now();
@@ -241,6 +245,7 @@ void Window::CursorPositionUpdate(double xCursorPos, double yCursorPos)
 		m_MouseLeftBtnDragInfo.startPos = m_cursorPos;
 		m_MouseLeftBtnDragInfo.tic = m_MouseLeftBtnDragInfo.toc;
 	}
+
 
 	m_MouseMidBtnDragInfo.toc = std::chrono::steady_clock::now();
 	if(m_MouseMidBtnDragInfo.bIsDragging && milliseconds(m_MouseMidBtnDragInfo.toc - m_MouseMidBtnDragInfo.tic).count() > 40)

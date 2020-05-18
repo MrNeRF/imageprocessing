@@ -27,15 +27,23 @@ const Eigen::Matrix4f& Camera::GetLookAt() const
 
 void Camera::SetPerspectiveProjection(float fov, float aspectRatio, float zNearPlane, float zFarPlane)
 {
-    float height = zNearPlane * tanf(fov * .5f);
-    float width  = height * aspectRatio;
+	m_zFar = zFarPlane;
+	m_zNear = zNearPlane;
+	m_fov = fov;
+	m_aspectRatio = aspectRatio;
 
-    m_frustum = Frustum(-width, width, -height, height, zNearPlane, zFarPlane);
+    float height = m_zNear * tanf(m_fov * .5f);
+    float width  = height * m_aspectRatio;
+
+    m_frustum = Frustum(-width, width, -height, height, m_zNear, m_zFar);
 }
 
-const Eigen::Matrix4f& Camera::GetPerspectiveProjection() const
+const Eigen::Matrix4f& Camera::GetPerspectiveProjection()
 { 
-	ASSERT(!m_frustum.isZero());
+	if(m_frustum.isZero())
+	{
+		SetPerspectiveProjection(m_fov, m_aspectRatio, m_zNear, m_zFar); 
+	}
 	return m_frustum; 
 }
 
@@ -58,7 +66,7 @@ void Camera::onNotify(const EventType &eventType, IEvent* pEventData)
 			MouseWheelEvent* pMouseWheelEvent = dynamic_cast<MouseWheelEvent*>(pEventData);
 			if(pMouseWheelEvent != nullptr)
 			{
-				m_eye.z() += -0.5f * static_cast<float>(pMouseWheelEvent->m_yoffset);
+				m_eye.z() += -0.6f * static_cast<float>(pMouseWheelEvent->m_yoffset);
 			}
 			else
 			{
@@ -72,7 +80,7 @@ void Camera::onNotify(const EventType &eventType, IEvent* pEventData)
 		[[fallthrough]];
 	case EventType::MOUSE_LEFT_BTN_DRAG:
 		[[fallthrough]];
-	case EventType::MOUSE_CLICK:
+	case EventType::MOUSE_LEFT_BTN_CLICK:
 		break;	
 	}
 }

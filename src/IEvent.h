@@ -7,7 +7,7 @@ enum class EventType
 {
 	MOUSE_LEFT_BTN_DRAG,
 	MOUSE_MID_BTN_DRAG,
-	MOUSE_CLICK,
+	MOUSE_LEFT_BTN_CLICK,
 	MOUSE_WHEEL,
 	KEY_PRESS
 };
@@ -24,6 +24,12 @@ struct MouseLeftBtnDragEvent : public IEvent
 		m_endCoordinates{endCoordinates}{};
 	Eigen::Vector2f m_startCoordinates;		
 	Eigen::Vector2f m_endCoordinates;		
+};
+
+struct MouseLeftBtnClickEvent : public IEvent
+{
+	MouseLeftBtnClickEvent(Eigen::Vector2f point) : m_point{point} {};
+	Eigen::Vector2f m_point;
 };
 
 struct MouseMidBtnDragEvent : public IEvent

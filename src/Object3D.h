@@ -41,6 +41,8 @@ public:
     // Observer overrides
     void onNotify(const EventType& eventType, IEvent* pEventData) override;	
 private:
+	bool rayTriangleIntersection(const Eigen::Vector2f& clickedPoint);
+private:
     const std::string                   m_name;
     Eigen::Vector4f                     m_position = Eigen::Vector4f(0.f, 0.f, 0.f, 0.f);
     Eigen::Quaternionf                  m_orientation{Eigen::AngleAxis{0.f, Eigen::Vector3f::UnitX()}};
