@@ -75,35 +75,32 @@ void Object3D::Render()
 bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, float windowWidth, float windowHeight)
 {
     Eigen::Vector2f NDC;
-    NDC(0) = (clickedPoint[0] + 0.5f) / windowWidth;
-    NDC(1) = (clickedPoint[1] + 0.5f) / windowHeight;
+    NDC[0] = 2.f * clickedPoint[0] / windowWidth;
+    NDC[1] = 2.f * clickedPoint[1] / windowHeight;
     Eigen::Vector2f PixelScreen;
-    PixelScreen(0) = 2.f * NDC[0] - 1;
-    PixelScreen(1) = 1 - 2.f * NDC[1];
-    Eigen::Vector4f clicked(PixelScreen[0], PixelScreen[1], -1, 1);
+    PixelScreen(0) =  NDC[0] - 1;
+    PixelScreen(1) = 1 -  NDC[1];
 
-    Eigen::Matrix3f model     = m_orientation.toRotationMatrix();
-    Eigen::Matrix4f model4f   = Eigen::Matrix4f::Zero();
-    model4f.block(0, 0, 3, 3) = model;
-    model4f.col(3)            = m_position;
-    model4f(3, 3)             = 1.f;
+    Eigen::Vector4f ray_clipped = Eigen::Vector4f(PixelScreen[0], PixelScreen[1], -1, 1);
+    Eigen::Vector4f ray_eye = m_spCamera->GetPerspectiveProjection().inverse() * ray_clipped;
+    ray_eye = Eigen::Vector4f(ray_eye.x(), ray_eye.y(), -1.f, 0.f);
 
-    Eigen::Matrix4f MPVinv      = (m_spCamera->GetPerspectiveProjection() * m_spCamera->GetLookAt()).inverse();
-    Eigen::Vector4f nearPoint   = MPVinv * clicked;
-    Eigen::Vector4f cameraPos4f = MPVinv.inverse().col(3);
-    Eigen::Vector4f dir4f       = nearPoint - cameraPos4f;
+    Eigen::Vector4f ray_world4f = (m_spCamera->GetLookAt().inverse() * ray_eye);
+	Eigen::Vector3f ray_world   = Eigen::Vector3f(ray_world4f.x(), ray_world4f.y(), ray_world4f.z()).normalized();
     Eigen::Vector3f camPos      = m_spCamera->GetCameraPosition();
-    Eigen::Vector3f dir         = -Eigen::Vector3f(dir4f.x(), dir4f.y(), dir4f.z());
-    Eigen::Vector3f position    = Eigen::Vector3f(m_position.x(), m_position.y(), m_position.z());
 
     std::vector<Eigen::Vector3f> vertices;
     vertices.push_back(camPos);
-    vertices.push_back(50.f * dir);
-    std::cout << "Origin: (" << camPos.x() << ", " << camPos.y() << ", " << camPos.z() << ")\n";
-    std::cout << "Dir: (" << dir.x() << ", " << dir.y() << ", " << dir.z() << ")\n";
+    vertices.push_back(10.f * ray_world);
+    std::cout << "Origin: (" << camPos.x() << ", " << camPos.y() << ", " << camPos.z()  << ")\n";
+    std::cout << "Dir: (" << ray_world.x() << ", " << ray_world.y() << ", " << ray_world.z() << ")\n";
     std::vector<uint32_t> indices{0, 1};
     m_rays.emplace_back(Ray3D());
     m_rays.back().init(m_spCamera, vertices, indices);
+
+
+    Eigen::Matrix3f model     = m_orientation.toRotationMatrix();
+    Eigen::Vector3f position  = Eigen::Vector3f(m_position.x(), m_position.y(), m_position.z());
 
     bool bHit = false;
     for (const auto& triangleIndex : faceIterator(*m_spMesh3D))
@@ -112,11 +109,14 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
         vec0                    = model * vec0 + position;
         vec1                    = model * vec1 + position;
         vec2                    = model * vec2 + position;
+    /* std::cout << "Dir: (" << vec0.x() << ", " << vec0.y() << ", " << vec0.z() << ")\n"; */
+    /* std::cout << "Dir: (" << vec1.x() << ", " << vec1.y() << ", " << vec1.z() << ")\n"; */
+    /* std::cout << "Dir: (" << vec2.x() << ", " << vec2.y() << ", " << vec2.z() << ")\n"; */
         Eigen::Vector3f vecA    = vec1 - vec0;
         Eigen::Vector3f vecB    = vec2 - vec0;
-        Eigen::Vector3f pVec    = dir.cross(vecB);
+        Eigen::Vector3f pVec    = ray_world.cross(vecB);
         float           det     = vecA.dot(pVec);
-        if (det < std::numeric_limits<float>::epsilon())
+        if (std::abs(det) < std::numeric_limits<float>::epsilon())
         {
             continue;
         }
@@ -129,7 +129,7 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
         }
 
         Eigen::Vector3f qvec = tvec.cross(vecA);
-        float           v    = dir.dot(qvec) * invDet;
+        float           v    = ray_world.dot(qvec) * invDet;
         if ((v < 0) || u + v > 1.f)
         {
             continue;
@@ -139,7 +139,7 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
     }
     if (bHit)
     {
-        std::cout << "Treffer\n";
+        std::cout << "\n\nTreffer\n\n";
         return true;
     }
     return false;
