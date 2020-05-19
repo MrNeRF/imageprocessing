@@ -19,8 +19,11 @@ OpenGL3DDataObject::~OpenGL3DDataObject(void)
 
 void OpenGL3DDataObject::InitializeVertexBuffer(Mesh3D& mesh)
 {
-    const auto& indices  = mesh.m_indices;
-    const auto& vertices = mesh.m_vertices;
+	InitializeVertexBuffer(mesh.m_vertices, mesh.m_indices);
+}
+
+void OpenGL3DDataObject::InitializeVertexBuffer(const std::vector<Eigen::Vector3f>& vertices, const std::vector<uint32_t>& indices)
+{
     numberOfIndices  = indices.size();
     numberOfVertices = vertices.size();
 

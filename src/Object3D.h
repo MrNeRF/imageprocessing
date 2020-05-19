@@ -13,8 +13,11 @@
 #include "OpenGL3DDataObject.h"
 #include "Shader.h"
 #include <Eigen/Dense>
+#include <vector>
 #include <memory>
 #include <string>
+
+class Ray3D;
 
 class Object3D : public IRenderable
     , public IObserver
@@ -41,7 +44,7 @@ public:
     // Observer overrides
     void onNotify(const EventType& eventType, IEvent* pEventData) override;	
 private:
-	bool rayTriangleIntersection(const Eigen::Vector2f& clickedPoint);
+	bool rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, float windowWidht, float windowHeight);
 private:
     const std::string                   m_name;
     Eigen::Vector4f                     m_position = Eigen::Vector4f(0.f, 0.f, 0.f, 0.f);
@@ -53,6 +56,7 @@ private:
     std::shared_ptr<Material>           m_spMaterial;
     std::shared_ptr<Shader>             m_spShader;
     std::shared_ptr<Light>              m_spLight;
+	std::vector<std::unique_ptr<Ray3D>>	m_rays;
     Color                               m_vertexColor = Color(0.8f, 0.f, 0.f);
 };
 

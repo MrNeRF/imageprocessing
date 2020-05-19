@@ -28,8 +28,11 @@ struct MouseLeftBtnDragEvent : public IEvent
 
 struct MouseLeftBtnClickEvent : public IEvent
 {
-	MouseLeftBtnClickEvent(Eigen::Vector2f point) : m_point{point} {};
+	MouseLeftBtnClickEvent(Eigen::Vector2f point, float width, float height) : 
+		m_point{point}, m_windowWidth{width}, m_windowHeigth{height} {};
 	Eigen::Vector2f m_point;
+	float m_windowWidth = 800.f;
+	float m_windowHeigth = 800.f;
 };
 
 struct MouseMidBtnDragEvent : public IEvent

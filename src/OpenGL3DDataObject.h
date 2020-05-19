@@ -5,6 +5,7 @@
 #include "Eigen/Dense"
 #include <GL/glew.h>
 #include <vector>
+#include <vector>
 
 class Mesh3D;
 
@@ -13,6 +14,7 @@ class OpenGL3DDataObject
 public:
     OpenGL3DDataObject(); 
     ~OpenGL3DDataObject(void);
+    void InitializeVertexBuffer(const std::vector<Eigen::Vector3f>& vertices, const std::vector<uint32_t>& indices);
     void InitializeVertexBuffer(Mesh3D& mesh);
     void InitializeNormalBuffer(Mesh3D& mesh);
 

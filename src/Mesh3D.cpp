@@ -18,7 +18,14 @@ Mesh3D::Mesh3D(const std::vector<Eigen::Vector3f>& vertexData,
 		Logger::GetInstance().GetLogger().error("There are no vertices indexed");
 		ASSERT(0);
     }
-    m_halfEdgeDS.InitHalfEdgeDS();
+    if (vertexData.size() >=3)
+	{
+		m_halfEdgeDS.InitHalfEdgeDS();
+	}
+	else
+	{
+		ASSERT(0);
+	}
 }
 
 std::tuple<Eigen::Vector3f, Eigen::Vector3f, Eigen::Vector3f> Mesh3D::GetFaceVertices(uint32_t faceIndex)
