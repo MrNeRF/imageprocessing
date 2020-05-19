@@ -1,39 +1,39 @@
 #include "Mesh3D.h"
+#include "Logger.h"
 #include "VertexColorAttribute.h"
 #include "VertexNormalAttribute.h"
-#include "Logger.h"
 #include <iostream>
 #include <typeinfo>
 
 Mesh3D::Mesh3D(const std::vector<Eigen::Vector3f>& vertexData,
                const std::vector<uint32_t>&        indexVector,
-               const std::string& name)
+               const std::string&                  name)
     : m_name{name}
-	, m_indices{indexVector}
+    , m_indices{indexVector}
     , m_vertices(vertexData)
     , m_halfEdgeDS(*this)
 {
     if (m_indices.empty() || vertexData.size() == 0)
     {
-		Logger::GetInstance().GetLogger().error("There are no vertices indexed");
-		ASSERT(0);
+        Logger::GetInstance().GetLogger().error("There are no vertices indexed");
+        ASSERT(0);
     }
-    if (vertexData.size() >=3)
-	{
-		m_halfEdgeDS.InitHalfEdgeDS();
-	}
-	else
-	{
-		ASSERT(0);
-	}
+    if (vertexData.size() >= 3)
+    {
+        m_halfEdgeDS.InitHalfEdgeDS();
+    }
+    else
+    {
+        ASSERT(0);
+    }
 }
 
 std::tuple<Eigen::Vector3f, Eigen::Vector3f, Eigen::Vector3f> Mesh3D::GetFaceVertices(uint32_t faceIndex)
 {
     uint32_t faceCount = GetNumberOfFaces();
-	ASSERT(faceIndex >= 0 && faceIndex < faceCount);
-	faceIndex *=3;
-	return std::make_tuple(m_vertices[m_indices[faceIndex]], m_vertices[m_indices[faceIndex + 1]], m_vertices[m_indices[faceIndex + 2]]);
+    ASSERT(faceIndex >= 0 && faceIndex < faceCount);
+    faceIndex *= 3;
+    return std::make_tuple(m_vertices[m_indices[faceIndex]], m_vertices[m_indices[faceIndex + 1]], m_vertices[m_indices[faceIndex + 2]]);
 }
 
 VertexAttribute& Mesh3D::AddVertexAttribute(EVertexAttribute vertexAttribute)
@@ -42,19 +42,19 @@ VertexAttribute& Mesh3D::AddVertexAttribute(EVertexAttribute vertexAttribute)
     switch (vertexAttribute)
     {
         case EVertexAttribute::Normal:
-			pVertexAttribute = GetVertexAttribute(vertexAttribute);
-			if (pVertexAttribute != nullptr)
-			{
-				return *pVertexAttribute;
-			}
+            pVertexAttribute = GetVertexAttribute(vertexAttribute);
+            if (pVertexAttribute != nullptr)
+            {
+                return *pVertexAttribute;
+            }
             m_vertexAttributes.push_back(std::make_unique<VertexNormalAttribute>(m_vertices, m_indices));
             break;
         case EVertexAttribute::Color:
-			pVertexAttribute = GetVertexAttribute(vertexAttribute);
-			if (pVertexAttribute != nullptr)
-			{
-				return *pVertexAttribute;
-			}
+            pVertexAttribute = GetVertexAttribute(vertexAttribute);
+            if (pVertexAttribute != nullptr)
+            {
+                return *pVertexAttribute;
+            }
             m_vertexAttributes.push_back(std::make_unique<VertexColorAttribute>(m_vertices, m_indices));
             break;
         case EVertexAttribute::UVCoordinates:
@@ -126,7 +126,7 @@ void Mesh3D::HalfEdgeDS::InitHalfEdgeDS(void)
         int i1 = m_mesh.m_indices[vIdx++];
         int i2 = m_mesh.m_indices[vIdx++];
 
-		// Get the vertices
+        // Get the vertices
         const Eigen::Vector3f& v0 = m_mesh.m_vertices[i0];
         const Eigen::Vector3f& v1 = m_mesh.m_vertices[i1];
         const Eigen::Vector3f& v2 = m_mesh.m_vertices[i2];
@@ -226,30 +226,28 @@ void Mesh3D::HalfEdgeDS::createFace(const std::pair<int, int>& e0,
 
 void Mesh3D::IterateAllFaces() const
 {
-	for(const auto spFace: m_halfEdgeDS.faces)
-	{
-		auto spEdgeBegin = spFace->wspBoundingHalfEdge.lock();
-		ASSERT(spEdgeBegin != nullptr)	
-		auto spEdgeNext = spEdgeBegin;
-		std::cout << "Face " << spFace->id << "\n";
-		do
-		{
-			ASSERT(spEdgeNext != nullptr)
-			const Eigen::Vector3f& point = spEdgeNext->spDestinationVertex->position;
-			std::cout << "Vector: (" << point.x() << ", " << point.y() << ", " << point.z() << ")\n";
-			spEdgeNext = spEdgeNext->wspNextHalfeEdge.lock();
-		}
-		while(spEdgeBegin != spEdgeNext);
-	}
+    for (const auto spFace : m_halfEdgeDS.faces)
+    {
+        auto spEdgeBegin = spFace->wspBoundingHalfEdge.lock();
+        ASSERT(spEdgeBegin != nullptr)
+        auto spEdgeNext = spEdgeBegin;
+        std::cout << "Face " << spFace->id << "\n";
+        do
+        {
+            ASSERT(spEdgeNext != nullptr)
+            const Eigen::Vector3f& point = spEdgeNext->spDestinationVertex->position;
+            std::cout << "Vector: (" << point.x() << ", " << point.y() << ", " << point.z() << ")\n";
+            spEdgeNext = spEdgeNext->wspNextHalfeEdge.lock();
+        } while (spEdgeBegin != spEdgeNext);
+    }
 
-	// Vertices
-	/* std::cout << "Vertices \n"; */
-	/* auto iter = m_vertices.begin(); */ 
-	/* for(const auto& v : m_halfEdgeDS.vertices) */
-	/* { */
-	/* 	std::cout << "HalfEdge: (" << v->position.x() << ", " << v->position.y() << ", " << v->position.z() << ")\n"; */
-	/* 	std::cout << "Mesh    : (" << (*iter).x() << ", " << (*iter).y() << ", " << (*iter).z() << ")\n"; */
-	/* 	iter = std::next(iter); */
-	/* } */
-	
+    // Vertices
+    /* std::cout << "Vertices \n"; */
+    /* auto iter = m_vertices.begin(); */
+    /* for(const auto& v : m_halfEdgeDS.vertices) */
+    /* { */
+    /* 	std::cout << "HalfEdge: (" << v->position.x() << ", " << v->position.y() << ", " << v->position.z() << ")\n"; */
+    /* 	std::cout << "Mesh    : (" << (*iter).x() << ", " << (*iter).y() << ", " << (*iter).z() << ")\n"; */
+    /* 	iter = std::next(iter); */
+    /* } */
 }

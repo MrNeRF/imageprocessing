@@ -10,7 +10,8 @@ class VertexColorAttribute : public VertexAttribute
 public:
     VertexColorAttribute(const std::vector<Eigen::Vector3f>& vertices, const std::vector<uint32_t>& indices)
         : m_indices{indices}
-        , m_vertices{vertices} {
+        , m_vertices{vertices}
+    {
         m_vertexColor.resize(m_vertices.size());
     }
     Eigen::Vector3f& operator[](uint32_t i)

@@ -6,11 +6,12 @@
 
 class AlgoVertexNormals : public Algorithm
 {
-	public:
-		AlgoVertexNormals(Mesh3D& rMesh) : m_rMesh{rMesh}{};
-		[[nodiscard]] bool Compute(void) override;
+public:
+    AlgoVertexNormals(Mesh3D& rMesh)
+        : m_rMesh{rMesh} {};
+    [[nodiscard]] bool Compute(void) override;
 
-	private:
-		Mesh3D& m_rMesh;
+private:
+    Mesh3D& m_rMesh;
 };
 #endif

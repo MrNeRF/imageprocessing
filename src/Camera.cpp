@@ -1,9 +1,8 @@
 #include "Camera.h"
-#include <cmath>
-#include "Macros.h"
 #include "Logger.h"
+#include "Macros.h"
+#include <cmath>
 #include <iostream>
-
 
 static Eigen::Matrix4f Frustum(float left, float right, float bottom, float top, float near, float far);
 
@@ -14,23 +13,23 @@ const Eigen::Matrix4f& Camera::GetLookAt() const
     Eigen::Vector3f camRight = (m_up.cross(camDir)).normalized();
     Eigen::Vector3f camUp    = camDir.cross(camRight);
 
-    m_view.block(0, 0, 1, 3)                           = camRight.transpose();
-    m_view.block(1, 0, 1, 3)                           = camUp.transpose();
-    m_view.block(2, 0, 1, 3)                           = camDir.transpose();
-    m_view(0, 3)                                       = -camRight.dot(m_eye);
-    m_view(1, 3)                                       = -camUp.dot(m_eye);
-    m_view(2, 3)                                       = -camDir.dot(m_eye);
-    m_view(3, 3)                                       = 1.f;
+    m_view.block(0, 0, 1, 3) = camRight.transpose();
+    m_view.block(1, 0, 1, 3) = camUp.transpose();
+    m_view.block(2, 0, 1, 3) = camDir.transpose();
+    m_view(0, 3)             = -camRight.dot(m_eye);
+    m_view(1, 3)             = -camUp.dot(m_eye);
+    m_view(2, 3)             = -camDir.dot(m_eye);
+    m_view(3, 3)             = 1.f;
 
     return m_view;
 }
 
 void Camera::SetPerspectiveProjection(float fov, float aspectRatio, float zNearPlane, float zFarPlane)
 {
-	m_zFar = zFarPlane;
-	m_zNear = zNearPlane;
-	m_fov = fov;
-	m_aspectRatio = aspectRatio;
+    m_zFar        = zFarPlane;
+    m_zNear       = zNearPlane;
+    m_fov         = fov;
+    m_aspectRatio = aspectRatio;
 
     float height = m_zNear * tanf(m_fov * .5f);
     float width  = height * m_aspectRatio;
@@ -39,50 +38,49 @@ void Camera::SetPerspectiveProjection(float fov, float aspectRatio, float zNearP
 }
 
 const Eigen::Matrix4f& Camera::GetPerspectiveProjection()
-{ 
-	if(m_frustum.isZero())
-	{
-		SetPerspectiveProjection(m_fov, m_aspectRatio, m_zNear, m_zFar); 
-	}
-	return m_frustum; 
+{
+    if (m_frustum.isZero())
+    {
+        SetPerspectiveProjection(m_fov, m_aspectRatio, m_zNear, m_zFar);
+    }
+    return m_frustum;
 }
 
-void Camera::UpdateOrientation(const Eigen::AngleAxisf &angleAxis)
+void Camera::UpdateOrientation(const Eigen::AngleAxisf& angleAxis)
 {
-	Eigen::Quaternionf rotationQuat = Eigen::Quaternionf(angleAxis);
-	Eigen::Quaternionf tmp = rotationQuat * Eigen::Quaternionf(m_eye.x(), m_eye.y(), m_eye.z(), 0.f) * rotationQuat.conjugate();
-	m_eye.x() = tmp.x();
-	m_eye.y() = tmp.y();
-	m_eye.z() = tmp.z();
+    Eigen::Quaternionf rotationQuat = Eigen::Quaternionf(angleAxis);
+    Eigen::Quaternionf tmp          = rotationQuat * Eigen::Quaternionf(m_eye.x(), m_eye.y(), m_eye.z(), 0.f) * rotationQuat.conjugate();
+    m_eye.x()                       = tmp.x();
+    m_eye.y()                       = tmp.y();
+    m_eye.z()                       = tmp.z();
 }
 
-void Camera::onNotify(const EventType &eventType, IEvent* pEventData)
+void Camera::onNotify(const EventType& eventType, IEvent* pEventData)
 {
-	switch(eventType)
-	{
-		case EventType::MOUSE_WHEEL:
-		{
-
-			MouseWheelEvent* pMouseWheelEvent = dynamic_cast<MouseWheelEvent*>(pEventData);
-			if(pMouseWheelEvent != nullptr)
-			{
-				m_eye.z() += -0.6f * static_cast<float>(pMouseWheelEvent->m_yoffset);
-			}
-			else
-			{
-				ASSERT(0);
-			}
-		}
-		break;
-	case EventType::MOUSE_MID_BTN_DRAG:
-		[[fallthrough]];
-	case EventType::KEY_PRESS:
-		[[fallthrough]];
-	case EventType::MOUSE_LEFT_BTN_DRAG:
-		[[fallthrough]];
-	case EventType::MOUSE_LEFT_BTN_CLICK:
-		break;	
-	}
+    switch (eventType)
+    {
+        case EventType::MOUSE_WHEEL:
+        {
+            MouseWheelEvent* pMouseWheelEvent = dynamic_cast<MouseWheelEvent*>(pEventData);
+            if (pMouseWheelEvent != nullptr)
+            {
+                m_eye.z() += -0.6f * static_cast<float>(pMouseWheelEvent->m_yoffset);
+            }
+            else
+            {
+                ASSERT(0);
+            }
+        }
+        break;
+        case EventType::MOUSE_MID_BTN_DRAG:
+            [[fallthrough]];
+        case EventType::KEY_PRESS:
+            [[fallthrough]];
+        case EventType::MOUSE_LEFT_BTN_DRAG:
+            [[fallthrough]];
+        case EventType::MOUSE_LEFT_BTN_CLICK:
+            break;
+    }
 }
 
 Eigen::Matrix4f Frustum(float left, float right, float bottom, float top, float near, float far)

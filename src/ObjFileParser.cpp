@@ -146,7 +146,7 @@ std::shared_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
         assert(vertexData[idx] == remappedVertexData[remappedIndices[i++]]);
     }
     auto& rLogger = Logger::GetInstance().GetLogger();
-    rLogger.info("{}: Number of Vertice {}, number of indices {}",spObjFile->filename, remappedVertexData.size(), remappedIndices.size());
+    rLogger.info("{}: Number of Vertice {}, number of indices {}", spObjFile->filename, remappedVertexData.size(), remappedIndices.size());
     return createMeshObject(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, remappedIndices, spObjFile->filename);
 }
 
@@ -154,7 +154,7 @@ std::shared_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vecto
                                                         std::vector<Eigen::Vector2f>& textureCoordinates,
                                                         std::vector<Eigen::Vector3f>& normals,
                                                         std::vector<uint32_t>&        indices,
-                                                        const std::string& name)
+                                                        const std::string&            name)
 
 {
     std::shared_ptr<Mesh3D> spMesh = std::make_unique<Mesh3D>(vertices, indices, name);
@@ -174,9 +174,9 @@ std::shared_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vecto
 
     if (hasNormals)
     {
-	spMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Normal);
+        spMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Normal);
         auto pNormal = dynamic_cast<VertexNormalAttribute*>(spMesh->GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
-    	pNormal->SetVertexNormals(normals);
+        pNormal->SetVertexNormals(normals);
     }
     return spMesh;
 }
@@ -194,4 +194,3 @@ void ObjFileParser::tokenize(std::string& line, char delim, std::vector<std::str
         start = finish;
     }
 }
-

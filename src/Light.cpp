@@ -1,15 +1,15 @@
 #include "Light.h"
 #include "File.h"
-#include "Macros.h"
 #include "Logger.h"
+#include "Macros.h"
 #include "ObjFileParser.h"
 #include <GL/glew.h>
 
 void Light::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader)
 {
     m_spMesh3D = spMesh3D;
-    m_spCamera  = spCamera;
-    m_spShader  = spShader;
+    m_spCamera = spCamera;
+    m_spShader = spShader;
 
     if (m_spMesh3D != nullptr)
     {

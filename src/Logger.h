@@ -6,13 +6,13 @@
 #else
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
 #endif
-#include "spdlog/spdlog.h"
-#include <memory>
 #include "Macros.h"
+#include "spdlog/spdlog.h"
 #include <cmath>
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>
+#include <memory>
 #include <sys/stat.h>
 #include <unistd.h>
 // this space is deliberately here because of the spdlog order. Do not remove
@@ -56,62 +56,64 @@ private:
 
 // Checks if a debugger is attached
 [[maybe_unused]] static bool CheckForDebugger(void)
-{    
-  char buf[256];   
-  int fd = open("/proc/self/status", O_RDONLY);
-  if (fd == -1) 
-  {
-    return false;  
-  }
-  const int len = read(fd, buf, sizeof(buf));
-  bool rc = false;
-  if (len > 0) {
-    const char *const debuggerPid = "TracerPid:\t";
-    buf[len - 1] = '\0';
-    const char *p = strstr(buf, debuggerPid);
-    if (p != NULL) {
-      rc = (strncmp(p + strlen(debuggerPid), "0\n", 2) != 0);
+{
+    char buf[256];
+    int  fd = open("/proc/self/status", O_RDONLY);
+    if (fd == -1)
+    {
+        return false;
     }
-  }
-  close(fd);
-  return rc;
+    const int len = read(fd, buf, sizeof(buf));
+    bool      rc  = false;
+    if (len > 0)
+    {
+        const char* const debuggerPid = "TracerPid:\t";
+        buf[len - 1]                  = '\0';
+        const char* p                 = strstr(buf, debuggerPid);
+        if (p != NULL)
+        {
+            rc = (strncmp(p + strlen(debuggerPid), "0\n", 2) != 0);
+        }
+    }
+    close(fd);
+    return rc;
 }
 
 #ifndef NDEBUG
 #include <csignal>
-// This macro 
+// This macro
 // Warning: Condition is only evaluated just once! Therefor bool evalCondition = !(cond)
-#define ASSERT(cond)																						\
-{																											\
-	bool evalCondition = !(cond);\
-	if (evalCondition && CheckForDebugger())																		\
-	{																										\
-        Logger::GetInstance().GetLogger().warn("ASSERTION FAILED: {}, {}, {}", __FUNCTION__, __FILE__, __LINE__); \
-		raise(SIGTRAP);																			\
-	}																							\
-	else if (evalCondition)																		\
-	{																							\
-        Logger::GetInstance().GetLogger().warn("ASSERTION FAILED: {}, {}, {}", __FUNCTION__, __FILE__, __LINE__); \
-	}																										\
-}
+#define ASSERT(cond)                                                                                                  \
+    {                                                                                                                 \
+        bool evalCondition = !(cond);                                                                                 \
+        if (evalCondition && CheckForDebugger())                                                                      \
+        {                                                                                                             \
+            Logger::GetInstance().GetLogger().warn("ASSERTION FAILED: {}, {}, {}", __FUNCTION__, __FILE__, __LINE__); \
+            raise(SIGTRAP);                                                                                           \
+        }                                                                                                             \
+        else if (evalCondition)                                                                                       \
+        {                                                                                                             \
+            Logger::GetInstance().GetLogger().warn("ASSERTION FAILED: {}, {}, {}", __FUNCTION__, __FILE__, __LINE__); \
+        }                                                                                                             \
+    }
 #else
-#define ASSERT(cond)																						\
-	if (!(cond))																							\
-	{																										\
+#define ASSERT(cond)                                                                                              \
+    if (!(cond))                                                                                                  \
+    {                                                                                                             \
         Logger::GetInstance().GetLogger().warn("ASSERTION FAILED: {}, {}, {}", __FUNCTION__, __FILE__, __LINE__); \
-	}																						
+    }
 #endif
 
-#define CHECK_GL_ERROR_(expr)                                                                        \
-    {                                                                                                \
-        expr;                                                                                        \
-        ASSERT(Logger::GetInstance().Check_GL_ErrorCode())                                             \
+#define CHECK_GL_ERROR_(expr)                              \
+    {                                                      \
+        expr;                                              \
+        ASSERT(Logger::GetInstance().Check_GL_ErrorCode()) \
     }
 
-#define CHECK_GL_ERROR_WITH_OUTPUT_(outvar, expr)                                                   \
-    {                                                                                                \
-        outvar = expr;                                                                               \
-        ASSERT(Logger::GetInstance().Check_GL_ErrorCode())                                             \
+#define CHECK_GL_ERROR_WITH_OUTPUT_(outvar, expr)          \
+    {                                                      \
+        outvar = expr;                                     \
+        ASSERT(Logger::GetInstance().Check_GL_ErrorCode()) \
     }
 
 #endif

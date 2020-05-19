@@ -42,4 +42,3 @@ bool Polyline2D::CheckCollision(const Eigen::Vector2f& pointToTest) const
     }
     return false;
 }
-

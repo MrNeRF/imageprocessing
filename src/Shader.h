@@ -1,12 +1,12 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include "Logger.h"
 #include <Eigen/Dense>
 #include <GL/glew.h>
 #include <cassert>
 #include <fstream>
 #include <iostream>
-#include "Logger.h"
 #include <map>
 #include <sstream>
 #include <string>
@@ -27,8 +27,8 @@ public:
     explicit Shader(const std::string& name)
         : shaderName(name){};
 
-    void InitShaders(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
-    void UseShader(void) { CHECK_GL_ERROR_(glUseProgram(shaderProgramID)); }
+    void         InitShaders(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
+    void         UseShader(void) { CHECK_GL_ERROR_(glUseProgram(shaderProgramID)); }
     unsigned int GetShaderProgramID(void) { return shaderProgramID; };
 
     template<typename T>
@@ -38,21 +38,21 @@ public:
         CHECK_GL_ERROR_(glUniform4f(glGetUniformLocation(shaderProgramID, name.c_str()), v.x(), v.y(), v.z(), v.w()));
     }
     void SetVector(const std::string& name, const Eigen::Vector3f& v)
-	{
-		CHECK_GL_ERROR_(glUniform3f(glGetUniformLocation(shaderProgramID, name.c_str()), v.x(), v.y(), v.z()));
-	}
+    {
+        CHECK_GL_ERROR_(glUniform3f(glGetUniformLocation(shaderProgramID, name.c_str()), v.x(), v.y(), v.z()));
+    }
     void SetVector(const std::string& name, const Eigen::Vector4f& v)
-	{
+    {
         CHECK_GL_ERROR_(glUniform4f(glGetUniformLocation(shaderProgramID, name.c_str()), v.x(), v.y(), v.z(), v.w()));
-	}
-	void SetTransformationMatrix(const std::string& name, const Eigen::Matrix4f& mat)
-	{
-		CHECK_GL_ERROR_(glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data()));
-	}
-	void SetTransformationMatrix(const std::string& name, const Eigen::Matrix3f& mat)
-	{
-		CHECK_GL_ERROR_(glUniformMatrix3fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data()));
-	}
+    }
+    void SetTransformationMatrix(const std::string& name, const Eigen::Matrix4f& mat)
+    {
+        CHECK_GL_ERROR_(glUniformMatrix4fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data()));
+    }
+    void SetTransformationMatrix(const std::string& name, const Eigen::Matrix3f& mat)
+    {
+        CHECK_GL_ERROR_(glUniformMatrix3fv(glGetUniformLocation(shaderProgramID, name.c_str()), 1, GL_FALSE, mat.data()));
+    }
 
 public:
     const std::string shaderName;

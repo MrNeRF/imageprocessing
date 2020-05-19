@@ -13,9 +13,6 @@ constexpr T degreeToRadians(const T degree)
 }
 
 const double PI = (4.0 * std::atan2(1.0, 1.0));
-}
-
-
+} // namespace MathHelper
 
 #endif
-

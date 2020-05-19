@@ -6,9 +6,9 @@
 
 class IObserver
 {
-	public:
-		virtual ~IObserver() = default;
-		virtual void onNotify(const EventType& eventType, IEvent* pEventData) = 0;
+public:
+    virtual ~IObserver()                                                  = default;
+    virtual void onNotify(const EventType& eventType, IEvent* pEventData) = 0;
 };
 
 #endif

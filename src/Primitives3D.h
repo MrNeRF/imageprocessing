@@ -6,10 +6,9 @@
 
 class Primitives3D
 {
-	public:
-		virtual ~Primitives3D() = default;
-		virtual std::shared_ptr<Mesh3D> GetMesh() = 0;
+public:
+    virtual ~Primitives3D()                   = default;
+    virtual std::shared_ptr<Mesh3D> GetMesh() = 0;
 };
 
 #endif
-
