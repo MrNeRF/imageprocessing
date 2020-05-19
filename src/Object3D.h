@@ -11,19 +11,21 @@
 #include "Light.h"
 #include "Material.h"
 #include "OpenGL3DDataObject.h"
+#include "Ray3D.h"
 #include "Shader.h"
 #include <Eigen/Dense>
-#include <vector>
 #include <memory>
 #include <string>
-
-class Ray3D;
+#include <vector>
 
 class Object3D : public IRenderable
     , public IObserver
 {
 public:
-    Object3D(const std::string &name) : m_name{name} {}
+    Object3D(const std::string& name)
+        : m_name{name}
+    {
+    }
     const Eigen::Vector4f&    GetPosition() const { return m_position; }
     const Eigen::Quaternionf& GetOrientation() const { return m_orientation; }
 
@@ -32,7 +34,7 @@ public:
     void SetColor(const Color& color) override;
     void Render() override;
 
-	void UpdateNormalBuffer();
+    void UpdateNormalBuffer();
 
     void SetMaterial(std::shared_ptr<Material> spMaterial) { m_spMaterial = spMaterial; }
     void SetCamera(std::shared_ptr<Camera> spCamera) { m_spCamera = spCamera; }
@@ -42,9 +44,11 @@ public:
     void ResetRotation() { m_orientation = Eigen::AngleAxis(0.f, Eigen::Vector3f::UnitX()); }
 
     // Observer overrides
-    void onNotify(const EventType& eventType, IEvent* pEventData) override;	
+    void onNotify(const EventType& eventType, IEvent* pEventData) override;
+
 private:
-	bool rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, float windowWidht, float windowHeight);
+    bool rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, float windowWidht, float windowHeight);
+
 private:
     const std::string                   m_name;
     Eigen::Vector4f                     m_position = Eigen::Vector4f(0.f, 0.f, 0.f, 0.f);
@@ -56,7 +60,7 @@ private:
     std::shared_ptr<Material>           m_spMaterial;
     std::shared_ptr<Shader>             m_spShader;
     std::shared_ptr<Light>              m_spLight;
-	std::vector<std::unique_ptr<Ray3D>>	m_rays;
+    std::vector<Ray3D>                  m_rays;
     Color                               m_vertexColor = Color(0.8f, 0.f, 0.f);
 };
 

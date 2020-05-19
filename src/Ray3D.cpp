@@ -22,6 +22,5 @@ void Ray3D::Draw()
     m_spShader->SetTransformationMatrix("view", m_spCam->GetLookAt());
     m_spShader->SetTransformationMatrix("projection", m_spCam->GetPerspectiveProjection());
 
-
-    m_spOGLDataObject->DrawObject(GL_LINE);
+    m_spOGLDataObject->DrawObject(GL_LINES);
 }
