@@ -103,7 +103,7 @@ Window::Window(const std::string name)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    m_windowInstance = glfwCreateWindow(winHeight, winWidth, "Window", NULL, NULL);
+    m_windowInstance = glfwCreateWindow(winWidth, winHeight, name.c_str(), NULL, NULL);
 
     auto& rLogger = Logger::GetInstance().GetLogger();
     if (m_windowInstance == NULL)

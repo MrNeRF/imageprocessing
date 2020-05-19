@@ -64,7 +64,7 @@ public:
 
 public:
     int               winHeight = 800;
-    int               winWidth  = 600;
+    int               winWidth  = 800;
     const std::string windowName;
     bool              m_bKeyPressed = false;
     int               m_key         = 0;
