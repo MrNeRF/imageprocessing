@@ -6,14 +6,23 @@
 class Color
 {
 public:
-    Color(void) = default;
+    enum class EColor
+    {
+        RED,
+        BLUE,
+        GREEN
+    };
+
+public:
+    Color() = default;
     Color(float R, float G, float B);
     Eigen::Vector3f GetColor() const { return Eigen::Vector3f(red, green, blue); }
+    static Eigen::Vector3f GetColor(Color::EColor color);
 
 private:
-    float red   = 0.0f;
-    float green = 0.0f;
-    float blue  = 0.0f;
+    float red   = 0.5f;
+    float green = 0.5f;
+    float blue  = 0.5f;
 };
 
 #endif

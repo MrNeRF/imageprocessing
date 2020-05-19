@@ -17,7 +17,7 @@ public:
     void InitializeVertexBuffer(Mesh3D& mesh);
     void InitializeNormalBuffer(Mesh3D& mesh);
 
-    void InitializeColorBuffer(const Color& color);
+    void InitializeColorBuffer(const std::vector<Eigen::Vector3f>& colors);
     void InitializeTextureUVBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>& uvCoordinates);
     void DrawObject(GLenum mode) const;
 
@@ -43,10 +43,9 @@ private:
     unsigned int normalsBuffer = 0;
     unsigned int normalAttrIdx = 3;
 
-    unsigned int numberOfIndices  = 0;
-    unsigned int numberOfVertices = 0;
-
     std::vector<unsigned int> buffersInUseVector;
+    uint32_t                  m_numberOfIndices  = 0;
+    uint32_t                  m_numberOfVertices = 0;
 };
 
 #endif

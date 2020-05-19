@@ -22,8 +22,8 @@ void OpenGL3DDataObject::InitializeVertexBuffer(Mesh3D& mesh)
 
 void OpenGL3DDataObject::InitializeVertexBuffer(const std::vector<Eigen::Vector3f>& vertices, const std::vector<uint32_t>& indices)
 {
-    numberOfIndices  = indices.size();
-    numberOfVertices = vertices.size();
+    m_numberOfIndices  = indices.size();
+    m_numberOfVertices = vertices.size();
 
     CHECK_GL_ERROR_(glGenVertexArrays(1, &VAO))
     CHECK_GL_ERROR_(glGenBuffers(1, &vertexBuffer));
@@ -35,11 +35,11 @@ void OpenGL3DDataObject::InitializeVertexBuffer(const std::vector<Eigen::Vector3
 
     constexpr unsigned int dimension = 3;
     CHECK_GL_ERROR_(glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer));
-    CHECK_GL_ERROR_(glBufferData(GL_ARRAY_BUFFER, dimension * sizeof(float) * numberOfVertices, vertices[0].data(), GL_STATIC_DRAW));
+    CHECK_GL_ERROR_(glBufferData(GL_ARRAY_BUFFER, dimension * sizeof(float) * m_numberOfVertices, vertices[0].data(), GL_STATIC_DRAW));
 
     // In Opengl there is only one index Buffer per VAO
     CHECK_GL_ERROR_(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer));
-    CHECK_GL_ERROR_(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * numberOfIndices, &indices[0], GL_STATIC_DRAW));
+    CHECK_GL_ERROR_(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * m_numberOfIndices, &indices[0], GL_STATIC_DRAW));
 
     // Dimension of Vertex Data
     CHECK_GL_ERROR_(glVertexAttribPointer(vertexAttrIdx, dimension, GL_FLOAT, GL_FALSE, 0, (void*)0));
@@ -49,7 +49,7 @@ void OpenGL3DDataObject::InitializeVertexBuffer(const std::vector<Eigen::Vector3
     CHECK_GL_ERROR_(glBindVertexArray(0));
 }
 
-void OpenGL3DDataObject::InitializeColorBuffer(const Color& color)
+void OpenGL3DDataObject::InitializeColorBuffer(const std::vector<Eigen::Vector3f>& colors)
 {
     if (colorBuffer == 0)
     {
@@ -57,15 +57,14 @@ void OpenGL3DDataObject::InitializeColorBuffer(const Color& color)
         buffersInUseVector.push_back(colorBuffer);
     }
 
+    ASSERT(m_numberOfVertices == colors.size())
     // Dimension of Color Data
     constexpr unsigned int dimension = 3;
 
-    Eigen::Matrix<float, Eigen::Dynamic, dimension, Eigen::RowMajor> colorData;
-    colorData = color.GetColor().replicate(1, numberOfVertices).transpose();
     CHECK_GL_ERROR_(glBindVertexArray(VAO))
 
     CHECK_GL_ERROR_(glBindBuffer(GL_ARRAY_BUFFER, colorBuffer))
-    CHECK_GL_ERROR_(glBufferData(GL_ARRAY_BUFFER, sizeof(float) * colorData.size(), colorData.data(), GL_STATIC_DRAW))
+    CHECK_GL_ERROR_(glBufferData(GL_ARRAY_BUFFER, sizeof(float) * dimension * colors.size(), colors[0].data(), GL_STATIC_DRAW))
 
     CHECK_GL_ERROR_(glVertexAttribPointer(colorAttrIdx, dimension, GL_FLOAT, GL_FALSE, 0, (void*)0))
     CHECK_GL_ERROR_(glEnableVertexAttribArray(colorAttrIdx))
@@ -105,11 +104,13 @@ void OpenGL3DDataObject::InitializeNormalBuffer(Mesh3D& mesh)
         buffersInUseVector.push_back(normalsBuffer);
     }
 
+
     VertexNormalAttribute* pVertexNormalAttribute = dynamic_cast<VertexNormalAttribute*>(mesh.GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
     if (pVertexNormalAttribute == nullptr)
     {
         return;
     }
+    ASSERT(m_numberOfVertices == pVertexNormalAttribute->m_vertexNormals.size())
     // Dimension of Normals Data
     constexpr unsigned int dimension = 3;
 
@@ -125,12 +126,12 @@ void OpenGL3DDataObject::InitializeNormalBuffer(Mesh3D& mesh)
 
 void OpenGL3DDataObject::DrawObject(GLenum mode) const
 {
-    if (numberOfIndices == 0)
+    if (m_numberOfIndices == 0)
     {
         assert(false && "There are no vertices");
     }
 
     CHECK_GL_ERROR_(glBindVertexArray(VAO))
-    CHECK_GL_ERROR_(glDrawElements(mode, numberOfIndices, GL_UNSIGNED_INT, NULL))
+    CHECK_GL_ERROR_(glDrawElements(mode, m_numberOfIndices, GL_UNSIGNED_INT, NULL))
     CHECK_GL_ERROR_(glBindVertexArray(0))
 }

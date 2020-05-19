@@ -34,7 +34,8 @@ void Object3D::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> sp
 void Object3D::SetColor(const Color& color)
 {
     m_vertexColor = color;
-    m_spOGLDataObject->InitializeColorBuffer(m_vertexColor);
+    std::vector<Eigen::Vector3f> colorData(m_spMesh3D->GetNumberOfVertice(), color.GetColor());
+    m_spOGLDataObject->InitializeColorBuffer(colorData);
 }
 
 void Object3D::UpdateNormalBuffer()
@@ -91,13 +92,15 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
     Eigen::Vector4f nearPoint   = MPVinv * clicked;
     Eigen::Vector4f cameraPos4f = MPVinv.inverse().col(3);
     Eigen::Vector4f dir4f       = nearPoint - cameraPos4f;
-    Eigen::Vector3f camerPos    = m_spCamera->GetCameraPosition();
+    Eigen::Vector3f camPos      = m_spCamera->GetCameraPosition();
     Eigen::Vector3f dir         = -Eigen::Vector3f(dir4f.x(), dir4f.y(), dir4f.z());
     Eigen::Vector3f position    = Eigen::Vector3f(m_position.x(), m_position.y(), m_position.z());
 
     std::vector<Eigen::Vector3f> vertices;
-    vertices.push_back(camerPos);
+    vertices.push_back(camPos);
     vertices.push_back(50.f * dir);
+    std::cout << "Origin: (" << camPos.x() << ", " << camPos.y() << ", " << camPos.z() << ")\n";
+    std::cout << "Dir: (" << dir.x() << ", " << dir.y() << ", " << dir.z() << ")\n";
     std::vector<uint32_t> indices{0, 1};
     m_rays.emplace_back(Ray3D());
     m_rays.back().init(m_spCamera, vertices, indices);
@@ -118,7 +121,7 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
             continue;
         }
         float           invDet = 1.f / det;
-        Eigen::Vector3f tvec   = camerPos - vec0;
+        Eigen::Vector3f tvec   = camPos - vec0;
         float           u      = tvec.dot(pVec) * invDet;
         if (u < 0.f || u > 1.f)
         {

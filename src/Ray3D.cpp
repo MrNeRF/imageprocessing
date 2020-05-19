@@ -14,7 +14,7 @@ void Ray3D::init(std::shared_ptr<Camera> spCam, const std::vector<Eigen::Vector3
 void Ray3D::Draw()
 {
     m_spOGLDataObject->InitializeVertexBuffer(m_vertices, m_indices);
-    m_spOGLDataObject->InitializeColorBuffer(Color(0.f, 1.f, 0.f));
+    m_spOGLDataObject->InitializeColorBuffer({Color::GetColor(Color::EColor::RED), Color::GetColor(Color::EColor::GREEN)});
 
     m_spShader->UseShader();
 

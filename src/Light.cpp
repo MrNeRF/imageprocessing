@@ -27,7 +27,8 @@ void Light::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> spCam
 void Light::SetColor(const Color& color)
 {
     m_vertexColor = color;
-    m_spOGLDataObject->InitializeColorBuffer(m_vertexColor);
+    std::vector<Eigen::Vector3f> colorData(m_spMesh3D->GetNumberOfVertice(), color.GetColor());
+    m_spOGLDataObject->InitializeColorBuffer(colorData);
 }
 
 void Light::Render()
