@@ -231,12 +231,9 @@ void Mesh3D::IterateAllFaces() const
         auto spEdgeBegin = spFace->wspBoundingHalfEdge.lock();
         ASSERT(spEdgeBegin != nullptr)
         auto spEdgeNext = spEdgeBegin;
-        std::cout << "Face " << spFace->id << "\n";
         do
         {
             ASSERT(spEdgeNext != nullptr)
-            const Eigen::Vector3f& point = spEdgeNext->spDestinationVertex->position;
-            std::cout << "Vector: (" << point.x() << ", " << point.y() << ", " << point.z() << ")\n";
             spEdgeNext = spEdgeNext->wspNextHalfeEdge.lock();
         } while (spEdgeBegin != spEdgeNext);
     }

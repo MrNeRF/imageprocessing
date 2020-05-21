@@ -6,12 +6,13 @@ layout (location = 3) in vec3 inputVertexNormal;
 
 out vec3 vertexColor;
 
+uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
 
 void main()
 {
-	gl_Position = projection * view  * vec4(inputVertexPosition, 1.f);
+	gl_Position = projection * view  * model * vec4(inputVertexPosition, 1.f);
 	vertexColor = inputVertexColor;
 }

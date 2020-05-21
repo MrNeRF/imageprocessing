@@ -24,6 +24,8 @@ void Object3D::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> sp
         m_spOGLDataObject->InitializeVertexBuffer(*m_spMesh3D);
         m_spOGLDataObject->InitializeNormalBuffer(*m_spMesh3D);
         SetColor(m_vertexColor);
+        m_spBVolume = std::make_unique<BoundingVolume>();
+        m_spBVolume->init(m_spCamera, m_spMesh3D);
     }
     else
     {
@@ -70,6 +72,13 @@ void Object3D::Render()
     {
         elem.Draw();
     }
+
+	Eigen::Matrix4f model =Eigen::Matrix4f::Identity();
+	model(0,3) = m_position.x();
+	model(1,3) = m_position.y();
+	model(2,3) = m_position.z();
+
+	m_spBVolume->Draw(model);
 }
 
 bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, float windowWidth, float windowHeight)
@@ -102,6 +111,10 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
     Eigen::Matrix3f model     = m_orientation.toRotationMatrix();
     Eigen::Vector3f position  = Eigen::Vector3f(m_position.x(), m_position.y(), m_position.z());
 
+    if(!m_spBVolume->IsBHHit(camPos, ray_world, position))
+	{
+		return false;
+	}
     bool bHit = false;
     for (const auto& triangleIndex : faceIterator(*m_spMesh3D))
     {
@@ -139,7 +152,7 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
     }
     if (bHit)
     {
-        std::cout << "\n\nTreffer\n\n";
+        std::cout << "\nTreffer: " << m_name << '\n';
         return true;
     }
     return false;

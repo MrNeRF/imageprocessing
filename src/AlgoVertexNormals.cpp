@@ -19,7 +19,7 @@ bool AlgoVertexNormals::Compute()
         auto normal             = ((vecB - vecA).cross(vecC - vecA));
         normal.normalize();
         faceNormals[faceID] = normal;
-        std::cout << "Normal " << i << ": " << normal.x() << ", " << normal.y() << ", " << normal.z() << "\n";
+        /* std::cout << "Normal " << i << ": " << normal.x() << ", " << normal.y() << ", " << normal.z() << "\n"; */
         ++i;
     }
 
@@ -35,7 +35,7 @@ bool AlgoVertexNormals::Compute()
         auto normal = std::accumulate(normals.begin(), normals.end(), Eigen::Vector3f(0.f, 0.f, 0.f));
         normal.normalize();
         vertexNormals[vertexID] = normal;
-        std::cout << "Normal " << i << ": " << normal.x() << ", " << normal.y() << ", " << normal.z() << "\n";
+        /* std::cout << "Normal " << i << ": " << normal.x() << ", " << normal.y() << ", " << normal.z() << "\n"; */
         ++i;
     }
 

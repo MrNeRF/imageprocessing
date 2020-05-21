@@ -8,9 +8,10 @@ class Color
 public:
     enum class EColor
     {
-        RED,
         BLUE,
-        GREEN
+        GREEN,
+        RED,
+        YELLOW
     };
 
 public:

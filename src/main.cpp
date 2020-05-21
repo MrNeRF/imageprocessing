@@ -35,11 +35,7 @@ int main()
     std::shared_ptr<Mesh3D>   spSuzaneMesh3D = ObjFileParser().Parse(std::make_unique<File>("../models/suzanne.obj"));
     std::shared_ptr<Object3D> spSuzane       = std::make_shared<Object3D>("Suzanne");
     spSuzane->Init(spSuzaneMesh3D, spCamera, spModelShader);
-    auto algo = AlgoVertexNormals(*spSuzaneMesh3D);
-    bool bOK = algo.Compute();
-    ASSERT(bOK)
     spSuzane->UpdateNormalBuffer();
-    ASSERT(bOK);
 
     spSuzane->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
     spSuzane->SetPosition({0.f, 0.f, -6.f, 0.f});
@@ -64,16 +60,16 @@ int main()
     pWindow->attach(spCamera);
     pWindow->attach(spSuzane);
     /* pWindow->attach(spBox); */
-    /* std::shared_ptr<Shader> spShader = std::make_shared<Shader>(std::string("3DModelShader") + std::to_string(2)); */
-    /* spShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs"); */
+    std::shared_ptr<Shader> spShader = std::make_shared<Shader>(std::string("3DModelShader") + std::to_string(2));
+    spShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
 
-    /* std::shared_ptr<Object3D> spRenderObject = std::make_shared<Object3D>(std::string("Suzanne") + std::to_string(2)); */
-    /* spRenderObject->Init(ObjFileParser().Parse(std::make_unique<File>("../models/suzanne.obj")), spCamera, spShader); */
-    /* spRenderObject->SetMaterial(Material::GetMaterial(MaterialType::GOLD)); */
-    /* spRenderObject->SetPosition({2.f, 0.f, 2.f, 0.f}); */
-    /* spRenderObject->SetLight(spLightCube); */
-    /* viewer.AddRenderObject(spRenderObject); */
-    /* pWindow->attach(spRenderObject); */
+    std::shared_ptr<Object3D> spRenderObject = std::make_shared<Object3D>(std::string("Suzanne") + std::to_string(2));
+    spRenderObject->Init(ObjFileParser().Parse(std::make_unique<File>("../models/suzanne.obj")), spCamera, spShader);
+    spRenderObject->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
+    spRenderObject->SetPosition({10.f, 3.f, 2.f, 0.f});
+    spRenderObject->SetLight(spLightCube);
+    viewer.AddRenderObject(spRenderObject);
+    pWindow->attach(spRenderObject);
 
     /* spQuaderMesh->IterateAllFaces(); */
     /* std::cout << "\nVertex 0: "; */

@@ -103,8 +103,10 @@ public:
 
     uint32_t           GetNumberOfVertice() const { return m_vertices.size(); }
     uint32_t           GetNumberOfFaces() const { return static_cast<uint32_t>(static_cast<float>(m_indices.size()) / 3.f); }
+	const Eigen::Vector3f& GetVertex(uint32_t index) {ASSERT(index < m_vertices.size()); return m_vertices[index];}
     VertexAttribute*   GetVertexAttribute(EVertexAttribute vertexAttribute);
     TriangleAttribute* GetTriangleAttribute(ETriangleAttribute triangleAttribute);
+
     void               IterateAllFaces() const;
 
 private:
