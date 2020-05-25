@@ -36,10 +36,6 @@ std::optional<AABB::Intersection> AABB::IntersectRayAABB(Eigen::Vector3f origin,
 			{
 				std::swap(t1, t2);
 			}
-			std::cout << "tmin: " << tmin << ", ";
-			std::cout << "tmax: " << tmax << ", ";
-			std::cout << "t1: " << t1 << ", ";
-			std::cout << "t2: " << t2 << std::endl;
 
 			tmin = std::max(tmin, t1);
 			tmax = std::min(tmax, t2);

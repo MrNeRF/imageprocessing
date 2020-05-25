@@ -7,6 +7,7 @@
 #include "Object3D.h"
 #include "Quader.h"
 #include "Shader.h"
+#include "Sphere.h"
 #include "Viewer.h"
 #include "Window.h"
 #include <GLFW/glfw3.h>
@@ -32,15 +33,15 @@ int main()
     std::shared_ptr<Shader> spModelShader = std::make_shared<Shader>("3DModelShader");
     spModelShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
 
-    std::shared_ptr<Mesh3D>   spSuzaneMesh3D = ObjFileParser().Parse(std::make_unique<File>("../models/suzanne.obj"));
-    std::shared_ptr<Object3D> spSuzane       = std::make_shared<Object3D>("Suzanne");
-    spSuzane->Init(spSuzaneMesh3D, spCamera, spModelShader);
-    spSuzane->UpdateNormalBuffer();
+    /* std::shared_ptr<Mesh3D>   spSuzaneMesh3D = ObjFileParser().Parse(std::make_unique<File>("../models/suzanne.obj")); */
+    /* std::shared_ptr<Object3D> spSuzane       = std::make_shared<Object3D>("Suzanne"); */
+    /* spSuzane->Init(spSuzaneMesh3D, spCamera, spModelShader); */
+    /* spSuzane->UpdateNormalBuffer(); */
 
-    spSuzane->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
-    spSuzane->SetPosition({0.f, 0.f, -6.f, 0.f});
-    spSuzane->SetLight(spLightCube);
-    viewer.AddRenderObject(spSuzane);
+    /* spSuzane->SetMaterial(Material::GetMaterial(MaterialType::GOLD)); */
+    /* spSuzane->SetPosition({0.f, 0.f, -6.f, 0.f}); */
+    /* spSuzane->SetLight(spLightCube); */
+    /* viewer.AddRenderObject(spSuzane); */
 
     /* std::shared_ptr<Shader> spQuaderShader = std::make_shared<Shader>("Quader Shader"); */
     /* spModelShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs"); */
@@ -57,8 +58,23 @@ int main()
     /* spBox->SetLight(spLightCube); */
     /* viewer.AddRenderObject(spBox); */
 
+
+	// SPHERE
+	Sphere sphere(4.f, 12, 36) ;
+    std::shared_ptr<Mesh3D> spSphereMesh = sphere.GetMesh();
+    auto                    algo         = AlgoVertexNormals(*spSphereMesh);
+    bool                    bOK          = algo.Compute();
+    ASSERT(bOK);
+    std::shared_ptr<Object3D> spSphere = std::make_shared<Object3D>("Sphere");
+    spSphere->Init(spSphereMesh, spCamera, spModelShader);
+    spSphere->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
+    spSphere->SetPosition({0.f, 0.f, -5.f, 1.f});
+    spSphere->SetLight(spLightCube);
+    viewer.AddRenderObject(spSphere);
+
     pWindow->attach(spCamera);
-    pWindow->attach(spSuzane);
+    pWindow->attach(spSphere);
+    /* pWindow->attach(spSuzane); */
     /* pWindow->attach(spBox); */
     std::shared_ptr<Shader> spShader = std::make_shared<Shader>(std::string("3DModelShader") + std::to_string(2));
     spShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
@@ -66,7 +82,7 @@ int main()
     std::shared_ptr<Object3D> spRenderObject = std::make_shared<Object3D>(std::string("Suzanne") + std::to_string(2));
     spRenderObject->Init(ObjFileParser().Parse(std::make_unique<File>("../models/suzanne.obj")), spCamera, spShader);
     spRenderObject->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
-    spRenderObject->SetPosition({10.f, 3.f, 2.f, 0.f});
+    spRenderObject->SetPosition({10.f, 3.f, -5.f, 1.f});
     spRenderObject->SetLight(spLightCube);
     viewer.AddRenderObject(spRenderObject);
     pWindow->attach(spRenderObject);

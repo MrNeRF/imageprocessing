@@ -27,7 +27,7 @@ private:
     float                   m_zFar        = 50.f;
     float                   m_aspectRatio = 0.75f;
     Eigen::Vector3f         m_eye         = Eigen::Vector3f(0.f, 0.f, 0.f);
-    Eigen::Vector3f         m_target      = Eigen::Vector3f(0.f, 0.f, 0.f);
+    Eigen::Vector3f         m_target      = Eigen::Vector3f(0.f, 0.f, -1.f);
     Eigen::Vector3f         m_up          = Eigen::Vector3f(0.f, 1.f, 0.f);
     Eigen::Matrix4f         m_frustum;
     mutable Eigen::Matrix4f m_view;

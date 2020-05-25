@@ -195,10 +195,17 @@ public:
         : m_rMesh(rMesh)
         , m_startVertexID(vertexID)
     {
-        ASSERT(vertexID >= 0 && vertexID < rMesh.m_vertices.size())
-        m_wspHalfEdge   = m_rMesh.m_halfEdgeDS.vertices[vertexID]->wspOutgoingHalfEdge;
-        m_currentFaceID = m_wspHalfEdge.lock()->spFace->id;
-        m_startFaceID   = m_currentFaceID;
+        ASSERT(vertexID >= 0 && vertexID < rMesh.m_vertices.size());
+		if(m_rMesh.m_halfEdgeDS.vertices[vertexID] == nullptr)
+		{
+			m_bStopIterating = true;
+		}
+		else
+		{
+			m_wspHalfEdge   = m_rMesh.m_halfEdgeDS.vertices[vertexID]->wspOutgoingHalfEdge;
+			m_currentFaceID = m_wspHalfEdge.lock()->spFace->id;
+			m_startFaceID   = m_currentFaceID;
+		}
     }
 
     uint32_t             operator*() { return m_currentFaceID; }

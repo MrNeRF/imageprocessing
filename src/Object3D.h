@@ -48,7 +48,7 @@ public:
     void onNotify(const EventType& eventType, IEvent* pEventData) override;
 
 private:
-    bool rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, float windowWidht, float windowHeight);
+    bool rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, float windowWidth, float windowHeight);
 
 private:
     const std::string                   m_name;
