@@ -12,26 +12,26 @@ bool AABB::TestABBOverlapping(const AABB& aabb)
 	return true;
 }
 
-std::optional<AABB::Intersection> AABB::IntersectRayAABB(Eigen::Vector3f origin, Eigen::Vector3f dir, Eigen::Vector3f translate)
+std::optional<AABB::Intersection> AABB::IntersectRayAABB(const Ray& rRay, const Eigen::Vector3f& rTranslate)
 {
 	float tmin = 0.f; 
 	float tmax = std::numeric_limits<float>::max();
 
-	Eigen::Vector3f min = m_min + translate;
-	Eigen::Vector3f max = m_max + translate;
+	Eigen::Vector3f min = m_min + rTranslate;
+	Eigen::Vector3f max = m_max + rTranslate;
 
 	for(uint32_t i = 0; i  < 3; ++i)
 	{
-		if(std::abs(dir[i]) < std::numeric_limits<float>::epsilon())
+		if(std::abs(rRay.m_direction[i]) < std::numeric_limits<float>::epsilon())
 		{
-			if(origin[i] < min[i] || origin[i] > max[i])
+			if(rRay.m_origin[i] < min[i] || rRay.m_origin[i] > max[i])
 				return std::nullopt;
 		}
 		else
 		{
-			float recip = 1.f / dir[i];
-			float t1 = (min[i] - origin[i]) * recip;
-			float t2 = (max[i] - origin[i]) * recip;
+			float r = 1.f / rRay.m_direction[i];
+			float t1 = (min[i] - rRay.m_origin[i]) * r;
+			float t2 = (max[i] - rRay.m_origin[i]) * r;
 			if (t1 > t2)
 			{
 				std::swap(t1, t2);
@@ -45,6 +45,5 @@ std::optional<AABB::Intersection> AABB::IntersectRayAABB(Eigen::Vector3f origin,
 			}
 		}
 	}
-	std::cout << "Hit!!!! "  << tmin << "at: " << origin + tmin * dir << std::endl;
-	return Intersection(tmin,  origin + tmin * dir);
+	return Intersection(tmin,  rRay.m_origin + tmin * rRay.m_direction);
 }

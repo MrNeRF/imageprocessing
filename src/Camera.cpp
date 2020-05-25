@@ -37,12 +37,9 @@ void Camera::SetPerspectiveProjection(float fov, float aspectRatio, float zNearP
     m_frustum = Frustum(-width, width, -height, height, m_zNear, m_zFar);
 }
 
-const Eigen::Matrix4f& Camera::GetPerspectiveProjection()
+const Eigen::Matrix4f& Camera::GetPerspectiveProjection() const
 {
-    if (m_frustum.isZero())
-    {
-        SetPerspectiveProjection(m_fov, m_aspectRatio, m_zNear, m_zFar);
-    }
+    ASSERT(!m_frustum.isZero())
     return m_frustum;
 }
 

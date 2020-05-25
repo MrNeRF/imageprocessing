@@ -10,7 +10,7 @@ class Sphere : public Primitives3D
 {
 public:
     explicit Sphere(float radius, uint32_t stackCount, uint32_t sectorCount);
-    std::shared_ptr<Mesh3D> GetMesh() override;
+    std::shared_ptr<Mesh3D> CreateMesh() override;
 
 private:
     std::vector<Eigen::Vector3f> m_vertices;

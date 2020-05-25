@@ -14,7 +14,7 @@ public:
         , m_up{up} {};
     const Eigen::Matrix4f& GetLookAt() const;
     void                   SetPerspectiveProjection(float fov, float aspectRatio, float zNearPlane, float zFarPlane);
-    const Eigen::Matrix4f& GetPerspectiveProjection();
+    const Eigen::Matrix4f& GetPerspectiveProjection() const;
     void                   UpdateOrientation(const Eigen::AngleAxisf& angleAxis);
     const Eigen::Vector3f& GetCameraPosition() const { return m_eye; }
 

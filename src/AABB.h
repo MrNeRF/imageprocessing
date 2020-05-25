@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <limits>
 #include <optional>
+#include "Ray.h"
 
 class AABB 
 {
@@ -20,7 +21,7 @@ public:
 		: m_min{min}, m_max{max} {}
 
 	bool TestABBOverlapping(const AABB& aabb);
-	std::optional<Intersection> IntersectRayAABB(Eigen::Vector3f origin, Eigen::Vector3f dir, Eigen::Vector3f translate);
+	std::optional<Intersection> IntersectRayAABB(const Ray& rRay, const Eigen::Vector3f& rTranslate);
 private:
 	Eigen::Vector3f m_min;
 	Eigen::Vector3f m_max;

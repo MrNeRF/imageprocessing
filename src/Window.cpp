@@ -208,7 +208,6 @@ void Window::MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods
             {
                 if (!m_MouseLeftBtnDragInfo.bIsDragging)
                 {
-                    std::cout << "Clicked: (" << m_cursorPos.x() << ", " << m_cursorPos.y() << ")\n";
                     notify(EventType::MOUSE_LEFT_BTN_CLICK, std::make_unique<MouseLeftBtnClickEvent>(m_cursorPos, winWidth, winHeight));
                 }
                 m_MouseLeftBtnDragInfo.bIsDragging = true;

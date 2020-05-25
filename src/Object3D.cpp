@@ -5,7 +5,7 @@
 #include "Macros.h"
 #include "ObjFileParser.h"
 #include "Object3D.h"
-#include "Ray3D.h"
+#include "Ray.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <numeric>
@@ -24,8 +24,7 @@ void Object3D::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> sp
         m_spOGLDataObject->InitializeVertexBuffer(*m_spMesh3D);
         m_spOGLDataObject->InitializeNormalBuffer(*m_spMesh3D);
         SetColor(m_vertexColor);
-        m_spBVolume = std::make_unique<BoundingVolume>();
-        m_spBVolume->init(m_spCamera, m_spMesh3D);
+        m_spBVolume = std::make_unique<BoundingVolume>(BoundingVolume::EBoundingVolume::Cube, *m_spMesh3D);
     }
     else
     {
@@ -66,19 +65,15 @@ void Object3D::Render()
     {
         m_spMaterial->Activate(m_spShader.get());
     }
-    m_spOGLDataObject->DrawObject(GL_TRIANGLES);
 
-    for (auto& elem : m_rays)
-    {
-        elem.Draw();
-    }
+    m_spOGLDataObject->DrawObject(GL_TRIANGLES);
 
 	Eigen::Matrix4f model =Eigen::Matrix4f::Identity();
 	model(0,3) = m_position.x();
 	model(1,3) = m_position.y();
 	model(2,3) = m_position.z();
 
-	m_spBVolume->Draw(model);
+	m_spBVolume->Draw(model, *m_spCamera);
 }
 
 bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, float windowWidth, float windowHeight)
@@ -101,30 +96,23 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
     std::vector<Eigen::Vector3f> vertices;
     vertices.push_back(camPos);
     vertices.push_back(10.f * ray_world);
-    std::cout << "Origin: (" << camPos.x() << ", " << camPos.y() << ", " << camPos.z()  << ")\n";
-    std::cout << "Dir: (" << ray_world.x() << ", " << ray_world.y() << ", " << ray_world.z() << ")\n";
     std::vector<uint32_t> indices{0, 1};
-    m_rays.emplace_back(Ray3D());
-    m_rays.back().init(m_spCamera, vertices, indices);
-
 
     Eigen::Matrix3f model     = m_orientation.toRotationMatrix();
     Eigen::Vector3f position  = Eigen::Vector3f(m_position.x(), m_position.y(), m_position.z());
 
-    if(!m_spBVolume->IsBHHit(camPos, ray_world, position))
+
+	Ray ray(camPos, ray_world, 0.f);
+    if(!m_spBVolume->IsBHHit(ray, position))
 	{
 		return false;
 	}
-    bool bHit = false;
     for (const auto& triangleIndex : faceIterator(*m_spMesh3D))
     {
         auto [vec0, vec1, vec2] = m_spMesh3D->GetFaceVertices(triangleIndex);
         vec0                    = model * vec0 + position;
         vec1                    = model * vec1 + position;
         vec2                    = model * vec2 + position;
-    /* std::cout << "Dir: (" << vec0.x() << ", " << vec0.y() << ", " << vec0.z() << ")\n"; */
-    /* std::cout << "Dir: (" << vec1.x() << ", " << vec1.y() << ", " << vec1.z() << ")\n"; */
-    /* std::cout << "Dir: (" << vec2.x() << ", " << vec2.y() << ", " << vec2.z() << ")\n"; */
         Eigen::Vector3f vecA    = vec1 - vec0;
         Eigen::Vector3f vecB    = vec2 - vec0;
         Eigen::Vector3f pVec    = ray_world.cross(vecB);
@@ -147,13 +135,7 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
         {
             continue;
         }
-        bHit = true;
-        break;
-    }
-    if (bHit)
-    {
-        std::cout << "\nTreffer: " << m_name << '\n';
-        return true;
+    	return true;
     }
     return false;
 }

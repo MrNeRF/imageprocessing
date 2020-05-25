@@ -11,7 +11,7 @@
 #include "Light.h"
 #include "Material.h"
 #include "OpenGL3DDataObject.h"
-#include "Ray3D.h"
+#include "Ray.h"
 #include "Shader.h"
 #include <Eigen/Dense>
 #include "BoundingVolume.h"
@@ -62,7 +62,6 @@ private:
     std::shared_ptr<Shader>             m_spShader;
     std::shared_ptr<Light>              m_spLight;
 	std::unique_ptr<BoundingVolume>		m_spBVolume;
-    std::vector<Ray3D>                  m_rays;
     Color                               m_vertexColor = Color(0.8f, 0.f, 0.f);
 };
 

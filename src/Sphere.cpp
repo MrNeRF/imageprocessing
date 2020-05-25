@@ -68,7 +68,7 @@ Sphere::Sphere(float radius, uint32_t stackCount, uint32_t sectorCount)
 
 }
 
-std::shared_ptr<Mesh3D> Sphere::GetMesh()
+std::shared_ptr<Mesh3D> Sphere::CreateMesh()
 {
     auto spSphereMesh =  std::make_shared<Mesh3D>(m_vertices, m_indices, "Sphere");
     /* auto& vertexNormalAttrib = dynamic_cast<VertexNormalAttribute&>(spSphereMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Normal)); */

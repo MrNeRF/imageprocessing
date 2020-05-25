@@ -61,7 +61,7 @@ int main()
 
 	// SPHERE
 	Sphere sphere(4.f, 12, 36) ;
-    std::shared_ptr<Mesh3D> spSphereMesh = sphere.GetMesh();
+    std::shared_ptr<Mesh3D> spSphereMesh = sphere.CreateMesh();
     auto                    algo         = AlgoVertexNormals(*spSphereMesh);
     bool                    bOK          = algo.Compute();
     ASSERT(bOK);
