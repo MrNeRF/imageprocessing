@@ -1,6 +1,7 @@
 #ifndef OBJECT3D_H
 #define OBJECT3D_H
 
+#include "BoundingVolume.h"
 #include "Camera.h"
 #include "Color.h"
 #include "Eigen/src/Geometry/AngleAxis.h"
@@ -14,7 +15,6 @@
 #include "Ray.h"
 #include "Shader.h"
 #include <Eigen/Dense>
-#include "BoundingVolume.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -61,7 +61,7 @@ private:
     std::shared_ptr<Material>           m_spMaterial;
     std::shared_ptr<Shader>             m_spShader;
     std::shared_ptr<Light>              m_spLight;
-	std::unique_ptr<BoundingVolume>		m_spBVolume;
+    std::unique_ptr<BoundingVolume>     m_spBVolume;
     Color                               m_vertexColor = Color(0.8f, 0.f, 0.f);
 };
 

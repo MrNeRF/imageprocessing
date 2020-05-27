@@ -104,7 +104,6 @@ void OpenGL3DDataObject::InitializeNormalBuffer(Mesh3D& mesh)
         buffersInUseVector.push_back(normalsBuffer);
     }
 
-
     VertexNormalAttribute* pVertexNormalAttribute = dynamic_cast<VertexNormalAttribute*>(mesh.GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
     if (pVertexNormalAttribute == nullptr)
     {

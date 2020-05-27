@@ -101,15 +101,19 @@ public:
     std::tuple<Eigen::Vector3f, Eigen::Vector3f, Eigen::Vector3f> GetFaceVertices(uint32_t faceIndex);
     VertexAttribute&                                              AddVertexAttribute(EVertexAttribute vertexAttribute);
 
-	const std::vector<Eigen::Vector3f>& GetVertices() const {return m_vertices;}
-	const std::vector<uint32_t>& GetIndices() const {return m_indices;}
-    uint32_t           GetNumberOfVertice() const { return m_vertices.size(); }
-    uint32_t           GetNumberOfFaces() const { return static_cast<uint32_t>(static_cast<float>(m_indices.size()) / 3.f); }
-	const Eigen::Vector3f& GetVertex(uint32_t index) const {ASSERT(index < m_vertices.size()); return m_vertices[index];}
+    const std::vector<Eigen::Vector3f>& GetVertices() const { return m_vertices; }
+    const std::vector<uint32_t>&        GetIndices() const { return m_indices; }
+    uint32_t                            GetNumberOfVertice() const { return m_vertices.size(); }
+    uint32_t                            GetNumberOfFaces() const { return static_cast<uint32_t>(static_cast<float>(m_indices.size()) / 3.f); }
+    const Eigen::Vector3f&              GetVertex(uint32_t index) const
+    {
+        ASSERT(index < m_vertices.size());
+        return m_vertices[index];
+    }
     VertexAttribute*   GetVertexAttribute(EVertexAttribute vertexAttribute);
     TriangleAttribute* GetTriangleAttribute(ETriangleAttribute triangleAttribute);
 
-    void               IterateAllFaces() const;
+    void IterateAllFaces() const;
 
 private:
     friend class OpenGL3DDataObject;
@@ -151,9 +155,9 @@ private:
         , idx{i} {};
 
 private:
-    const Mesh3D&  m_rMesh;
-    uint32_t idx    = 0;
-    uint32_t endIdx = m_rMesh.m_vertices.size();
+    const Mesh3D& m_rMesh;
+    uint32_t      idx    = 0;
+    uint32_t      endIdx = m_rMesh.m_vertices.size();
 };
 
 class faceIterator
@@ -198,16 +202,16 @@ public:
         , m_startVertexID(vertexID)
     {
         ASSERT(vertexID >= 0 && vertexID < rMesh.m_vertices.size());
-		if(m_rMesh.m_halfEdgeDS.vertices[vertexID] == nullptr)
-		{
-			m_bStopIterating = true;
-		}
-		else
-		{
-			m_wspHalfEdge   = m_rMesh.m_halfEdgeDS.vertices[vertexID]->wspOutgoingHalfEdge;
-			m_currentFaceID = m_wspHalfEdge.lock()->spFace->id;
-			m_startFaceID   = m_currentFaceID;
-		}
+        if (m_rMesh.m_halfEdgeDS.vertices[vertexID] == nullptr)
+        {
+            m_bStopIterating = true;
+        }
+        else
+        {
+            m_wspHalfEdge   = m_rMesh.m_halfEdgeDS.vertices[vertexID]->wspOutgoingHalfEdge;
+            m_currentFaceID = m_wspHalfEdge.lock()->spFace->id;
+            m_startFaceID   = m_currentFaceID;
+        }
     }
 
     uint32_t             operator*() { return m_currentFaceID; }

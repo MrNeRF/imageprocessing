@@ -58,9 +58,8 @@ int main()
     spBox->SetLight(spLightCube);
     viewer.AddRenderObject(spBox);
 
-
-	// SPHERE
-	/* Sphere sphere(4.f, 12, 36) ; */
+    // SPHERE
+    /* Sphere sphere(4.f, 12, 36) ; */
     /* std::shared_ptr<Mesh3D> spSphereMesh = sphere.CreateMesh(); */
     /* auto                    algo         = AlgoVertexNormals(*spSphereMesh); */
     /* bool                    bOK          = algo.Compute(); */

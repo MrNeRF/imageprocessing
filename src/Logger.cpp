@@ -1,7 +1,7 @@
 #include <GL/glew.h>
 //
-#include "Logger.h"
 #include "GLFW/glfw3.h"
+#include "Logger.h"
 
 bool Logger::Check_GL_ErrorCode()
 {

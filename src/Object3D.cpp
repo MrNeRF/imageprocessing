@@ -68,12 +68,12 @@ void Object3D::Render()
 
     m_spOGLDataObject->DrawObject(GL_TRIANGLES);
 
-	Eigen::Matrix4f model =Eigen::Matrix4f::Identity();
-	model(0,3) = m_position.x();
-	model(1,3) = m_position.y();
-	model(2,3) = m_position.z();
+    Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
+    model(0, 3)           = m_position.x();
+    model(1, 3)           = m_position.y();
+    model(2, 3)           = m_position.z();
 
-	m_spBVolume->Draw(model, *m_spCamera);
+    m_spBVolume->Draw(model, *m_spCamera);
 }
 
 bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, float windowWidth, float windowHeight)
@@ -82,15 +82,15 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
     NDC[0] = 2.f * clickedPoint[0] / windowWidth;
     NDC[1] = 2.f * clickedPoint[1] / windowHeight;
     Eigen::Vector2f PixelScreen;
-    PixelScreen(0) =  NDC[0] - 1;
-    PixelScreen(1) = 1 -  NDC[1];
+    PixelScreen(0) = NDC[0] - 1;
+    PixelScreen(1) = 1 - NDC[1];
 
     Eigen::Vector4f ray_clipped = Eigen::Vector4f(PixelScreen[0], PixelScreen[1], -1, 1);
-    Eigen::Vector4f ray_eye = m_spCamera->GetPerspectiveProjection().inverse() * ray_clipped;
-    ray_eye = Eigen::Vector4f(ray_eye.x(), ray_eye.y(), -1.f, 0.f);
+    Eigen::Vector4f ray_eye     = m_spCamera->GetPerspectiveProjection().inverse() * ray_clipped;
+    ray_eye                     = Eigen::Vector4f(ray_eye.x(), ray_eye.y(), -1.f, 0.f);
 
     Eigen::Vector4f ray_world4f = (m_spCamera->GetLookAt().inverse() * ray_eye);
-	Eigen::Vector3f ray_world   = Eigen::Vector3f(ray_world4f.x(), ray_world4f.y(), ray_world4f.z()).normalized();
+    Eigen::Vector3f ray_world   = Eigen::Vector3f(ray_world4f.x(), ray_world4f.y(), ray_world4f.z()).normalized();
     Eigen::Vector3f camPos      = m_spCamera->GetCameraPosition();
 
     std::vector<Eigen::Vector3f> vertices;
@@ -98,15 +98,14 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
     vertices.push_back(10.f * ray_world);
     std::vector<uint32_t> indices{0, 1};
 
-    Eigen::Matrix3f model     = m_orientation.toRotationMatrix();
-    Eigen::Vector3f position  = Eigen::Vector3f(m_position.x(), m_position.y(), m_position.z());
+    Eigen::Matrix3f model    = m_orientation.toRotationMatrix();
+    Eigen::Vector3f position = Eigen::Vector3f(m_position.x(), m_position.y(), m_position.z());
 
-
-	Ray ray(camPos, ray_world, 0.f);
-    if(!m_spBVolume->IsBHHit(ray, position))
-	{
-		return false;
-	}
+    Ray ray(camPos, ray_world, 0.f);
+    if (!m_spBVolume->IsBHHit(ray, position))
+    {
+        return false;
+    }
     for (const auto& triangleIndex : faceIterator(*m_spMesh3D))
     {
         auto [vec0, vec1, vec2] = m_spMesh3D->GetFaceVertices(triangleIndex);
@@ -135,8 +134,8 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
         {
             continue;
         }
-		std::cout << "Object hit" << std::endl;
-    	return true;
+        std::cout << "Object hit" << std::endl;
+        return true;
     }
     return false;
 }

@@ -17,7 +17,7 @@ public:
 public:
     Color() = default;
     Color(float R, float G, float B);
-    Eigen::Vector3f GetColor() const { return Eigen::Vector3f(red, green, blue); }
+    Eigen::Vector3f        GetColor() const { return Eigen::Vector3f(red, green, blue); }
     static Eigen::Vector3f GetColor(Color::EColor color);
 
 private:
