@@ -24,7 +24,7 @@ void Object3D::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> sp
         m_spOGLDataObject->InitializeVertexBuffer(*m_spMesh3D);
         m_spOGLDataObject->InitializeNormalBuffer(*m_spMesh3D);
         SetColor(m_vertexColor);
-        m_spBVolume = std::make_unique<BoundingVolume>(BoundingVolume::EBoundingVolume::Cube, *m_spMesh3D);
+        m_spBVolume = std::make_unique<BoundingVolume>(BoundingVolume::EBoundingVolume::Sphere, *m_spMesh3D);
     }
     else
     {
@@ -135,6 +135,7 @@ bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, floa
         {
             continue;
         }
+		std::cout << "Object hit" << std::endl;
     	return true;
     }
     return false;
