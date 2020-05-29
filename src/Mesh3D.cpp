@@ -47,7 +47,7 @@ VertexAttribute& Mesh3D::AddVertexAttribute(EVertexAttribute vertexAttribute)
             {
                 return *pVertexAttribute;
             }
-            m_vertexAttributes.push_back(std::make_unique<VertexNormalAttribute>(m_vertices, m_indices));
+            m_vertexAttributes.push_back(std::make_unique<VertexNormalAttribute>());
             break;
         case EVertexAttribute::Color:
             pVertexAttribute = GetVertexAttribute(vertexAttribute);
@@ -55,7 +55,7 @@ VertexAttribute& Mesh3D::AddVertexAttribute(EVertexAttribute vertexAttribute)
             {
                 return *pVertexAttribute;
             }
-            m_vertexAttributes.push_back(std::make_unique<VertexColorAttribute>(m_vertices, m_indices));
+            m_vertexAttributes.push_back(std::make_unique<VertexColorAttribute>());
             break;
         case EVertexAttribute::UVCoordinates:
             break;

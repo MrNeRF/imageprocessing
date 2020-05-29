@@ -26,7 +26,7 @@ int main()
     std::shared_ptr<Shader> spLightShader = std::make_shared<Shader>("Light Cube");
     spLightShader->InitShaders("../Shaders/lightShader.vs", "../Shaders/lightShader.fs");
     std::shared_ptr<Light>  spLightCube   = std::make_shared<Light>("Light");
-    std::shared_ptr<Mesh3D> spLightMesh3D = ObjFileParser().Parse(std::make_unique<File>("../models/quader.obj"));
+    std::shared_ptr<Mesh3D> spLightMesh3D = ObjFileParser().GetMesh(std::make_unique<File>("../models/quader.obj"));
     spLightCube->Init(spLightMesh3D, spCamera, spLightShader);
 
     viewer.AddRenderObject(spLightCube);
@@ -48,9 +48,9 @@ int main()
     Quader quader(1.f, 1.f, 1.f);
 
     std::shared_ptr<Mesh3D> spQuaderMesh = quader.CreateMesh();
-    auto                    algo         = AlgoVertexNormals(*spQuaderMesh);
-    bool                    bOK          = algo.Compute();
-    ASSERT(bOK);
+    /* auto                    algo         = AlgoVertexNormals(*spQuaderMesh); */
+    /* bool                    bOK          = algo.Compute(); */
+    /* ASSERT(bOK); */
     std::shared_ptr<Object3D> spBox = std::make_shared<Object3D>("Box");
     spBox->Init(spQuaderMesh, spCamera, spModelShader);
     spBox->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
@@ -79,7 +79,7 @@ int main()
     spShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
 
     std::shared_ptr<Object3D> spRenderObject = std::make_shared<Object3D>(std::string("Suzanne") + std::to_string(2));
-    spRenderObject->Init(ObjFileParser().Parse(std::make_unique<File>("../models/suzanne.obj")), spCamera, spShader);
+    spRenderObject->Init(ObjFileParser().GetMesh(std::make_unique<File>("../models/suzanne.obj")), spCamera, spShader);
     spRenderObject->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
     spRenderObject->SetPosition({10.f, 3.f, -5.f, 1.f});
     spRenderObject->SetLight(spLightCube);

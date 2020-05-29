@@ -27,6 +27,8 @@ public:
     std::shared_ptr<Mesh3D>          CreateMesh() override;
     std::pair<bool, Eigen::Vector3f> IsHit(const Ray& rRay, Eigen::Vector3f position);
 
+    int m_creationConstructor = 0;
+
 private:
     std::vector<Eigen::Vector3f> m_vertices;
     std::vector<Eigen::Vector3f> m_normals;

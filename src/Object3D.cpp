@@ -1,11 +1,14 @@
 #include <GL/glew.h>
 ///
+#include "AlgoVertexNormals.h"
 #include "File.h"
 #include "Logger.h"
 #include "Macros.h"
 #include "ObjFileParser.h"
 #include "Object3D.h"
 #include "Ray.h"
+#include "VertexColorAttribute.h"
+#include "VertexNormalAttribute.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <numeric>
@@ -21,27 +24,24 @@ void Object3D::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> sp
     if (m_spMesh3D != nullptr)
     {
         m_spOGLDataObject = std::make_unique<OpenGL3DDataObject>();
-        m_spOGLDataObject->InitializeVertexBuffer(*m_spMesh3D);
-        m_spOGLDataObject->InitializeNormalBuffer(*m_spMesh3D);
-        SetColor(m_vertexColor);
+
+        VertexColorAttribute&        rColor = dynamic_cast<VertexColorAttribute&>(m_spMesh3D->AddVertexAttribute(Mesh3D::EVertexAttribute::Color));
+        std::vector<Eigen::Vector3f> colorData(m_spMesh3D->GetNumberOfVertice(), Color::GetColor(Color::EColor::GREEN));
+        rColor.SetVertexColor(colorData, m_spMesh3D->GetIndices());
+        auto pNormal = dynamic_cast<VertexNormalAttribute*>(m_spMesh3D->GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
+        if (pNormal == nullptr)
+        {
+            AlgoVertexNormals algo(*m_spMesh3D);
+            ASSERT(algo.Compute() == true);
+        }
+        m_spOGLDataObject->InitializeBuffer(*m_spMesh3D);
+
         m_spBVolume = std::make_unique<BoundingVolume>(BoundingVolume::EBoundingVolume::Sphere, *m_spMesh3D);
     }
     else
     {
         ASSERT(0);
     }
-}
-
-void Object3D::SetColor(const Color& color)
-{
-    m_vertexColor = color;
-    std::vector<Eigen::Vector3f> colorData(m_spMesh3D->GetNumberOfVertice(), color.GetColor());
-    m_spOGLDataObject->InitializeColorBuffer(colorData);
-}
-
-void Object3D::UpdateNormalBuffer()
-{
-    m_spOGLDataObject->InitializeNormalBuffer(*m_spMesh3D);
 }
 
 void Object3D::Render()

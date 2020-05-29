@@ -24,6 +24,8 @@ Eigen::Vector3f Color::GetColor(Color::EColor color)
             break;
         case Color::EColor::YELLOW:
             col = Color(1.f, 1.f, 0.f);
+        case Color::EColor::WHITE:
+            col = Color(1.f, 1.f, 1.f);
             break;
     }
     return col.GetColor();

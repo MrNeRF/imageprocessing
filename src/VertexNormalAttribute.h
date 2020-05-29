@@ -5,27 +5,22 @@
 class VertexNormalAttribute : public VertexAttribute
 {
 public:
-    VertexNormalAttribute(const std::vector<Eigen::Vector3f>& vertices, const std::vector<uint32_t>& indices)
-        : m_indices{indices}
-        , m_vertices{vertices}
-    {
-        m_vertexNormals.resize(m_vertices.size());
-    }
-
     Eigen::Vector3f& operator[](uint32_t i)
     {
-        return m_vertexNormals[i];
+        return m_vertexNormals[m_vertexNormalsIndices[i]];
     }
 
-    void SetVertexNormals(const std::vector<Eigen::Vector3f>& vertexNormals)
+    void SetVertexNormals(const std::vector<Eigen::Vector3f>& vertexNormals,
+                          const std::vector<uint32_t>         vertexNormalsIndics)
     {
-        ASSERT(m_vertexNormals.size() == m_vertexNormals.size());
+        m_vertexNormals.resize(vertexNormals.size());
+        m_vertexNormalsIndices.resize(vertexNormalsIndics.size());
         std::copy(std::begin(vertexNormals), std::end(vertexNormals), std::begin(m_vertexNormals));
+        std::copy(std::begin(vertexNormalsIndics), std::end(vertexNormalsIndics), std::begin(m_vertexNormalsIndices));
     }
 
 private:
     friend class OpenGL3DDataObject;
-    std::vector<Eigen::Vector3f>        m_vertexNormals;
-    const std::vector<uint32_t>&        m_indices;
-    const std::vector<Eigen::Vector3f>& m_vertices;
+    std::vector<Eigen::Vector3f> m_vertexNormals;
+    std::vector<uint32_t>        m_vertexNormalsIndices;
 };

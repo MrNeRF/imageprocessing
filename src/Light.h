@@ -17,7 +17,6 @@ public:
     // IRenderable overrides
     void Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader) override;
     void Render() override;
-    void SetColor(const Color& color) override;
 
     const Color&              GetColor() { return m_vertexColor; }
     const Eigen::Vector4f&    GetPosition() const { return m_position; }

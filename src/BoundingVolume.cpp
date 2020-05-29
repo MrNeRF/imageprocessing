@@ -1,12 +1,15 @@
 #include "BoundingVolume.h"
+#include "AlgoVertexNormals.h"
 #include "Quader.h"
 #include "Sphere.h"
+#include "VertexColorAttribute.h"
+#include "VertexNormalAttribute.h"
 #include <deque>
 #include <iterator>
 #include <limits>
 
 // Welzl Miniball Algorithm
-static Sphere recursiveMB(std::deque<Eigen::Vector3f>& points, std::vector<Eigen::Vector3f>& bound)
+static Sphere recursiveMB(std::deque<Eigen::Vector3f>& points, std::vector<Eigen::Vector3f> bound)
 {
     Sphere mb;
     if (points.empty() || bound.size() == 4)
@@ -37,12 +40,12 @@ static Sphere recursiveMB(std::deque<Eigen::Vector3f>& points, std::vector<Eigen
         mb                       = recursiveMB(points, bound);
         const Eigen::Vector3f sc = mb.GetCenter();
         const float           r2 = mb.GetRadius() * mb.GetRadius();
-        if ((p - sc).squaredNorm() > r2)
+        if ((sc - p).squaredNorm() - r2 > 0.f)
         {
             bound.push_back(p);
             mb = recursiveMB(points, bound);
             // move to front
-            points.push_front(p);
+            points.push_back(p);
         }
     }
 
@@ -55,6 +58,20 @@ BoundingVolume::BoundingVolume(BoundingVolume::EBoundingVolume type, const Mesh3
     m_spShader = std::make_shared<Shader>("Line");
     m_spShader->InitShaders("../Shaders/color.vs", "../Shaders/color.fs");
     m_spOGLDataObject = std::make_shared<OpenGL3DDataObject>();
+
+    auto vertices = rMeshToBound.GetVertices();
+    for (uint32_t i = 0; i < vertices.size(); ++i)
+    {
+        for (uint32_t j = 0; j < vertices.size(); ++j)
+        {
+            if (i == j)
+            {
+                continue;
+            }
+
+            ASSERT(vertices[i] != vertices[j]);
+        }
+    }
     switch (type)
     {
         case BoundingVolume::EBoundingVolume::Sphere:
@@ -90,9 +107,17 @@ void BoundingVolume::createBoundingCube(const Mesh3D& rMeshToBound)
     m_spBoundingVolume = std::make_unique<Quader>(min, max);
     m_spBVMesh         = m_spBoundingVolume->CreateMesh();
 
-    m_spOGLDataObject->InitializeVertexBuffer(m_spBVMesh->GetVertices(), m_spBVMesh->GetIndices());
+    VertexColorAttribute&        rColor = dynamic_cast<VertexColorAttribute&>(m_spBVMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Color));
     std::vector<Eigen::Vector3f> colorData(m_spBVMesh->GetNumberOfVertice(), Color::GetColor(Color::EColor::YELLOW));
-    m_spOGLDataObject->InitializeColorBuffer(colorData);
+    rColor.SetVertexColor(colorData, m_spBVMesh->GetIndices());
+    auto pNormal = dynamic_cast<VertexNormalAttribute*>(m_spBVMesh->GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
+    if (pNormal == nullptr)
+    {
+        AlgoVertexNormals algo(*m_spBVMesh);
+        ASSERT(algo.Compute() == true);
+    }
+
+    m_spOGLDataObject->InitializeBuffer(*m_spBVMesh);
 }
 void BoundingVolume::createBoundingSphere(const Mesh3D& rMeshToBound)
 {
@@ -106,11 +131,21 @@ void BoundingVolume::createBoundingSphere(const Mesh3D& rMeshToBound)
 
     Sphere sphere      = recursiveMB(input, bound);
     m_spBoundingVolume = std::make_unique<Sphere>(sphere);
-    m_spBVMesh         = m_spBoundingVolume->CreateMesh();
+    std::cout << sphere.m_creationConstructor << std::endl;
+    m_spBVMesh = m_spBoundingVolume->CreateMesh();
 
-    m_spOGLDataObject->InitializeVertexBuffer(m_spBVMesh->GetVertices(), m_spBVMesh->GetIndices());
+    VertexColorAttribute&        rColor = dynamic_cast<VertexColorAttribute&>(m_spBVMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Color));
     std::vector<Eigen::Vector3f> colorData(m_spBVMesh->GetNumberOfVertice(), Color::GetColor(Color::EColor::YELLOW));
-    m_spOGLDataObject->InitializeColorBuffer(colorData);
+    rColor.SetVertexColor(colorData, m_spBVMesh->GetIndices());
+
+    auto pNormal = dynamic_cast<VertexNormalAttribute*>(m_spBVMesh->GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
+    if (pNormal == nullptr)
+    {
+        AlgoVertexNormals algo(*m_spBVMesh);
+        ASSERT(algo.Compute() == true);
+    }
+
+    m_spOGLDataObject->InitializeBuffer(*m_spBVMesh);
 }
 
 bool BoundingVolume::IsBHHit(const Ray& rRay, Eigen::Vector3f translate)
@@ -149,7 +184,7 @@ void BoundingVolume::Draw(const Eigen::Matrix4f& model, const Camera& rCam)
     GLint polygonMode;
     glGetIntegerv(GL_POLYGON_MODE, &polygonMode);
     bool bIsModeSwitched = false;
-    if (polygonMode == GL_LINE)
+    if (polygonMode == GL_FILL)
     {
         bIsModeSwitched = true;
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

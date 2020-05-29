@@ -11,7 +11,8 @@ public:
         BLUE,
         GREEN,
         RED,
-        YELLOW
+        YELLOW,
+        WHITE
     };
 
 public:

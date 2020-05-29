@@ -39,7 +39,7 @@ bool AlgoVertexNormals::Compute()
         ++i;
     }
 
-    auto& vertexNormalAttrib = dynamic_cast<VertexNormalAttribute&>(m_rMesh.AddVertexAttribute(Mesh3D::EVertexAttribute::Normal));
-    vertexNormalAttrib.SetVertexNormals(vertexNormals);
+    auto& rNormals = dynamic_cast<VertexNormalAttribute&>(m_rMesh.AddVertexAttribute(Mesh3D::EVertexAttribute::Normal));
+    rNormals.SetVertexNormals(vertexNormals, m_rMesh.GetIndices());
     return true;
 }
