@@ -40,7 +40,7 @@ static Sphere recursiveMB(std::deque<Eigen::Vector3f>& points, std::vector<Eigen
         mb                       = recursiveMB(points, bound);
         const Eigen::Vector3f sc = mb.GetCenter();
         const float           r2 = mb.GetRadius() * mb.GetRadius();
-        if ((sc - p).squaredNorm() - r2 > 0.f)
+        if ((sc - p).squaredNorm() > r2)
         {
             bound.push_back(p);
             mb = recursiveMB(points, bound);
@@ -52,34 +52,21 @@ static Sphere recursiveMB(std::deque<Eigen::Vector3f>& points, std::vector<Eigen
     return mb;
 }
 
-BoundingVolume::BoundingVolume(BoundingVolume::EBoundingVolume type, const Mesh3D& rMeshToBound)
+BoundingVolume::BoundingVolume(const BoundingVolume::EBoundingVolume& type, const Mesh3D& rMeshToBound)
     : m_bvType{type}
 {
     m_spShader = std::make_shared<Shader>("Line");
     m_spShader->InitShaders("../Shaders/color.vs", "../Shaders/color.fs");
     m_spOGLDataObject = std::make_shared<OpenGL3DDataObject>();
 
-    auto vertices = rMeshToBound.GetVertices();
-    for (uint32_t i = 0; i < vertices.size(); ++i)
+    switch (m_bvType)
     {
-        for (uint32_t j = 0; j < vertices.size(); ++j)
-        {
-            if (i == j)
-            {
-                continue;
-            }
-
-            ASSERT(vertices[i] != vertices[j]);
-        }
-    }
-    switch (type)
-    {
-        case BoundingVolume::EBoundingVolume::Sphere:
+        case EBoundingVolume::Sphere:
         {
             createBoundingSphere(rMeshToBound);
         }
         break;
-        case BoundingVolume::EBoundingVolume::Cube:
+        case EBoundingVolume::Cube:
         {
             createBoundingCube(rMeshToBound);
         }
@@ -129,10 +116,10 @@ void BoundingVolume::createBoundingSphere(const Mesh3D& rMeshToBound)
     }
     std::vector<Eigen::Vector3f> bound;
 
-    Sphere sphere      = recursiveMB(input, bound);
+    Sphere sphere = recursiveMB(input, bound);
+    fmt::print("Center: ({}, {}, {}); Radius: {}\n", sphere.GetCenter().x(), sphere.GetCenter().x(), sphere.GetCenter().x(), sphere.GetRadius());
     m_spBoundingVolume = std::make_unique<Sphere>(sphere);
-    std::cout << sphere.m_creationConstructor << std::endl;
-    m_spBVMesh = m_spBoundingVolume->CreateMesh();
+    m_spBVMesh         = m_spBoundingVolume->CreateMesh();
 
     VertexColorAttribute&        rColor = dynamic_cast<VertexColorAttribute&>(m_spBVMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Color));
     std::vector<Eigen::Vector3f> colorData(m_spBVMesh->GetNumberOfVertice(), Color::GetColor(Color::EColor::YELLOW));

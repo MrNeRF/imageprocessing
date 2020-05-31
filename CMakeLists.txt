@@ -8,7 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # --verbose flag might be helpful in case something is broken during linking
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "-ggdb3 -Wall -Werror -Wno-write-strings -D_GLIBCXX_DEBUG")
+set(CMAKE_CXX_FLAGS "-ggdb3 -O0 -Wall -Werror -Wno-write-strings -D_GLIBCXX_DEBUG")
 message("CMAKE_BUILD_TYPE is ${CMAKE_BUILD_TYPE}")
 
 

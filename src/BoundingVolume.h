@@ -22,7 +22,7 @@ public:
     };
 
 public:
-    BoundingVolume(EBoundingVolume type, const Mesh3D& rMeshToBound);
+    BoundingVolume(const EBoundingVolume& type, const Mesh3D& rMeshToBound);
 
     bool IsBHHit(const Ray& rRay, Eigen::Vector3f translate);
     void Draw(const Eigen::Matrix4f& model, const Camera& rCam);
