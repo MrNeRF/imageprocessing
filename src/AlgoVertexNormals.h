@@ -7,11 +7,22 @@
 class AlgoVertexNormals : public Algorithm
 {
 public:
-    AlgoVertexNormals(Mesh3D& rMesh)
-        : m_rMesh{rMesh} {};
+    enum class NormalType
+    {
+        SMOOTH,
+        NONSMOOTH
+    };
+
+public:
+    AlgoVertexNormals(Mesh3D& rMesh, NormalType type)
+        : m_rMesh{rMesh}
+        , m_type{type} {};
     [[nodiscard]] bool Compute(void) override;
+    [[nodiscard]] bool ComputeSmoothNormals(void);
+    [[nodiscard]] bool ComputeNonSmoothNormals(void);
 
 private:
-    Mesh3D& m_rMesh;
+    Mesh3D&          m_rMesh;
+    const NormalType m_type;
 };
 #endif

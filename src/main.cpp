@@ -56,25 +56,25 @@ int main()
     spBox->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
     spBox->SetPosition({0.f, 0.f, 2.f, 0.f});
     spBox->SetLight(spLightCube);
-    viewer.AddRenderObject(spBox);
+    /* viewer.AddRenderObject(spBox); */
 
     // SPHERE
-    /* Sphere sphere(4.f, 12, 36) ; */
-    /* std::shared_ptr<Mesh3D> spSphereMesh = sphere.CreateMesh(); */
+    Sphere                  sphere(4.f);
+    std::shared_ptr<Mesh3D> spSphereMesh = sphere.CreateMesh();
     /* auto                    algo         = AlgoVertexNormals(*spSphereMesh); */
     /* bool                    bOK          = algo.Compute(); */
     /* ASSERT(bOK); */
-    /* std::shared_ptr<Object3D> spSphere = std::make_shared<Object3D>("Sphere"); */
-    /* spSphere->Init(spSphereMesh, spCamera, spModelShader); */
-    /* spSphere->SetMaterial(Material::GetMaterial(MaterialType::GOLD)); */
-    /* spSphere->SetPosition({0.f, 0.f, -5.f, 1.f}); */
-    /* spSphere->SetLight(spLightCube); */
-    /* viewer.AddRenderObject(spSphere); */
+    std::shared_ptr<Object3D> spSphere = std::make_shared<Object3D>("Sphere");
+    spSphere->Init(spSphereMesh, spCamera, spModelShader);
+    spSphere->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
+    spSphere->SetPosition({0.f, 0.f, -5.f, 1.f});
+    spSphere->SetLight(spLightCube);
+    viewer.AddRenderObject(spSphere);
 
     pWindow->attach(spCamera);
-    /* pWindow->attach(spSphere); */
+    pWindow->attach(spSphere);
     /* pWindow->attach(spSuzane); */
-    pWindow->attach(spBox);
+    /* pWindow->attach(spBox); */
     std::shared_ptr<Shader> spShader = std::make_shared<Shader>(std::string("3DModelShader") + std::to_string(2));
     spShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
 

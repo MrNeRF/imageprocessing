@@ -100,7 +100,7 @@ void BoundingVolume::createBoundingCube(const Mesh3D& rMeshToBound)
     auto pNormal = dynamic_cast<VertexNormalAttribute*>(m_spBVMesh->GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
     if (pNormal == nullptr)
     {
-        AlgoVertexNormals algo(*m_spBVMesh);
+        AlgoVertexNormals algo(*m_spBVMesh, AlgoVertexNormals::NormalType::SMOOTH);
         ASSERT(algo.Compute() == true);
     }
 
@@ -128,7 +128,7 @@ void BoundingVolume::createBoundingSphere(const Mesh3D& rMeshToBound)
     auto pNormal = dynamic_cast<VertexNormalAttribute*>(m_spBVMesh->GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
     if (pNormal == nullptr)
     {
-        AlgoVertexNormals algo(*m_spBVMesh);
+        AlgoVertexNormals algo(*m_spBVMesh, AlgoVertexNormals::NormalType::SMOOTH);
         ASSERT(algo.Compute() == true);
     }
 

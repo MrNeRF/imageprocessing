@@ -24,7 +24,7 @@ void Light::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> spCam
         auto pNormal = dynamic_cast<VertexNormalAttribute*>(m_spMesh3D->GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
         if (pNormal == nullptr)
         {
-            AlgoVertexNormals algo(*m_spMesh3D);
+            AlgoVertexNormals algo(*m_spMesh3D, AlgoVertexNormals::NormalType::SMOOTH);
             ASSERT(algo.Compute() == true);
         }
 

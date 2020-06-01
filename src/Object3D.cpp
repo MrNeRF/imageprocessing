@@ -31,7 +31,7 @@ void Object3D::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> sp
         auto pNormal = dynamic_cast<VertexNormalAttribute*>(m_spMesh3D->GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
         if (pNormal == nullptr)
         {
-            AlgoVertexNormals algo(*m_spMesh3D);
+            AlgoVertexNormals algo(*m_spMesh3D, AlgoVertexNormals::NormalType::SMOOTH);
             ASSERT(algo.Compute() == true);
         }
         m_spOGLDataObject->InitializeBuffer(*m_spMesh3D);
@@ -73,7 +73,7 @@ void Object3D::Render()
     model(1, 3)           = m_position.y();
     model(2, 3)           = m_position.z();
 
-    m_spBVolume->Draw(model, *m_spCamera);
+    /* m_spBVolume->Draw(model, *m_spCamera); */
 }
 
 bool Object3D::rayTriangleIntersection(const Eigen::Vector2f& clickedPoint, float windowWidth, float windowHeight)
