@@ -1,5 +1,8 @@
 #!/bin/bash
 
+cp hooks/pre-commit .git/hooks/pre-commit
+chmod u+x .git/hooks/pre-commit
+
 if [ ! -d "build" ]
 then
 	echo "Creating build directory"

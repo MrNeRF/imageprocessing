@@ -30,7 +30,7 @@ File::File(const std::string& filePath)
         filename   = filename.substr(0, pos);
     }
 }
-void File::GetContents(std::string &buffer)
+void File::GetContents(std::string& buffer)
 {
     std::ifstream filereader;
     filereader.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -42,12 +42,10 @@ void File::GetContents(std::string &buffer)
         filereader.close();
         buffer = ss.str();
     }
-    catch(const std::ifstream::failure& e)
+    catch (const std::ifstream::failure& e)
     {
         std::cerr << "ERROR: File "
                   << filename + fileending
                   << " not successfully read" << std::endl;
     }
 }
-
-

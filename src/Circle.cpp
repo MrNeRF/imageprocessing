@@ -22,7 +22,7 @@ void Circle::createCircle(float radius, Eigen::Matrix<float, Eigen::Dynamic, 2, 
 
     m_indices.push_back(0);
 
-    float PI2      = 2 * M_PI;
+    float PI2            = 2 * M_PI;
     int   numberOfPoints = vertices.rows() - 1;
     float fraction       = 1.0f / static_cast<float>(numberOfPoints);
     for (int i = 0; i < numberOfPoints; ++i)

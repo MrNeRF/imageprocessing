@@ -14,29 +14,29 @@
 
 Window* Viewer::Init(const std::string& name)
 {
-	m_spWindow = std::make_unique<Window>(name);
-	return m_spWindow.get();
+    m_spWindow = std::make_unique<Window>(name);
+    return m_spWindow.get();
 }
 
 void Viewer::AddRenderObject(std::shared_ptr<IRenderable> spRenderObject)
 {
-	m_renderObjects.push_back(spRenderObject);
+    m_renderObjects.push_back(spRenderObject);
 }
 
 std::shared_ptr<IRenderable> Viewer::GetLastRenderObject()
 {
-	return m_renderObjects.back();
+    return m_renderObjects.back();
 }
 
 void Viewer::Run(void)
 {
     auto& rLogger = Logger::GetInstance().GetLogger();
     rLogger.info("Viewer::Run()");
-	if (m_spWindow == nullptr)
-	{
-		rLogger.critical("No Window Object created!");
-		ASSERT(0);
-	}
+    if (m_spWindow == nullptr)
+    {
+        rLogger.critical("No Window Object created!");
+        ASSERT(0);
+    }
 
     CHECK_GL_ERROR_(glEnable(GL_DEPTH_TEST));
     while (!glfwWindowShouldClose(m_spWindow->GetGLFWWindow()))
@@ -44,23 +44,22 @@ void Viewer::Run(void)
         CHECK_GL_ERROR_(glClearColor(0.2f, 0.3f, 0.3f, 1.0f))
         CHECK_GL_ERROR_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
-        if (glfwGetKey(m_spWindow->GetGLFWWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        CHECK_GL_ERROR_(glEnable(GL_DEPTH_TEST))
+        CHECK_GL_ERROR_(glDepthFunc(GL_LESS))
+        if (m_spWindow->m_bWireFrame)
         {
-            glfwSetWindowShouldClose(m_spWindow->GetGLFWWindow(), true);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+        for (const auto& o : m_renderObjects)
+        {
+            o->Render();
         }
 
-        if (m_spWindow->m_key == GLFW_KEY_R
-            && m_spWindow->m_bKeyPressed == true)
-        {
-        	/* suzanne->ResetRotation(); */
-        }
-
-		for (const auto& o : m_renderObjects)
-		{
-			o->Render();
-		}
         glfwSwapBuffers(m_spWindow->GetGLFWWindow());
         glfwPollEvents();
     }
 }
-

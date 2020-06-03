@@ -25,4 +25,3 @@ bool CrossingNumberPPolygon::Compute(void)
     m_result = crossingNumberCounter % 2 == 0 ? false : true;
     return true;
 }
-

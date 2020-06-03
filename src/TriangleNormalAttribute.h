@@ -6,10 +6,10 @@
 
 class TriangleNormalAttribute : public TriangleAttribute
 {
-	public:
-		TriangleNormalAttribute();
+public:
+    TriangleNormalAttribute();
 
-	private:
-		Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> triangleNormals = Eigen::MatrixX3f::Zero(1, 3);
+private:
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> triangleNormals = Eigen::MatrixX3f::Zero(1, 3);
 };
 #endif

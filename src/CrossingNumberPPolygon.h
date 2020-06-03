@@ -18,9 +18,8 @@ public:
     bool GetOutput(void) noexcept { return m_result; };
 
 private:
-    std::vector<Eigen::Vector2f>       m_vertices;
-    Eigen::Vector2f                    m_point;
-    bool                               m_result = false;
+    std::vector<Eigen::Vector2f> m_vertices;
+    Eigen::Vector2f              m_point;
+    bool                         m_result = false;
 };
 #endif
-

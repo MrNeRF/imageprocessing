@@ -5,15 +5,15 @@
 
 struct TriangleAttribute
 {
-	public:
-		virtual ~TriangleAttribute(){};
+public:
+    virtual ~TriangleAttribute(){};
 };
 
 struct TriangleNormalAttribute : public TriangleAttribute
 {
-	public:
-		TriangleNormalAttribute();
+public:
+    TriangleNormalAttribute();
 
-		Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> triangleNormals = Eigen::MatrixX3f::Zero(1, 3);
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> triangleNormals = Eigen::MatrixX3f::Zero(1, 3);
 };
 #endif

@@ -16,4 +16,3 @@ Image::~Image(void)
     stbi_image_free(data);
     data = nullptr;
 }
-

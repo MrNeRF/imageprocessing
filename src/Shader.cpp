@@ -7,7 +7,7 @@ void Shader::InitShaders(const std::string& vertexShaderPath, const std::string&
     std::vector<unsigned int> shaderIDs;
 
     // Vertex Shader Shader
-    std::string  vertexCode     = readShaderProgramCode(vertexShaderPath);
+    std::string  vertexCode = readShaderProgramCode(vertexShaderPath);
     unsigned int vertexShaderID;
     CHECK_GL_ERROR_WITH_OUTPUT_(vertexShaderID, glCreateShader(GL_VERTEX_SHADER))
     createShader(vertexShaderID, vertexCode, ShaderType::VERTEX);
@@ -16,7 +16,7 @@ void Shader::InitShaders(const std::string& vertexShaderPath, const std::string&
     rLogger.info("Vertex Shader {} with ID {} created", vertexShaderPath, vertexShaderID);
 
     // Fragment Shader
-    std::string  fragmentCode     = readShaderProgramCode(fragmentShaderPath);
+    std::string  fragmentCode = readShaderProgramCode(fragmentShaderPath);
     unsigned int fragmentShaderID;
     CHECK_GL_ERROR_WITH_OUTPUT_(fragmentShaderID, glCreateShader(GL_FRAGMENT_SHADER))
     createShader(fragmentShaderID, fragmentCode, ShaderType::FRAGMENT);
@@ -112,4 +112,3 @@ void Shader::checkCompileErrors(unsigned int shaderID, const Shader::ShaderType&
             rLogger.info("{} successfully compile!", shaderTypeMapping[shaderType]);
     };
 }
-

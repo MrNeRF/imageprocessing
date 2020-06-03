@@ -11,41 +11,16 @@ class Mesh3D;
 class OpenGL3DDataObject
 {
 public:
-    OpenGL3DDataObject(); 
+    OpenGL3DDataObject();
     ~OpenGL3DDataObject(void);
-    void InitializeVertexBuffer(Mesh3D& mesh);
-    void InitializeNormalBuffer(Mesh3D& mesh);
-
-    void InitializeColorBuffer(const Color& color);
-    void InitializeTextureUVBuffer(const Eigen::Matrix<float, Eigen::Dynamic, 2, Eigen::RowMajor>& uvCoordinates);
+    void InitializeBuffer(Mesh3D& mesh);
     void DrawObject(GLenum mode) const;
 
 private:
     // Vertex Array Object
-    unsigned int VAO = 0;
-    // Vertex Element Object (EBO)
-    unsigned int indexBuffer = 0;
-
-    // Vertex Buffer
-    unsigned int vertexBuffer  = 0;
-    unsigned int vertexAttrIdx = 0;
-
-    // Color Buffer
-    unsigned int colorBuffer  = 0;
-    unsigned int colorAttrIdx = 1;
-
-    // Texture Buffer
-    unsigned int textureBuffer  = 0;
-    unsigned int textureAttrIdx = 2;
-
-    // Normal Buffer
-    unsigned int normalsBuffer = 0;
-    unsigned int normalAttrIdx = 3;
-
-    unsigned int numberOfIndices  = 0;
-    unsigned int numberOfVertices = 0;
-
-    std::vector<unsigned int> buffersInUseVector;
+    unsigned int m_VAO               = 0;
+    unsigned int m_VBO               = 0;
+    uint32_t     m_vertexRenderCount = 0;
 };
 
 #endif

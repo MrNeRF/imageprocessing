@@ -6,3 +6,7 @@
 	path = 3rdParty/Eigen
 	url = https://gitlab.com/libeigen/eigen
 	branch = master
+[submodule "3rdParty/Catch2"]
+	path = 3rdParty/Catch2
+	url = https://github.com/catchorg/Catch2
+	branch = master

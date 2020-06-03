@@ -1,0 +1,15 @@
+#!/bin/bash
+
+echo "Pre-commit hook clang-format"
+re='.*\.(c|h|hpp|cpp|cc)'
+for FILE in $(git diff-index --cached --name-only HEAD)
+do
+	if [[ "$FILE" =~ $re ]]
+	then
+		echo $FILE
+		clang-format -i $FILE
+	fi
+done
+echo "Formating done!"
+
+git update-index --again

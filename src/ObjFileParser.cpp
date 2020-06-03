@@ -2,6 +2,7 @@
 #include "Logger.h"
 #include "Macros.h"
 #include "Mesh3D.h"
+#include "VertexColorAttribute.h"
 #include "VertexNormalAttribute.h"
 #include <algorithm>
 #include <cassert>
@@ -44,30 +45,48 @@ struct KeyHasher
         return res;
     }
 };
+
 } // namespace
 
-std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
+static void tokenize(std::string& line, char delim, std::vector<std::string>& tokens)
+{
+    auto start = find(cbegin(line), cend(line), delim);
+    tokens.push_back(std::string(cbegin(line), start));
+
+    while (start != cend(line))
+    {
+        const auto finish = find(++start, cend(line), delim);
+
+        tokens.push_back(std::string(start, finish));
+        start = finish;
+    }
+}
+
+std::shared_ptr<Mesh3D> ObjFileParser::GetMesh(std::unique_ptr<File> spObjFile)
 {
     std::string buffer;
     spObjFile->GetContents(buffer);
+
+    /* bool bHasTexels = false; */
+    bool bHasNormals = false;
 
     std::vector<Eigen::Vector3f> vertexData;
     std::vector<Eigen::Vector2f> textureCoordinatesData;
     std::vector<Eigen::Vector3f> normalData;
 
-    std::vector<int> vertexIndices;
-    std::vector<int> textureCoordinatesIndices;
-    std::vector<int> normalsIndices;
+    std::vector<uint32_t> vertexIndices;
+    std::vector<uint32_t> textureCoordinatesIndices;
+    std::vector<uint32_t> normalsIndices;
 
-    std::vector<Eigen::Vector3f> remappedVertexData;
-    std::vector<Eigen::Vector2f> remappedTextureCoordinatesData;
-    std::vector<Eigen::Vector3f> remappedNormalData;
-    // Vector of new Indices
-    std::vector<uint32_t> remappedIndices;
+    /* std::vector<Eigen::Vector3f> remappedVertexData; */
+    /* std::vector<Eigen::Vector2f> remappedTextureCoordinatesData; */
+    /* std::vector<Eigen::Vector3f> remappedNormalData; */
+    /* // Vector of new Indices */
+    /* std::vector<uint32_t> remappedIndices; */
     // New Index Number
-    int newIndex = 0;
+    /* uint32_t newIndex = 0; */
     // The map with the key value tuples
-    std::unordered_map<Key, int, KeyHasher> indexMap;
+    /* std::unordered_map<Key, int, KeyHasher> indexMap; */
 
     std::istringstream iss(buffer);
     std::string        line;
@@ -86,13 +105,13 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
         {
             // texture vertexData
             textureCoordinatesData.emplace_back(Eigen::Vector2f{std::stof(tokens[1]), std::stof(tokens[2])});
-            hasTextureCoordinates = true;
+            /* bHasTexels = true; */
         }
         else if (tokens.at(0).compare("vn") == 0 && tokens.size() == 4)
         {
             // normalData
             normalData.emplace_back(Eigen::Vector3f{std::stof(tokens[1]), std::stof(tokens.at(2)), std::stof(tokens.at(3))});
-            hasNormals = true;
+            bHasNormals = true;
         }
         else if (tokens.at(0).compare("f") == 0 && tokens.size() == 4)
         {
@@ -108,90 +127,51 @@ std::unique_ptr<Mesh3D> ObjFileParser::Parse(std::unique_ptr<File> spObjFile)
                 textureCoordinatesIndices.push_back(std::stoi(subTokens[1]) - 1);
                 normalsIndices.push_back(std::stoi(subTokens[2]) - 1);
 
-                Key key(vertexIndices.back(), textureCoordinatesIndices.back(), normalsIndices.back());
+                /* Key key(vertexIndices.back(), textureCoordinatesIndices.back(), normalsIndices.back()); */
 
-                if (indexMap.count(key))
-                {
-                    // the key already exists. We insert its index;
-                    remappedIndices.push_back(indexMap[key]);
-                }
-                else
-                {
-                    // we create new index for this new key
-                    indexMap[key] = newIndex;
-                    remappedIndices.push_back(newIndex);
-                    ++newIndex;
-                    remappedVertexData.push_back(vertexData[vertexIndices.back()]);
-                    if (hasTextureCoordinates)
-                    {
-                        remappedTextureCoordinatesData.push_back(textureCoordinatesData[textureCoordinatesIndices.back()]);
-                    }
-                    if (hasNormals)
-                    {
-                        remappedNormalData.push_back(normalData[normalsIndices.back()]);
-                    }
-                }
+                /* if (indexMap.count(key)) */
+                /* { */
+                /*     // the key already exists. We insert its index; */
+                /*     remappedIndices.push_back(indexMap[key]); */
+                /* } */
+                /* else */
+                /* { */
+                /*     // we create new index for this new key */
+                /*     indexMap[key] = newIndex; */
+                /*     remappedIndices.push_back(newIndex); */
+                /*     ++newIndex; */
+                /*     remappedVertexData.push_back(vertexData[vertexIndices.back()]); */
+                /*     if (hasTextureCoordinates) */
+                /*     { */
+                /*         remappedTextureCoordinatesData.push_back(textureCoordinatesData[textureCoordinatesIndices.back()]); */
+                /*     } */
+                /*     if (hasNormals) */
+                /*     { */
+                /*         remappedNormalData.push_back(normalData[normalsIndices.back()]); */
+                /*     } */
+                /* } */
             }
         }
     }
 
-    ASSERT(vertexIndices.size() == remappedIndices.size());
-    if (hasNormals)
+    std::shared_ptr<Mesh3D> spMesh = std::make_unique<Mesh3D>(vertexData, vertexIndices, spObjFile->filename);
+
+    if (bHasNormals)
     {
-        ASSERT(remappedNormalData.size() == remappedVertexData.size());
+        VertexNormalAttribute& rNormal = dynamic_cast<VertexNormalAttribute&>(spMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Normal));
+        rNormal.SetVertexNormals(normalData, normalsIndices);
     }
-    int i = 0;
-    for (const auto& idx : vertexIndices)
-    {
-        assert(vertexData[idx] == remappedVertexData[remappedIndices[i++]]);
-    }
-    auto& rLogger = Logger::GetInstance().GetLogger();
-    rLogger.info("{}: Number of Vertice {}, number of indices {}",spObjFile->filename, remappedVertexData.size(), remappedIndices.size());
-    return createMeshObject(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, remappedIndices, spObjFile->filename);
-}
-
-std::unique_ptr<Mesh3D> ObjFileParser::createMeshObject(std::vector<Eigen::Vector3f>& vertices,
-                                                        std::vector<Eigen::Vector2f>& textureCoordinates,
-                                                        std::vector<Eigen::Vector3f>& normals,
-                                                        std::vector<uint32_t>&        indices,
-                                                        const std::string& name)
-
-{
-    std::unique_ptr<Mesh3D> spMesh = std::make_unique<Mesh3D>(vertices, indices, name);
-
-    // @TODO Weitere Attribute noch einbauen.
-    /* if (hasTextureCoordinates) */
+    /* ASSERT(vertexIndices.size() == remappedIndices.size()); */
+    /* if (hasNormals) */
     /* { */
-    /*     mesh.uvCoordinates.resize(textureCoordinatesData.size(), 2); */
-    /*     row = 0; */
-    /*     for (const auto& t : textureCoordinatesData) */
-    /*     { */
-    /*         mesh.uvCoordinates(row, 0) = t(0); */
-    /*         mesh.uvCoordinates(row, 1) = t(1); */
-    /*         ++row; */
-    /*     } */
+    /*     ASSERT(remappedNormalData.size() == remappedVertexData.size()); */
     /* } */
-
-    if (hasNormals)
-    {
-	spMesh->AddVertexAttribute(Mesh3D::EVertexAttribute::Normal);
-        auto pNormal = dynamic_cast<VertexNormalAttribute*>(spMesh->GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
-    	pNormal->SetVertexNormals(normals);
-    }
+    /* int i = 0; */
+    /* for (const auto& idx : vertexIndices) */
+    /* { */
+    /*     assert(vertexData[idx] == remappedVertexData[remappedIndices[i++]]); */
+    /* } */
+    /* Logger::GetInstance().GetLogger().info("{}: Number of Vertice {}, number of indices {}", spObjFile->filename, remappedVertexData.size(), remappedIndices.size()); */
     return spMesh;
+    /* return createMeshObject(remappedVertexData, remappedTextureCoordinatesData, remappedNormalData, remappedIndices, spObjFile->filename); */
 }
-
-void ObjFileParser::tokenize(std::string& line, char delim, std::vector<std::string>& tokens)
-{
-    auto start = find(cbegin(line), cend(line), delim);
-    tokens.push_back(std::string(cbegin(line), start));
-
-    while (start != cend(line))
-    {
-        const auto finish = find(++start, cend(line), delim);
-
-        tokens.push_back(std::string(start, finish));
-        start = finish;
-    }
-}
-
