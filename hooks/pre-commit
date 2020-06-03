@@ -7,7 +7,7 @@ do
 	if [[ "$FILE" =~ $re ]]
 	then
 		echo $FILE
-		clang-format-8 -i $FILE
+		clang-format -i $FILE
 	fi
 done
 echo "Formating done!"
