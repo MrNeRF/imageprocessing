@@ -1,4 +1,5 @@
 #include "Mesh3D.h"
+#include "FaceColorAttribute.h"
 #include "Logger.h"
 #include "VertexColorAttribute.h"
 #include "VertexNormalAttribute.h"
@@ -107,9 +108,44 @@ VertexAttribute* Mesh3D::GetVertexAttribute(EVertexAttribute vertexAttribute)
     }
 }
 
-TriangleAttribute* Mesh3D::GetTriangleAttribute(ETriangleAttribute triangleAttribute)
+FaceAttribute& Mesh3D::AddFaceAttribute(EFaceAttribute faceAttribute)
 {
-    return nullptr;
+    FaceAttribute* pFaceAttribute = nullptr;
+    switch (faceAttribute)
+    {
+        case EFaceAttribute::Color:
+            pFaceAttribute = GetFaceAttribute(faceAttribute);
+            if (pFaceAttribute != nullptr)
+            {
+                return *pFaceAttribute;
+            }
+            m_FaceAttributes.push_back(std::make_unique<FaceColorAttribute>());
+            break;
+        case EFaceAttribute::Normal:
+            break;
+    }
+
+    return *(m_FaceAttributes.back());
+}
+
+FaceAttribute* Mesh3D::GetFaceAttribute(EFaceAttribute faceAttribute)
+{
+    switch (faceAttribute)
+    {
+        case EFaceAttribute::Color:
+            for (auto const& attribute : m_FaceAttributes)
+            {
+                auto pAttri = attribute.get();
+                if (typeid(*pAttri) == typeid(FaceColorAttribute))
+                {
+                    return attribute.get();
+                }
+            }
+            return nullptr;
+            break;
+        default:
+            return nullptr;
+    }
 }
 
 void Mesh3D::HalfEdgeDS::InitHalfEdgeDS(void)

@@ -1,7 +1,6 @@
 #ifndef VERTEX_COLOR_ATTRIBUTE
 #define VERTEX_COLOR_ATTRIBUTE
 
-#include "Eigen/Dense"
 #include "VertexAttribute.h"
 #include <vector>
 
@@ -14,7 +13,7 @@ public:
     }
 
     void SetVertexColor(const std::vector<Eigen::Vector3f>& vertexColor,
-                        const std::vector<uint32_t>         vertexColorIndices)
+                        const std::vector<uint32_t>&        vertexColorIndices)
     {
         m_vertexColor.resize(vertexColor.size());
         m_vertexColorIndices.resize(vertexColorIndices.size());

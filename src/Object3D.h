@@ -34,12 +34,14 @@ public:
     void Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> spCamera, std::shared_ptr<Shader> spShader) override;
     void Render() override;
 
-    void SetMaterial(std::shared_ptr<Material> spMaterial) { m_spMaterial = spMaterial; }
-    void SetCamera(std::shared_ptr<Camera> spCamera) { m_spCamera = spCamera; }
-    void SetLight(std::shared_ptr<Light> spLight) { m_spLight = spLight; }
-    void UpdateOrientation(const Eigen::AngleAxisf& angleAxis) { m_orientation = Eigen::Quaternionf(angleAxis) * m_orientation; }
-    void SetPosition(const Eigen::Vector4f& pos) { m_position = pos; }
-    void ResetRotation() { m_orientation = Eigen::AngleAxis(0.f, Eigen::Vector3f::UnitX()); }
+    void    UpdateOpenGLData();
+    void    SetMaterial(std::shared_ptr<Material> spMaterial) { m_spMaterial = spMaterial; }
+    void    SetCamera(std::shared_ptr<Camera> spCamera) { m_spCamera = spCamera; }
+    void    SetLight(std::shared_ptr<Light> spLight) { m_spLight = spLight; }
+    void    UpdateOrientation(const Eigen::AngleAxisf& angleAxis) { m_orientation = Eigen::Quaternionf(angleAxis) * m_orientation; }
+    void    SetPosition(const Eigen::Vector4f& pos) { m_position = pos; }
+    void    ResetRotation() { m_orientation = Eigen::AngleAxis(0.f, Eigen::Vector3f::UnitX()); }
+    Mesh3D* GetMesh() { return m_spMesh3D.get(); }
 
     // Observer overrides
     void onNotify(const EventType& eventType, IEvent* pEventData) override;

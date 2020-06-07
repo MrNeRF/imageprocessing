@@ -2,8 +2,8 @@
 #define MESH_3D_H
 
 #include "Defs.h"
+#include "FaceAttribute.h"
 #include "Logger.h"
-#include "TriangleAttribute.h"
 #include "VertexAttribute.h"
 #include <Eigen/Dense>
 #include <map>
@@ -25,7 +25,7 @@ public:
         UVCoordinates
     };
 
-    enum class ETriangleAttribute
+    enum class EFaceAttribute
     {
         Normal,
         Color
@@ -100,6 +100,7 @@ public:
     bool                                                          HasNormals(void) { return GetVertexAttribute(EVertexAttribute::Normal) != nullptr; };
     std::tuple<Eigen::Vector3f, Eigen::Vector3f, Eigen::Vector3f> GetFaceVertices(uint32_t faceIndex);
     VertexAttribute&                                              AddVertexAttribute(EVertexAttribute vertexAttribute);
+    FaceAttribute&                                                AddFaceAttribute(EFaceAttribute faceAttribute);
 
     const std::vector<Eigen::Vector3f>& GetVertices() const { return m_vertices; }
     const std::vector<uint32_t>&        GetIndices() const { return m_indices; }
@@ -110,8 +111,8 @@ public:
         ASSERT(index < m_vertices.size());
         return m_vertices[index];
     }
-    VertexAttribute*   GetVertexAttribute(EVertexAttribute vertexAttribute);
-    TriangleAttribute* GetTriangleAttribute(ETriangleAttribute triangleAttribute);
+    VertexAttribute* GetVertexAttribute(EVertexAttribute vertexAttribute);
+    FaceAttribute*   GetFaceAttribute(EFaceAttribute triangleAttribute);
 
     void IterateAllFaces() const;
 
@@ -125,9 +126,9 @@ private:
     std::vector<Eigen::Vector3f> m_vertices;
     std::vector<Eigen::Vector2f> m_uvCoordinates;
 
-    std::vector<std::unique_ptr<VertexAttribute>>   m_vertexAttributes;
-    std::vector<std::unique_ptr<TriangleAttribute>> m_TriangleAttributes;
-    HalfEdgeDS                                      m_halfEdgeDS;
+    std::vector<std::unique_ptr<VertexAttribute>> m_vertexAttributes;
+    std::vector<std::unique_ptr<FaceAttribute>>   m_FaceAttributes;
+    HalfEdgeDS                                    m_halfEdgeDS;
 };
 
 class vertexIterator

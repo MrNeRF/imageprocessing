@@ -1,3 +1,4 @@
+#include "AlgoTrianglesToQuads.h"
 #include "AlgoVertexNormals.h"
 #include "Camera.h"
 #include "File.h"
@@ -69,6 +70,9 @@ int main()
     spSphere->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
     spSphere->SetPosition({0.f, 0.f, -5.f, 1.f});
     spSphere->SetLight(spLightCube);
+    AlgoTrianglesToQuads tri2Quads(spSphereMesh.get());
+    ASSERT(tri2Quads.Compute());
+    spSphere->UpdateOpenGLData();
     viewer.AddRenderObject(spSphere);
 
     pWindow->attach(spCamera);
@@ -79,13 +83,20 @@ int main()
     spShader->InitShaders("../Shaders/modelShader.vs", "../Shaders/modelShader.fs");
 
     std::shared_ptr<Object3D> spRenderObject = std::make_shared<Object3D>(std::string("Suzanne") + std::to_string(2));
-    spRenderObject->Init(ObjFileParser().GetMesh(std::make_unique<File>("../models/suzanne.obj")), spCamera, spShader);
+
+    std::shared_ptr<Mesh3D> spMesh = ObjFileParser().GetMesh(std::make_unique<File>("../models/suzanne.obj"));
+    spRenderObject->Init(spMesh, spCamera, spShader);
     spRenderObject->SetMaterial(Material::GetMaterial(MaterialType::GOLD));
     spRenderObject->SetPosition({10.f, 3.f, -5.f, 1.f});
     spRenderObject->SetLight(spLightCube);
+    AlgoTrianglesToQuads tri2Quads2(spSphereMesh.get());
+    ASSERT(tri2Quads2.Compute());
+    spRenderObject->UpdateOpenGLData();
     viewer.AddRenderObject(spRenderObject);
     pWindow->attach(spRenderObject);
 
+    /* AlgoTrianglesToQuads tri2Quad(spQuaderMesh.get()); */
+    /* ASSERT(tri2Quad.Compute()); */
     /* spQuaderMesh->IterateAllFaces(); */
     /* std::cout << "\nVertex 0: "; */
     /* for(const auto& faceID : oneRingFaceIterator(*spQuaderMesh, 0)) */

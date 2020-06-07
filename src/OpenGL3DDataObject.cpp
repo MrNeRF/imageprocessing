@@ -1,4 +1,5 @@
 #include "OpenGL3DDataObject.h"
+#include "FaceColorAttribute.h"
 #include "Logger.h"
 #include "Mesh3D.h"
 #include "VertexAttribute.h"
@@ -26,16 +27,14 @@ void OpenGL3DDataObject::InitializeBuffer(Mesh3D& mesh)
     const std::vector<Eigen::Vector3f>& normals       = pNormal->m_vertexNormals;
     const std::vector<uint32_t>&        normalIndices = pNormal->m_vertexNormalsIndices;
 
-    auto                                pColor       = dynamic_cast<VertexColorAttribute*>(mesh.GetVertexAttribute(Mesh3D::EVertexAttribute::Color));
-    const std::vector<Eigen::Vector3f>& color        = pColor->m_vertexColor;
-    const std::vector<uint32_t>&        colorIndices = pColor->m_vertexColorIndices;
+    auto pFaceColor = dynamic_cast<FaceColorAttribute*>(mesh.GetFaceAttribute(Mesh3D::EFaceAttribute::Color));
+    auto pColor     = dynamic_cast<VertexColorAttribute*>(mesh.GetVertexAttribute(Mesh3D::EVertexAttribute::Color));
 
     ASSERT(vertexIndices.size() == normalIndices.size());
-    ASSERT(normalIndices.size() == colorIndices.size());
     // position, normal,
     std::vector<float> bufferData;
     // each vertex, normal and color has 3 dimensions
-    bufferData.resize(3 * (vertexIndices.size() + normalIndices.size() + colorIndices.size()));
+    bufferData.resize(3 * (vertexIndices.size() * 3));
     int j = 0;
     for (uint32_t i = 0; i < bufferData.size(); i += 9)
     {
@@ -57,13 +56,38 @@ void OpenGL3DDataObject::InitializeBuffer(Mesh3D& mesh)
     }
 
     j = 0;
-    for (uint32_t i = 6; i < bufferData.size(); i += 9)
+    if (pFaceColor == nullptr)
     {
-        const Eigen::Vector3f& c = color[colorIndices[j]];
-        bufferData[i]            = c.x();
-        bufferData[i + 1]        = c.y();
-        bufferData[i + 2]        = c.z();
-        ++j;
+        const std::vector<Eigen::Vector3f>& color        = pColor->m_vertexColor;
+        const std::vector<uint32_t>&        colorIndices = pColor->m_vertexColorIndices;
+        for (uint32_t i = 6; i < bufferData.size(); i += 9)
+        {
+            const Eigen::Vector3f& c = color[colorIndices[j]];
+            bufferData[i]            = c.x();
+            bufferData[i + 1]        = c.y();
+            bufferData[i + 2]        = c.z();
+            ++j;
+        }
+    }
+    else
+    {
+        const std::vector<Eigen::Vector3f>& faceColor = pFaceColor->m_faceColor;
+        for (uint32_t i = 6; i < bufferData.size(); i += 27)
+        {
+            const Eigen::Vector3f& c = faceColor[j];
+            bufferData[i]            = c.x();
+            bufferData[i + 1]        = c.y();
+            bufferData[i + 2]        = c.z();
+
+            bufferData[i + 9]     = c.x();
+            bufferData[i + 1 + 9] = c.y();
+            bufferData[i + 2 + 9] = c.z();
+
+            bufferData[i + 18]     = c.x();
+            bufferData[i + 1 + 18] = c.y();
+            bufferData[i + 2 + 18] = c.z();
+            ++j;
+        }
     }
 
     m_vertexRenderCount = vertexIndices.size();

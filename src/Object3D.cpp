@@ -1,5 +1,6 @@
 #include <GL/glew.h>
 ///
+#include "AlgoTrianglesToQuads.h"
 #include "AlgoVertexNormals.h"
 #include "File.h"
 #include "Logger.h"
@@ -25,9 +26,11 @@ void Object3D::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> sp
     {
         m_spOGLDataObject = std::make_unique<OpenGL3DDataObject>();
 
-        VertexColorAttribute&        rColor = dynamic_cast<VertexColorAttribute&>(m_spMesh3D->AddVertexAttribute(Mesh3D::EVertexAttribute::Color));
-        std::vector<Eigen::Vector3f> colorData(m_spMesh3D->GetNumberOfVertice(), Color::GetColor(Color::EColor::GREEN));
-        rColor.SetVertexColor(colorData, m_spMesh3D->GetIndices());
+        /* VertexColorAttribute&        rColor = dynamic_cast<VertexColorAttribute&>(m_spMesh3D->AddVertexAttribute(Mesh3D::EVertexAttribute::Color)); */
+        /* std::vector<Eigen::Vector3f> colorData(m_spMesh3D->GetNumberOfVertice(), Color::GetColor(Color::EColor::GREEN)); */
+        /* rColor.SetVertexColor(colorData, m_spMesh3D->GetIndices()); */
+        AlgoTrianglesToQuads quant(m_spMesh3D.get());
+        ASSERT(quant.Compute());
         auto pNormal = dynamic_cast<VertexNormalAttribute*>(m_spMesh3D->GetVertexAttribute(Mesh3D::EVertexAttribute::Normal));
         if (pNormal == nullptr)
         {
@@ -44,6 +47,10 @@ void Object3D::Init(std::shared_ptr<Mesh3D> spMesh3D, std::shared_ptr<Camera> sp
     }
 }
 
+void Object3D::UpdateOpenGLData()
+{
+    m_spOGLDataObject->InitializeBuffer(*m_spMesh3D);
+}
 void Object3D::Render()
 {
     m_spShader->UseShader();
